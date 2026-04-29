@@ -1,136 +1,131 @@
-<div class="dashboard-wrapper">
-  <!-- Header Banner -->
-  <div class="banner-section">
-    <div class="banner-content">
-      <div class="banner-text">
-        @if (firstName()) {
-          <p class="text-sm font-semibold text-orange-600 mb-1">
-            {{ 'dashboard.welcome' | translate }}, {{ firstName() }}
-            @if (className()) { <span class="text-gray-500"> · {{ className() }}</span> }
-          </p>
-        }
-        <h1 class="banner-title">{{ 'app.tagline' | translate }}</h1>
-        <p class="banner-subtitle">{{ 'dashboard.todaysPlan' | translate }} · {{ 'dashboard.continueLast' | translate }}</p>
-        <div class="banner-cta">
-          <input type="text" [placeholder]="'search.placeholder' | translate" class="cta-input">
-          <button class="cta-button">{{ 'common.search' | translate }}</button>
+<div class="min-h-full bg-surface-dim pb-12">
+
+  <!-- Top header bar -->
+  <header class="sticky top-0 z-10 bg-white border-b border-surface-line">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full bg-brand-700 text-white flex items-center justify-center font-semibold text-sm">
+          {{ initials() || (firstName() | slice:0:1) }}
         </div>
+        <span class="font-bold text-lg text-brand-700">EduResolve</span>
       </div>
-      <div class="banner-icon">
-        <svg viewBox="0 0 100 100" class="icon-animate">
-          <circle cx="50" cy="50" r="40" fill="none" stroke="#ff5625" stroke-width="2" opacity="0.3"/>
-          <path d="M 50 30 L 65 55 L 55 55 L 55 70 L 45 70 L 45 55 L 35 55 Z" fill="#ff5625"/>
-        </svg>
+      <div class="flex items-center gap-2 chip">
+        <span>🔥</span>
+        <span>{{ streakDays() }}</span>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- NCERT Trackers Section -->
-    <section class="section">
-      <h2 class="section-title">NCERT Trackers</h2>
-      <div class="tracker-grid">
-        <!-- Physics Tracker -->
-        <div class="tracker-card physics-card">
-          <div class="card-header">
-            <div class="subject-icon physics-icon">⚡</div>
-            <span class="grade-badge">GRADE 12</span>
-          </div>
-          <h3 class="subject-name">Physics</h3>
-          <p class="current-topic">Current: Electromagnetic induction</p>
-          <div class="progress-container">
-            <label class="progress-label">Progress</label>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 68%"></div>
-            </div>
-            <span class="progress-text">68%</span>
-          </div>
-        </div>
+  <main class="max-w-2xl mx-auto px-4 py-5 space-y-5">
 
-        <!-- Mathematics Tracker -->
-        <div class="tracker-card math-card">
-          <div class="card-header">
-            <div class="subject-icon math-icon">Σ</div>
-            <span class="grade-badge">GRADE 12</span>
-          </div>
-          <h3 class="subject-name">Mathematics</h3>
-          <p class="current-topic">Current: Integrals</p>
-          <div class="progress-container">
-            <label class="progress-label">Progress</label>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 42%"></div>
-            </div>
-            <span class="progress-text">42%</span>
-          </div>
-        </div>
-
-        <!-- English Tracker -->
-        <div class="tracker-card english-card">
-          <div class="card-header">
-            <div class="subject-icon english-icon">📖</div>
-            <span class="core-badge">CORE</span>
-          </div>
-          <h3 class="subject-name">English</h3>
-          <p class="current-topic">Current: Flamingo Chapters</p>
-          <div class="progress-container">
-            <label class="progress-label">Progress</label>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 85%"></div>
-            </div>
-            <span class="progress-text">85%</span>
-          </div>
-        </div>
+    <!-- Greeting + weekly goal -->
+    <section class="card card-pad">
+      <h1 class="text-display-md text-surface-ink">
+        {{ 'dashboard.welcome' | translate }}, {{ firstName() || '...' }}
+      </h1>
+      <p class="text-body-md text-surface-mute mt-1">
+        {{ 'dashboard.todaysPlan' | translate }}
+      </p>
+      <div class="mt-4 pt-4 border-t border-surface-line flex items-center justify-between">
+        <span class="eyebrow">{{ 'dashboard.weeklyGoal' | translate }}</span>
+        <span class="text-body-md font-semibold">{{ streakDays() }} / 7 {{ 'common.days' | translate }}</span>
       </div>
     </section>
 
-    <!-- Assessment Lab Section -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Assessment Lab</h2>
-        <a href="#" class="view-all-link">VIEW ALL</a>
+    <!-- XP + rank card (red accent) -->
+    <section class="rounded-lg p-4 bg-brand-50 border border-brand-100">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-brand-700 text-white flex items-center justify-center">⭐</div>
+          <div>
+            <p class="text-display-md text-brand-700 leading-none">{{ experiencePoints() }} <span class="text-body-md font-normal">{{ 'dashboard.xp' | translate }}</span></p>
+            <p class="text-body-md text-brand-900">{{ rankLabel() }}</p>
+          </div>
+        </div>
       </div>
-      <div class="assessment-list">
-        <div class="assessment-item">
-          <div class="assessment-icon">📋</div>
-          <div class="assessment-content">
-            <h4 class="assessment-title">Daily Physics MCQs</h4>
-            <p class="assessment-meta">20 Questions • Optics & Atoms</p>
-          </div>
-          <div class="assessment-arrow">→</div>
-        </div>
-        <div class="assessment-item">
-          <div class="assessment-icon">📝</div>
-          <div class="assessment-content">
-            <h4 class="assessment-title">Previous Year Questions (PYQs)</h4>
-            <p class="assessment-meta">Delhi Board 2023 • All Subjects</p>
-          </div>
-          <div class="assessment-arrow">→</div>
-        </div>
+      <div class="h-2 rounded-full bg-white overflow-hidden">
+        <div class="h-full bg-brand-700 transition-all" [style.width.%]="xpProgressPercent()"></div>
+      </div>
+      <div class="mt-2 flex justify-between text-xs text-brand-900">
+        <span>{{ 'dashboard.next' | translate }}: {{ nextRankLabel() }}</span>
+        <span>{{ xpToNextRank() }} {{ 'dashboard.xpNeeded' | translate }}</span>
       </div>
     </section>
 
-    <!-- Learning Velocity Section -->
-    <section class="section">
-      <h2 class="section-title">Learning Velocity</h2>
-      <div class="velocity-container">
-        <div class="velocity-info">
-          <p class="velocity-text">You're in the top {{ topPercentage() }}% of students today. Keep the momentum going!</p>
-        </div>
-        <div class="velocity-chart">
-          <div class="chart-bar"></div>
-        </div>
-        <div class="velocity-stats">
-          <div class="stat-item">
-            <span class="stat-label">{{ streakDays() }} Days</span>
-            <span class="stat-value">STREAK</span>
+    <!-- Continue Learning -->
+    <section>
+      <h2 class="text-title-lg mb-3">{{ 'dashboard.continueLearning' | translate }}</h2>
+      @if (recommendedChapter(); as c) {
+        <article class="card card-pad">
+          <div class="flex items-center justify-between gap-3">
+            <span class="chip">{{ recommendedSubjectName() || 'Subject' }}</span>
+            @if (recommendedAccuracy() != null) {
+              <span class="chip-neutral">{{ recommendedAccuracy() }}%</span>
+            }
           </div>
-          <div class="stat-item">
-            <span class="stat-label">{{ experiencePoints() }}</span>
-            <span class="stat-value">EXPERIENCE</span>
+          <h3 class="text-title-lg mt-2">{{ c.name }}</h3>
+          @if (c.summary) {
+            <p class="text-body-md text-surface-mute mt-1 line-clamp-2">{{ c.summary }}</p>
+          }
+          <div class="mt-3 h-1.5 rounded-full bg-surface-low overflow-hidden">
+            <div class="h-full bg-brand-700" [style.width.%]="recommendedProgressPercent()"></div>
           </div>
+          <button (click)="continueLearning()"
+                  class="btn-primary w-full mt-4">
+            {{ 'dashboard.resumeLesson' | translate }} →
+          </button>
+        </article>
+      } @else {
+        <div class="card card-pad text-surface-mute text-body-md">
+          {{ 'common.loading' | translate }}
         </div>
-      </div>
+      }
     </section>
-  </div>
+
+    <!-- Daily Study Plan -->
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-title-lg">{{ 'dashboard.dailyPlan' | translate }}</h2>
+        <a routerLink="/learn/subjects" class="text-body-md text-brand-700 font-semibold">{{ 'common.viewAll' | translate }}</a>
+      </div>
+      <ul class="card divide-y divide-surface-line">
+        @for (item of dailyPlan(); track item.chapterId) {
+          <li>
+            <a [routerLink]="['/learn/chapters', item.chapterId]"
+               class="flex items-center gap-3 p-4 hover:bg-surface-low">
+              <span class="w-5 h-5 rounded-full border-2 border-surface-ring shrink-0"></span>
+              <div class="flex-1 min-w-0">
+                <p class="text-body-lg font-semibold truncate">{{ item.title }}</p>
+                <p class="text-body-md text-surface-mute">
+                  {{ item.subject }} · {{ item.minutes }} {{ 'common.minutes' | translate }}
+                </p>
+              </div>
+              <span class="text-surface-ring">›</span>
+            </a>
+          </li>
+        }
+        @if (dailyPlan().length === 0) {
+          <li class="p-4 text-body-md text-surface-mute">{{ 'common.loading' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    <!-- Focus Areas -->
+    @if (weakTopics().length > 0) {
+      <section>
+        <h2 class="text-title-lg mb-3">{{ 'dashboard.focusAreas' | translate }}</h2>
+        <div class="grid grid-cols-2 gap-3">
+          @for (w of weakTopics(); track w.id) {
+            <article class="rounded-lg p-3 bg-brand-50 border border-brand-200">
+              <p class="text-label-md uppercase text-brand-700 flex items-center gap-1">
+                <span>📉</span> {{ w.subject || 'Topic' }}
+              </p>
+              <p class="text-body-lg font-semibold mt-1 truncate">{{ w.topicName || ('#' + w.topicId) }}</p>
+              <p class="text-body-md text-brand-900">{{ w.accuracy }}% {{ 'dashboard.accuracy' | translate }}</p>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </main>
 </div>

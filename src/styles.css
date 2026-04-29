@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+/* =====================================================================
+ * EduResolve global styles
+ * Design system: Academic Excellence (red / black / white)
+ * ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Design tokens (mirror tailwind.config.js for places that can't use
+       Tailwind classes, e.g. inline styles, charts, SVGs) ----------------- */
+:root {
+  --brand-50:  #fef2f2;
+  --brand-100: #fee2e2;
+  --brand-500: #ef4444;
+  --brand-600: #dc2626;
+  --brand-700: #b91c1c;
+  --brand-900: #7f1d1d;
+
+  --surface-base: #ffffff;
+  --surface-dim:  #f7f7f8;
+  --surface-low:  #f3f3f4;
+  --surface-line: #e5e5e5;
+
+  --ink:       #0a0a0a;
+  --ink-mute:  #525252;
+  --ink-soft:  #737373;
+}
+
+/* --- Base resets ------------------------------------------------------- */
+html, body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--surface-dim);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hindi locale gets a slightly larger line-height for readability. */
+html[lang="hi"] body {
+  line-height: 1.6;
+}
+
+/* --- Reusable component helpers --------------------------------------- */
+@layer components {
+  /* Card surface: 1px outline, no shadow (per design system) */
+  .card {
+    @apply bg-white border border-surface-line rounded-lg;
+  }
+  .card-pad { @apply p-4; }
+
+  /* Solid primary action */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg
+           bg-brand-700 text-white font-semibold px-4 py-2.5
+           hover:bg-brand-800 active:bg-brand-900 disabled:opacity-50
+           transition-colors;
+  }
+  /* Outlined secondary action */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg
+           bg-white text-surface-ink font-semibold px-4 py-2.5
+           border border-surface-line hover:bg-surface-low
+           disabled:opacity-50 transition-colors;
+  }
+  /* Subtle chip / tag */
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
+           text-xs font-semibold bg-brand-50 text-brand-700;
+  }
+  .chip-neutral {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
+           text-xs font-semibold bg-surface-low text-surface-mute;
+  }
+  /* Section heading: small uppercase eyebrow */
+  .eyebrow {
+    @apply text-label-md uppercase text-surface-mute;
+  }
+}
