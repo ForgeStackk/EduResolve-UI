@@ -1,0 +1,25 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 font-sans">
+  <div class="mb-5 border-b border-gray-100 pb-3">
+    <h3 class="text-xl font-bold text-brand-black">Voice Announcements</h3>
+    <p class="text-sm text-gray-500 mt-1">Record quick audio clips for your class.</p>
+  </div>
+
+  <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+    @if (!isRecording()) {
+      <button (click)="startRecording()" class="flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors shadow-sm">
+        <div class="w-2.5 h-2.5 bg-white rounded-full"></div> Record
+      </button>
+    } @else {
+      <button (click)="stopRecording()" class="flex items-center gap-2 px-5 py-2.5 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 transition-colors shadow-sm animate-pulse">
+        <div class="w-2.5 h-2.5 bg-red-500 rounded-sm"></div> Stop Recording...
+      </button>
+    }
+
+    @if (audioUrl()) {
+      <div class="flex items-center gap-3 ml-auto border-l border-gray-200 pl-4">
+        <span class="text-sm font-semibold text-gray-500">Preview:</span>
+        <audio [src]="audioUrl()" controls class="h-10 w-64 outline-none rounded-full"></audio>
+      </div>
+    }
+  </div>
+</div>

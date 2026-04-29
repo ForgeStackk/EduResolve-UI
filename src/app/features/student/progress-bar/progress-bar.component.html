@@ -1,0 +1,9 @@
+<div class="mb-4">
+  <div class="flex justify-between mb-1">
+    <span class="text-sm font-medium text-brand-black">{{ label() }}</span>
+    <span class="text-sm font-medium text-brand-black">{{ progress() }}%</span>
+  </div>
+  <div class="w-full bg-gray-200 rounded-full h-2">
+    <div class="h-2 rounded-full {{ colorClass() }}" [style.width.%]="progress()"></div>
+  </div>
+</div>

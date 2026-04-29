@@ -1,0 +1,180 @@
+<div class="dashboard-container">
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="banner-top">
+      <div class="teacher-label">TEACHER SUITE</div>
+      <div class="banner-info">
+        <h1 class="banner-title">Workflows & Insights</h1>
+        <p class="banner-description">Optimized orchestration for Advanced Calculus - Section II</p>
+      </div>
+    </div>
+    <button class="create-assignment-btn">
+      <span class="btn-icon">➕</span>
+      <span class="btn-text">Create Assignment</span>
+    </button>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="main-content">
+    <!-- Left Column -->
+    <div class="left-column">
+      <!-- ForgeAI Bottleneck Analysis -->
+      <div class="card analysis-card">
+        <div class="card-header">
+          <span class="icon">⚡</span>
+          <h3 class="card-title">ForgeAI Bottleneck Analysis</h3>
+        </div>
+      </div>
+
+      <!-- Doubt Cluster -->
+      <div class="card doubt-card">
+        <h4 class="card-subtitle">DoubtCluster: Integration by Parts</h4>
+        <p class="card-text">65% of students failed to identify u/v substitution in the mid-week quiz. Recommend targeted drill</p>
+      </div>
+
+      <!-- Velocity Alert -->
+      <div class="card velocity-card">
+        <h4 class="card-subtitle">Velocity Alert: Rapid Completion</h4>
+        <p class="card-text">Top 15% are finishing 'Vector Species' 2 days ahead of schedule. Auto-unlock advanced modules</p>
+      </div>
+
+      <!-- Homework Dispatch -->
+      <div class="card homework-card">
+        <h3 class="card-title">Homework Dispatch</h3>
+        <div class="homework-options">
+          <div class="homework-option">
+            <div class="option-icon">📝</div>
+            <div class="option-content">
+              <h5 class="option-title">Text Instruction</h5>
+              <p class="option-desc">Write custom text</p>
+            </div>
+          </div>
+          <div class="homework-option">
+            <div class="option-icon">🖼️</div>
+            <div class="option-content">
+              <h5 class="option-title">Capture Whiteboard</h5>
+              <p class="option-desc">Auto-OCR text</p>
+            </div>
+          </div>
+          <div class="homework-option">
+            <div class="option-icon">🎙️</div>
+            <div class="option-content">
+              <h5 class="option-title">Voice Memo</h5>
+              <p class="option-desc">Audio feedback & guidance</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload Area -->
+      <div class="file-upload-area">
+        <div class="upload-placeholder">
+          Drop PDF or Asset here
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-column">
+      <!-- Class Roster -->
+      <div class="card roster-card">
+        <div class="roster-header">
+          <h3 class="card-title">Class Roster</h3>
+          <span class="roster-count">32 Active</span>
+          <span class="at-risk-badge">4 AT RISK</span>
+        </div>
+        <div class="roster-table">
+          <div class="table-header">
+            <div class="col-student">STUDENT</div>
+            <div class="col-engagement">ENGAGEMENT</div>
+            <div class="col-grade">LAST GRADE</div>
+            <div class="col-status">STATUS</div>
+          </div>
+          <div class="table-body">
+            @if (loading()) {
+              <div class="table-row"><div class="col-student">Loading roster...</div></div>
+            } @else if (error()) {
+              <div class="table-row"><div class="col-student">{{ error() }}</div></div>
+            } @else {
+              @for (student of students(); track student.id) {
+                <div class="table-row">
+                  <div class="col-student">
+                    <div class="student-avatar" [style.backgroundColor]="student.color">{{ student.initials }}</div>
+                    <span class="student-name">{{ student.name }}</span>
+                  </div>
+                  <div class="col-engagement">
+                    <div class="engagement-bar">
+                      <div class="engagement-fill" [style.width]="student.engagement + '%'"></div>
+                    </div>
+                    <span class="engagement-text">{{ student.engagement }}%</span>
+                  </div>
+                  <div class="col-grade">
+                    <span class="grade-badge" [ngClass]="'grade-' + (student.grade || '').toLowerCase()">{{ student.grade }}</span>
+                  </div>
+                  <div class="col-status">
+                    <span class="status-indicator" [ngClass]="student.status"></span>
+                  </div>
+                </div>
+              } @empty {
+                <div class="table-row"><div class="col-student">No students yet.</div></div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ForgeAI Test Builder -->
+      <div class="card test-builder-card">
+        <div class="card-header-orange">
+          <span class="builder-icon">⚙️</span>
+          <div>
+            <h3 class="card-title-white">ForgeAI Test Builder</h3>
+            <p class="builder-subtitle">Generate tests for Assessment Wizard</p>
+          </div>
+        </div>
+
+        <!-- Select Syllabus Scope -->
+        <div class="builder-section">
+          <label class="section-label">Select Syllabus Scope</label>
+          <div class="scope-buttons">
+            <button class="scope-btn">Chapter 5 (Integrals)</button>
+          </div>
+        </div>
+
+        <!-- Difficulty Matrix -->
+        <div class="builder-section">
+          <label class="section-label">Difficulty Matrix</label>
+          <div class="difficulty-matrix">
+            <div class="difficulty-item">
+              <span class="diff-label">REMEMBERING</span>
+              <div class="difficulty-bar">
+                <div class="difficulty-dot"></div>
+              </div>
+            </div>
+            <div class="difficulty-item">
+              <span class="diff-label">APPLYING</span>
+              <div class="difficulty-bar">
+                <div class="difficulty-dot" style="left: 50%"></div>
+              </div>
+            </div>
+            <div class="difficulty-item">
+              <span class="diff-label">BITE</span>
+              <div class="difficulty-bar">
+                <div class="difficulty-dot" style="left: 80%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Draft Preview -->
+        <div class="draft-preview">
+          <div class="draft-item">▪ MCQ on Chain Rule and Application</div>
+          <div class="draft-item">▪ Filled Fundamental Theorem</div>
+          <div class="draft-item">▪ [Read] Supplemental Question...</div>
+        </div>
+
+        <button class="forge-assessment-btn">Forge Assessment</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<aside class="sidebar-container">
+  <div class="sidebar-header">
+    <h2 class="sidebar-title">EduResolve</h2>
+  </div>
+
+  <nav class="sidebar-nav">
+    @if (!currentUser || currentUser.role === 'student') {
+      <a routerLink="/student/dashboard"  routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.dashboard' | translate }}</a>
+      <a routerLink="/learn/subjects"     routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.subjects'  | translate }}</a>
+      <a routerLink="/learn/quiz"         routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.quiz'      | translate }}</a>
+      <a routerLink="/learn/pyqs"         routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.pyqs'      | translate }}</a>
+      <a routerLink="/learn/doubt"        routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.doubt'     | translate }}</a>
+      <a routerLink="/learn/bookmarks"    routerLinkActive="nav-link-active" class="nav-link">{{ 'nav.bookmarks' | translate }}</a>
+    }
+    @if (currentUser) {
+      @if (currentUser.role === 'teacher') {
+        <a routerLink="/teacher/dashboard" routerLinkActive="nav-link-active" class="nav-link">Dashboard</a>
+        <a routerLink="/teacher/classes" routerLinkActive="nav-link-active" class="nav-link">My Classes</a>
+        <a routerLink="/teacher/assignments" routerLinkActive="nav-link-active" class="nav-link">Assignments</a>
+      }
+      @if (currentUser.role === 'admin') {
+        <a routerLink="/admin/dashboard" routerLinkActive="nav-link-active" class="nav-link">Admin Dashboard</a>
+        <a routerLink="/admin/users" routerLinkActive="nav-link-active" class="nav-link">Manage Users</a>
+      }
+      @if (currentUser.role === 'parent') {
+        <a routerLink="/parent/dashboard" routerLinkActive="nav-link-active" class="nav-link">Parent Dashboard</a>
+      }
+    }
+  </nav>
+</aside>

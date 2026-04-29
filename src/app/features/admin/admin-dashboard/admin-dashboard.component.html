@@ -1,0 +1,194 @@
+<div class="dashboard-container">
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="header-content">
+      <h1 class="header-title">Administrative Overview</h1>
+      <p class="header-subtitle">Real-time school performance and operations dashboard.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export">
+        <span class="icon">⬇</span>
+        <span>Export PDF</span>
+      </button>
+      <button class="btn-broadcast">
+        <span class="icon">+</span>
+        <span>New Broadcast</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="main-grid">
+    <!-- Left Column -->
+    <div class="left-column">
+      <!-- Revenue Card -->
+      <div class="card metric-card revenue-card">
+        <div class="card-header">
+          <span class="metric-icon">📊</span>
+          <span class="metric-growth green">+12.5%</span>
+        </div>
+        <h3 class="metric-label">TOTAL REVENUE</h3>
+        <p class="metric-value">${{ revenue() | number:'1.0-0' }}</p>
+        <div class="metric-bar"></div>
+      </div>
+
+      <!-- Enrollment Card -->
+      <div class="card metric-card enrollment-card">
+        <div class="card-header">
+          <span class="metric-icon">👥</span>
+          <span class="metric-growth green">+4%</span>
+        </div>
+        <h3 class="metric-label">ENROLLMENT</h3>
+        <p class="metric-value">{{ enrollment() | number }}</p>
+        <p class="metric-target">Target: {{ enrollmentTarget() | number }} students</p>
+      </div>
+
+      <!-- Active Ticket Volume -->
+      <div class="card ticket-volume-card">
+        <h3 class="card-title">ACTIVE TICKET VOLUME</h3>
+        <p class="volume-count">{{ activeTickets() }} Open</p>
+        <div class="volume-legend">
+          <div class="legend-item">
+            <span class="legend-dot technical"></span>
+            <span>Technical</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot billing"></span>
+            <span>Billing</span>
+          </div>
+        </div>
+        <div class="volume-chart">
+          <div class="chart-bar" style="height: 65%"></div>
+          <div class="chart-bar" style="height: 85%"></div>
+          <div class="chart-bar" style="height: 45%"></div>
+          <div class="chart-bar" style="height: 72%"></div>
+          <div class="chart-bar" style="height: 58%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-column">
+      <!-- Bulk Communication Hub -->
+      <div class="card comm-hub-card">
+        <div class="hub-header">
+          <h3 class="card-title">Bulk Communication Hub</h3>
+          <span class="settings-icon">⚙️</span>
+        </div>
+
+        <!-- Broadcast Channel -->
+        <div class="channel-section">
+          <label class="channel-label">BROADCAST CHANNEL</label>
+          <div class="channel-buttons">
+            <button class="channel-btn whatsapp">
+              <span class="icon">📱</span>
+              <span>WhatsApp</span>
+            </button>
+            <button class="channel-btn sms">
+              <span class="icon">💬</span>
+              <span>SMS Gateway</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recipients Selector -->
+        <div class="recipients-section">
+          <label class="recipients-label">RECIPIENTS</label>
+          <select class="recipients-select">
+            <option>All Parents (Grade 9-12)</option>
+            <option>Grade 9</option>
+            <option>Grade 10</option>
+            <option>Grade 11</option>
+            <option>Grade 12</option>
+          </select>
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-section">
+          <textarea class="message-input" placeholder="Type your emergency or informative broadcast here..."></textarea>
+        </div>
+
+        <!-- Recipients Preview -->
+        <div class="recipients-preview">
+          <div class="recipient-avatars">
+            <div class="avatar">👨</div>
+            <div class="avatar">👩</div>
+            <div class="avatar">👨</div>
+            <div class="avatar">👩</div>
+          </div>
+          <span class="recipients-count">+1,402 Recipients Selected</span>
+        </div>
+      </div>
+
+      <!-- Fee Management Status -->
+      <div class="card fee-card">
+        <div class="fee-header">
+          <h3 class="card-title">Fee Management Status</h3>
+          <a href="#" class="view-link">View All Transactions</a>
+        </div>
+        <div class="fee-table">
+          <div class="table-header">
+            <div class="col-id">STUDENT ID</div>
+            <div class="col-name">PARENT NAME</div>
+            <div class="col-amount">AMOUNT</div>
+          </div>
+          <div class="table-body">
+            @for (fee of feeData(); track fee.studentId) {
+              <div class="table-row">
+                <div class="col-id">{{ fee.studentId }}</div>
+                <div class="col-name">{{ fee.parentName }}</div>
+                <div class="col-amount">{{ fee.amount }}</div>
+              </div>
+            } @empty {
+              <div class="table-row"><div class="col-id" colspan="3">No outstanding fees.</div></div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Queue -->
+      <div class="card ticket-queue-card">
+        <div class="queue-header">
+          <h3 class="card-title">TicketQueue</h3>
+          <span class="new-badge">NEW</span>
+        </div>
+        <div class="tickets-list">
+          <div class="ticket-item billing-inquiry">
+            <div class="ticket-icon">💰</div>
+            <div class="ticket-content">
+              <h4 class="ticket-title">Billing Inquiry</h4>
+              <p class="ticket-time">1 min ago</p>
+              <p class="ticket-text">Clarification on semester lab fees.</p>
+              <p class="ticket-user">📝 Stacy Connor (Grade 10)</p>
+            </div>
+          </div>
+
+          <div class="ticket-item it-support">
+            <div class="ticket-icon">🔧</div>
+            <div class="ticket-content">
+              <h4 class="ticket-title">IT Support</h4>
+              <p class="ticket-time">11 min ago</p>
+              <p class="ticket-text">Unable to access my password using the automated portal login issues.</p>
+              <p class="ticket-user">🔐 John Drake (Grade 10)</p>
+            </div>
+          </div>
+
+          <div class="ticket-item bus-route">
+            <div class="ticket-icon">🚌</div>
+            <div class="ticket-content">
+              <h4 class="ticket-title">Bus Route Update</h4>
+              <p class="ticket-time">27 min ago</p>
+              <p class="ticket-text">Route bus to have been rescheduled new shift...</p>
+              <p class="ticket-user">🎫 Marcus Ahmed (Grade 12)</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="load-more-btn">
+          <span class="icon">✉️</span>
+          <span>Load Older Tickets</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

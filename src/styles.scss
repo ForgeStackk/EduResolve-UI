@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .school-card {
+    @apply p-6 rounded-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e4e2e1;
+  }
+  
+  .glass-card {
+    @apply rounded-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-[#ff5625] text-[#541100] font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-[#ff5625]/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-[#ff5625] focus:ring-offset-2 focus:ring-offset-[#131313];
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-[#1a1a2e] text-[#bef264] font-bold rounded-lg hover:opacity-90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-[#bef264] focus:ring-offset-2 focus:ring-offset-[#131313];
+  }
+  
+  .btn-outline {
+    @apply px-6 py-3 border border-white/10 text-white font-bold rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .form-input {
+    @apply w-full p-4 border border-white/10 rounded-xl outline-none focus:ring-0 transition-all bg-[#2a2a2a] text-white placeholder-slate-500 disabled:opacity-50;
+  }
+}

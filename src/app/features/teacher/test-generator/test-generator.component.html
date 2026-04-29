@@ -1,0 +1,42 @@
+<div class="school-card font-sans">
+  <div class="mb-5 border-b border-gray-100 pb-3 flex justify-between items-center">
+    <div>
+      <h3 class="text-xl font-bold text-gray-900">Test Creator Dashboard</h3>
+      <p class="text-sm text-gray-500 mt-1">Generate tests instantly from the question bank.</p>
+    </div>
+    <button [disabled]="filteredQuestions().length === 0" class="btn-primary">
+      Generate PDF
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-gray-900">Select Subject</label>
+      <select [ngModel]="selectedSubject()" (ngModelChange)="onSubjectChange($event)" class="form-input">
+        <option value="">-- Choose Subject --</option>
+        @for (sub of subjects(); track sub) { <option [value]="sub">{{ sub }}</option> }
+      </select>
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-gray-900">Select Chapter</label>
+      <select [ngModel]="selectedChapter()" (ngModelChange)="selectedChapter.set($event)" [disabled]="!selectedSubject()" class="form-input">
+        <option value="">-- Choose Chapter --</option>
+        @for (chap of availableChapters(); track chap) { <option [value]="chap">{{ chap }}</option> }
+      </select>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 font-semibold text-sm text-gray-600">Question Preview ({{ filteredQuestions().length }})</div>
+    <ul class="divide-y divide-gray-200 max-h-60 overflow-y-auto">
+      @for (q of filteredQuestions(); track q.id) {
+        <li class="p-4 hover:bg-white transition-colors flex gap-3">
+          <span class="text-brand-primary font-bold font-mono">Q.</span>
+          <span class="text-gray-900 font-medium">{{ q.text }}</span>
+        </li>
+      } @empty {
+        <li class="p-8 text-center text-gray-400 text-sm">Select a subject and chapter to load questions.</li>
+      }
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row gap-8 font-sans">
+  
+  <!-- Doubt Input Area -->
+  <div class="flex-1 flex flex-col gap-4">
+    <form (ngSubmit)="submitDoubt()" class="flex items-end gap-3 bg-gray-50 p-2 rounded-xl border border-gray-200 focus-within:ring-2 focus-within:ring-brand-orange focus-within:border-transparent transition-all">
+      <div class="flex-1">
+        <textarea [(ngModel)]="query" name="query" rows="2"
+          class="w-full p-2 bg-transparent outline-none resize-none text-brand-black placeholder-gray-400"
+          placeholder="Ask a doubt... (E.g., How does refraction work?)"></textarea>
+      </div>
+      
+      <!-- Voice Input Mock Button -->
+      <button type="button" class="p-2 mb-1 text-gray-400 hover:text-brand-orange rounded-full hover:bg-orange-100 transition-colors" title="Voice Input">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+      </button>
+
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="isAsking() || !query().trim()"
+        class="mb-1 p-2 bg-brand-orange text-white rounded-full hover:bg-orange-600 disabled:opacity-50 disabled:hover:bg-brand-orange transition-colors shadow-sm">
+         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+
+    @if (isAsking()) {
+      <div class="text-sm font-semibold text-brand-orange animate-pulse px-2">Gathering the best explanation...</div>
+    }
+
+    @if (response(); as res) {
+      <div class="p-5 bg-orange-50 border border-orange-200 rounded-xl shadow-sm">
+        <h5 class="font-bold text-brand-black mb-2 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-orange"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Tutor Response
+        </h5>
+        <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ res.answer }}</p>
+
+        @if (!feedbackSubmitted()) {
+          <div class="mt-5 flex items-center gap-4 border-t border-orange-200/60 pt-4">
+            <span class="text-sm font-semibold text-gray-500 tracking-tight uppercase">Was this helpful?</span>
+            <button (click)="submitFeedback(true)" class="px-4 py-1.5 bg-white border border-green-500 text-green-700 rounded-lg shadow-sm hover:bg-green-50 text-sm font-bold transition-colors flex items-center gap-1">👍 Yes</button>
+            <button (click)="submitFeedback(false)" class="px-4 py-1.5 bg-white border border-red-400 text-red-600 rounded-lg shadow-sm hover:bg-red-50 text-sm font-bold transition-colors flex items-center gap-1">👎 No</button>
+          </div>
+        } @else {
+          <div class="mt-5 text-sm font-bold text-green-600 border-t border-orange-200/60 pt-4">
+            ✓ Thank you for your feedback! It helps improve our system.
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Subject Performance Visualization -->
+  <div class="w-full md:w-72 bg-brand-white p-5 rounded-xl border border-gray-200 flex-shrink-0 shadow-sm self-start">
+    <h4 class="text-base font-bold text-brand-black mb-5 border-b border-gray-100 pb-2">Subject Performance</h4>
+    <app-progress-bar label="Science Clarity" [progress]="85" colorClass="bg-green-500"></app-progress-bar>
+    <app-progress-bar label="Mathematics" [progress]="60" colorClass="bg-brand-orange"></app-progress-bar>
+    <app-progress-bar label="English" [progress]="92" colorClass="bg-blue-500"></app-progress-bar>
+  </div>
+</div>

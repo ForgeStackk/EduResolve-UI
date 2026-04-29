@@ -1,0 +1,36 @@
+<div class="school-card font-sans">
+  <div class="mb-5 border-b border-gray-100 pb-3">
+    <h3 class="text-xl font-bold text-gray-900">Assign Homework</h3>
+    <p class="text-sm text-gray-500 mt-1">Broadcast new assignments to your class.</p>
+  </div>
+
+  <form [formGroup]="homeworkForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-gray-900">Title</label>
+      <input type="text" formControlName="title" class="form-input" placeholder="E.g., Chapter 4 Science Questions" />
+    </div>
+    
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-gray-900">Description / Instructions</label>
+      <textarea formControlName="description" rows="3" class="form-input resize-none" placeholder="Provide detailed instructions..."></textarea>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-gray-900">Due Date</label>
+        <input type="date" formControlName="dueDate" class="form-input" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-gray-900">Photo Attachment (Optional)</label>
+        <input type="file" formControlName="attachment" accept="image/*" class="form-input !p-1.5 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-brand-primary hover:file:bg-blue-100 cursor-pointer" />
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-between">
+      <span class="text-sm font-bold text-green-600">{{ successMessage }}</span>
+      <button type="submit" [disabled]="homeworkForm.invalid" class="btn-primary">
+        Broadcast Assignment
+      </button>
+    </div>
+  </form>
+</div>

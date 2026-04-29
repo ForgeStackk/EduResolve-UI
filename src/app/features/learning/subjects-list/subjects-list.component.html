@@ -1,0 +1,28 @@
+<div class="p-6 max-w-5xl mx-auto">
+  <h1 class="text-2xl font-bold mb-1">{{ 'nav.subjects' | translate }}</h1>
+  <p class="text-gray-500 mb-6">{{ 'app.tagline' | translate }}</p>
+
+  @if (loading()) {
+    <p class="text-gray-500">{{ 'common.loading' | translate }}</p>
+  } @else if (subjects().length === 0) {
+    <p class="text-gray-500">{{ 'common.noResults' | translate }}</p>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (s of subjects(); track s.id) {
+        <a [routerLink]="['/learn/subjects', s.id]"
+           class="block rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl text-white"
+                 [style.background]="s.colorHex || '#667eea'">
+              {{ s.icon || '📚' }}
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold">{{ s.name }}</h3>
+              <p class="text-xs text-gray-500">Grade {{ s.grade }}</p>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

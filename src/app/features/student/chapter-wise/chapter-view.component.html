@@ -1,0 +1,23 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden font-sans">
+  <div class="p-6 border-b border-gray-100 flex justify-between items-start gap-4 flex-wrap">
+    <div>
+      <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full mb-2 tracking-wide">NCERT Science</span>
+      <h4 class="text-xl font-bold text-brand-black">{{ chapter()?.title || 'Loading Chapter...' }}</h4>
+    </div>
+    <button (click)="toggleOffline()" 
+            class="flex items-center gap-2 px-4 py-2 border rounded-md font-semibold transition-all duration-200" 
+            [ngClass]="isOffline() ? 'border-green-500 text-green-700 bg-green-50 shadow-sm' : 'border-gray-300 text-gray-600 hover:bg-gray-50'">
+      @if (isOffline()) {
+        <span>✓ Saved Offline</span>
+      } @else {
+        <span>↓ Download for Offline</span>
+      }
+    </button>
+  </div>
+  <div class="p-6 prose max-w-none text-gray-700 leading-relaxed">
+    <p>{{ chapter()?.content }}</p>
+    <div class="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-500 italic border border-gray-100">
+      *Note: This is a mock JSON payload rendered into the chapter view. The "Save for Offline" toggle persists this exact object to your browser's localStorage.*
+    </div>
+  </div>
+</div>

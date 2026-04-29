@@ -1,0 +1,58 @@
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 font-sans">
+  <div class="mb-5 border-b border-gray-100 pb-3 flex justify-between items-end">
+    <div>
+      <h3 class="text-xl font-bold text-brand-black">Fee Management</h3>
+      <p class="text-sm text-gray-500 mt-1">Track payments and send reminders via WhatsApp.</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-4 mb-6">
+    <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Search by name or class..." 
+           class="flex-1 p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange">
+    <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange bg-white min-w-[150px]">
+      <option value="All">All Statuses</option>
+      <option value="Paid">Paid</option>
+      <option value="Unpaid">Unpaid</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-gray-200">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+          <th class="p-4 font-semibold">Student Name</th>
+          <th class="p-4 font-semibold">Class</th>
+          <th class="p-4 font-semibold">Fee Status</th>
+          <th class="p-4 font-semibold">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (student of students | studentFilter:searchTerm():statusFilter(); track student.id) {
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="p-4 font-bold text-brand-black">{{ student.name }}</td>
+            <td class="p-4 text-gray-600 font-medium">{{ student.class }}</td>
+            <td class="p-4">
+              <span [class]="student.feeStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" 
+                    class="px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wide">
+                {{ student.feeStatus }}
+              </span>
+            </td>
+            <td class="p-4">
+              <button [disabled]="student.feeStatus === 'Paid' || isSending() === student.id"
+                      (click)="sendReminder(student.id)"
+                      class="text-sm px-4 py-1.5 rounded-md font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      [ngClass]="student.feeStatus === 'Paid' ? 'bg-gray-100 text-gray-400' : 'bg-green-500 text-white hover:bg-green-600 shadow-sm hover:shadow-md'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                {{ isSending() === student.id ? 'Sending...' : 'WhatsApp Reminder' }}
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="p-8 text-center text-gray-500 font-medium">No students match your search criteria.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="p-6 max-w-4xl mx-auto">
+  <h1 class="text-2xl font-bold mb-4">{{ 'pyq.title' | translate }}</h1>
+
+  <div class="flex flex-wrap gap-3 mb-4 text-sm">
+    <label class="flex items-center gap-2">
+      <span class="font-semibold text-gray-600">{{ 'pyq.filterDifficulty' | translate }}:</span>
+      <select [(ngModel)]="difficulty" (ngModelChange)="reload()" class="rounded border-gray-300 text-sm">
+        <option [ngValue]="null">All</option>
+        <option value="EASY">{{ 'quiz.easy' | translate }}</option>
+        <option value="MEDIUM">{{ 'quiz.medium' | translate }}</option>
+        <option value="HARD">{{ 'quiz.hard' | translate }}</option>
+      </select>
+    </label>
+    <label class="flex items-center gap-2">
+      <span class="font-semibold text-gray-600">{{ 'pyq.filterYear' | translate }}:</span>
+      <input type="number" [(ngModel)]="year" (change)="reload()" class="w-24 rounded border-gray-300 text-sm" />
+    </label>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gray-500">{{ 'common.loading' | translate }}</p>
+  } @else if (rows().length === 0) {
+    <p class="text-gray-500">{{ 'common.noResults' | translate }}</p>
+  } @else {
+    <div class="space-y-3">
+      @for (row of rows(); track row.id) {
+        <article class="rounded-xl border border-gray-200 bg-white p-4">
+          <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+            <span class="font-semibold">{{ row.year }}</span>
+            @if (row.board) { <span>· {{ row.board }}</span> }
+            @if (row.difficulty) { <span>· {{ ('quiz.' + row.difficulty.toLowerCase()) | translate }}</span> }
+            @if (row.marks != null) { <span>· {{ row.marks }} {{ 'pyq.marks' | translate }}</span> }
+          </div>
+          <p class="text-gray-800 mb-3">{{ row.text }}</p>
+          @if (row.modelAnswer) {
+            <details>
+              <summary class="cursor-pointer text-orange-600 text-sm font-semibold">
+                {{ 'pyq.showAnswer' | translate }}
+              </summary>
+              <p class="mt-2 text-sm text-gray-700 whitespace-pre-line">{{ row.modelAnswer }}</p>
+            </details>
+          }
+        </article>
+      }
+    </div>
+  }
+</div>

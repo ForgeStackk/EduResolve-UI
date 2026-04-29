@@ -1,0 +1,109 @@
+{
+  "app": {
+    "name": "EduResolve",
+    "tagline": "All your learning. One place."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "subjects": "Subjects",
+    "chapters": "Chapters",
+    "quiz": "Quiz",
+    "pyqs": "Previous Year Questions",
+    "revision": "Revision",
+    "bookmarks": "Bookmarks",
+    "doubt": "Ask a Doubt",
+    "logout": "Log out"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "language": "Language",
+    "english": "English",
+    "hindi": "हिन्दी",
+    "minutes": "minutes",
+    "questions": "questions",
+    "noResults": "No results found.",
+    "tryAgain": "Try again"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "todaysPlan": "Today's study plan",
+    "continueLast": "Continue where you left off",
+    "weakTopics": "Topics that need attention",
+    "streak": "Day streak",
+    "xp": "XP",
+    "topPercent": "Top {{value}}% today"
+  },
+  "chapters": {
+    "title": "Chapters",
+    "estimatedTime": "Estimated time",
+    "summary": "Summary",
+    "explanation": "Detailed explanation",
+    "examples": "Examples",
+    "importantQa": "Important Q&A",
+    "flashcards": "Flashcards",
+    "onePageNotes": "One-page notes",
+    "startQuiz": "Start a quiz",
+    "viewPyqs": "View past papers",
+    "addBookmark": "Bookmark",
+    "removeBookmark": "Bookmarked"
+  },
+  "quiz": {
+    "title": "Quiz",
+    "configure": "Configure your quiz",
+    "difficulty": "Difficulty",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "count": "Number of questions",
+    "generate": "Generate quiz",
+    "timer": "Time remaining",
+    "submitTest": "Submit test",
+    "score": "Your score",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "explanation": "Explanation",
+    "noQuestions": "No questions available for this selection. Try a different chapter or difficulty."
+  },
+  "pyq": {
+    "title": "Previous Year Questions",
+    "filterYear": "Year",
+    "filterDifficulty": "Difficulty",
+    "marks": "marks",
+    "modelAnswer": "Model answer",
+    "showAnswer": "Show answer",
+    "hideAnswer": "Hide answer"
+  },
+  "revision": {
+    "title": "Revision Mode",
+    "fiveMin": "Revise in 5 minutes",
+    "flashcardOf": "Card {{current}} of {{total}}",
+    "tapToFlip": "Tap to flip"
+  },
+  "bookmarks": {
+    "title": "Saved for later",
+    "empty": "Nothing bookmarked yet. Tap the bookmark icon on any chapter, question, or doubt to save it here."
+  },
+  "doubt": {
+    "title": "Ask a Doubt",
+    "placeholder": "Type your question...",
+    "ask": "Ask",
+    "answer": "Answer",
+    "source": {
+      "cache": "from saved answers",
+      "db": "from your textbook content",
+      "ai": "AI-generated",
+      "fallback": "Not enough content yet"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search topics, chapters, examples...",
+    "results": "Results"
+  }
+}

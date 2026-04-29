@@ -1,0 +1,37 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 font-sans">
+  <div class="mb-5 border-b border-gray-100 pb-3">
+    <h3 class="text-xl font-bold text-brand-black">Submit a Request / Complaint</h3>
+    <p class="text-sm text-gray-500 mt-1">Select a category and provide details below.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-brand-black">Category</label>
+        <select formControlName="category" class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange bg-white">
+          <option value="" disabled>Select category...</option>
+          <option value="Fee">Fee Related</option>
+          <option value="Teacher">Teacher Feedback</option>
+          <option value="Homework">Homework / Academics</option>
+          <option value="General">General Inquiry</option>
+        </select>
+      </div>
+      
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-brand-black">Subject</label>
+        <input type="text" formControlName="subject" class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange" placeholder="Brief subject" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-brand-black">Description</label>
+      <textarea formControlName="description" rows="4" class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange resize-none" placeholder="Please provide detailed information..."></textarea>
+    </div>
+
+    <div class="mt-2 flex items-center justify-end">
+      <button type="submit" [disabled]="form.invalid" class="px-6 py-2.5 bg-brand-orange text-white font-bold rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+        Submit Request
+      </button>
+    </div>
+  </form>
+</div>

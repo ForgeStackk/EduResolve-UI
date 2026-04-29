@@ -1,0 +1,48 @@
+<div class="max-w-4xl mx-auto flex flex-col gap-8 font-sans">
+  <div class="bg-brand-white p-8 rounded-xl border border-gray-200 shadow-sm">
+    <div class="mb-6 border-b border-gray-100 pb-4">
+      <h2 class="text-2xl font-bold text-brand-black">Admin Communication Hub</h2>
+      <p class="text-gray-500 text-sm mt-1">Broadcast urgent notices via SMS and WhatsApp.</p>
+    </div>
+    
+    <form (submit)="handleSubmit()" class="flex flex-col gap-5">
+      <div class="flex flex-col gap-1">
+        <label for="audience" class="text-sm font-semibold text-brand-black">Target Audience</label>
+        <select id="audience" [ngModel]="audience()" (ngModelChange)="audience.set($event)" name="audience" required class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange bg-white">
+          <option value="" disabled>Select target audience...</option>
+          <option value="All Parents">All Parents</option>
+          <option value="Grade 9 Parents">Grade 9 Parents</option>
+          <option value="Grade 10 Parents">Grade 10 Parents</option>
+          <option value="All Teachers">All Teachers</option>
+          <option value="All Students">All Students</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="message" class="text-sm font-semibold text-brand-black">Message Content</label>
+        <textarea id="message" [ngModel]="message()" (ngModelChange)="message.set($event)" name="message" required rows="5" placeholder="Type the urgent notice here..." class="p-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange resize-none"></textarea>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-brand-black">Delivery Methods</span>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+            <input type="checkbox" [checked]="delivery().whatsapp" (change)="handleToggle('whatsapp')" class="w-4 h-4 accent-brand-orange">
+            <span class="text-brand-black font-medium">WhatsApp</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer p-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+            <input type="checkbox" [checked]="delivery().sms" (change)="handleToggle('sms')" class="w-4 h-4 accent-brand-orange">
+            <span class="text-brand-black font-medium">SMS</span>
+          </label>
+        </div>
+        @if (!delivery().whatsapp && !delivery().sms) {
+          <span class="text-xs text-red-500 font-medium">Please select at least one delivery method.</span>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isSending() || (!delivery().whatsapp && !delivery().sms)" class="mt-4 self-start px-8 py-3 bg-brand-orange text-brand-white font-bold rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+        {{ isSending() ? 'Sending Notice...' : 'Send Urgent Notice' }}
+      </button>
+    </form>
+  </div>
+</div>

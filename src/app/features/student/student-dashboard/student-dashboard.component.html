@@ -1,0 +1,136 @@
+<div class="dashboard-wrapper">
+  <!-- Header Banner -->
+  <div class="banner-section">
+    <div class="banner-content">
+      <div class="banner-text">
+        @if (firstName()) {
+          <p class="text-sm font-semibold text-orange-600 mb-1">
+            {{ 'dashboard.welcome' | translate }}, {{ firstName() }}
+            @if (className()) { <span class="text-gray-500"> · {{ className() }}</span> }
+          </p>
+        }
+        <h1 class="banner-title">{{ 'app.tagline' | translate }}</h1>
+        <p class="banner-subtitle">{{ 'dashboard.todaysPlan' | translate }} · {{ 'dashboard.continueLast' | translate }}</p>
+        <div class="banner-cta">
+          <input type="text" [placeholder]="'search.placeholder' | translate" class="cta-input">
+          <button class="cta-button">{{ 'common.search' | translate }}</button>
+        </div>
+      </div>
+      <div class="banner-icon">
+        <svg viewBox="0 0 100 100" class="icon-animate">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#ff5625" stroke-width="2" opacity="0.3"/>
+          <path d="M 50 30 L 65 55 L 55 55 L 55 70 L 45 70 L 45 55 L 35 55 Z" fill="#ff5625"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- NCERT Trackers Section -->
+    <section class="section">
+      <h2 class="section-title">NCERT Trackers</h2>
+      <div class="tracker-grid">
+        <!-- Physics Tracker -->
+        <div class="tracker-card physics-card">
+          <div class="card-header">
+            <div class="subject-icon physics-icon">⚡</div>
+            <span class="grade-badge">GRADE 12</span>
+          </div>
+          <h3 class="subject-name">Physics</h3>
+          <p class="current-topic">Current: Electromagnetic induction</p>
+          <div class="progress-container">
+            <label class="progress-label">Progress</label>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 68%"></div>
+            </div>
+            <span class="progress-text">68%</span>
+          </div>
+        </div>
+
+        <!-- Mathematics Tracker -->
+        <div class="tracker-card math-card">
+          <div class="card-header">
+            <div class="subject-icon math-icon">Σ</div>
+            <span class="grade-badge">GRADE 12</span>
+          </div>
+          <h3 class="subject-name">Mathematics</h3>
+          <p class="current-topic">Current: Integrals</p>
+          <div class="progress-container">
+            <label class="progress-label">Progress</label>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 42%"></div>
+            </div>
+            <span class="progress-text">42%</span>
+          </div>
+        </div>
+
+        <!-- English Tracker -->
+        <div class="tracker-card english-card">
+          <div class="card-header">
+            <div class="subject-icon english-icon">📖</div>
+            <span class="core-badge">CORE</span>
+          </div>
+          <h3 class="subject-name">English</h3>
+          <p class="current-topic">Current: Flamingo Chapters</p>
+          <div class="progress-container">
+            <label class="progress-label">Progress</label>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 85%"></div>
+            </div>
+            <span class="progress-text">85%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Assessment Lab Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Assessment Lab</h2>
+        <a href="#" class="view-all-link">VIEW ALL</a>
+      </div>
+      <div class="assessment-list">
+        <div class="assessment-item">
+          <div class="assessment-icon">📋</div>
+          <div class="assessment-content">
+            <h4 class="assessment-title">Daily Physics MCQs</h4>
+            <p class="assessment-meta">20 Questions • Optics & Atoms</p>
+          </div>
+          <div class="assessment-arrow">→</div>
+        </div>
+        <div class="assessment-item">
+          <div class="assessment-icon">📝</div>
+          <div class="assessment-content">
+            <h4 class="assessment-title">Previous Year Questions (PYQs)</h4>
+            <p class="assessment-meta">Delhi Board 2023 • All Subjects</p>
+          </div>
+          <div class="assessment-arrow">→</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Learning Velocity Section -->
+    <section class="section">
+      <h2 class="section-title">Learning Velocity</h2>
+      <div class="velocity-container">
+        <div class="velocity-info">
+          <p class="velocity-text">You're in the top {{ topPercentage() }}% of students today. Keep the momentum going!</p>
+        </div>
+        <div class="velocity-chart">
+          <div class="chart-bar"></div>
+        </div>
+        <div class="velocity-stats">
+          <div class="stat-item">
+            <span class="stat-label">{{ streakDays() }} Days</span>
+            <span class="stat-value">STREAK</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">{{ experiencePoints() }}</span>
+            <span class="stat-value">EXPERIENCE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

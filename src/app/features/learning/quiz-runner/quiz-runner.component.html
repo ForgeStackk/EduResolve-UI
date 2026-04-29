@@ -1,0 +1,119 @@
+<div class="p-6 max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold mb-4">{{ 'quiz.title' | translate }}</h1>
+
+  <!-- 1. Config -->
+  @if (phase() === 'config') {
+    <div class="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
+      <h2 class="font-semibold">{{ 'quiz.configure' | translate }}</h2>
+
+      <div>
+        <label class="text-sm font-semibold text-gray-600">{{ 'quiz.difficulty' | translate }}</label>
+        <div class="flex gap-2 mt-1">
+          @for (d of difficulties; track d) {
+            <button (click)="difficulty.set(d)"
+                    [class.bg-orange-500]="difficulty() === d"
+                    [class.text-white]="difficulty() === d"
+                    [class.border-gray-300]="difficulty() !== d"
+                    class="px-3 py-1.5 rounded-full text-sm font-semibold border">
+              {{ ('quiz.' + d.toLowerCase()) | translate }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold text-gray-600">{{ 'quiz.count' | translate }}</label>
+        <input type="number" min="1" max="50" [ngModel]="count()" (ngModelChange)="count.set($event)"
+               class="block mt-1 w-32 rounded-md border border-gray-300 px-3 py-1.5 text-sm" />
+      </div>
+
+      <button (click)="generate()" [disabled]="!chapterId()"
+              class="rounded-full bg-orange-500 text-white px-5 py-2 font-semibold hover:bg-orange-600 disabled:opacity-50">
+        {{ 'quiz.generate' | translate }}
+      </button>
+      @if (!chapterId()) {
+        <p class="text-xs text-gray-500">Open a chapter and tap "Start a quiz" to begin.</p>
+      }
+    </div>
+  }
+
+  <!-- 2. Quiz in progress -->
+  @if (phase() === 'taking' && quiz(); as q) {
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-sm text-gray-600">
+          Q{{ currentIndex() + 1 }} / {{ q.questions.length }}
+        </span>
+        <span class="text-sm font-semibold text-orange-600">
+          ⏱ {{ formatTime(remainingSeconds()) }}
+        </span>
+      </div>
+
+      @if (currentQuestion(); as cq) {
+        <p class="font-semibold text-gray-800 mb-4">{{ cq.text }}</p>
+        <div class="space-y-2">
+          @for (opt of currentOptions(); track opt.id) {
+            <label class="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-gray-50"
+                   [class.border-orange-400]="answers()[cq.id] === opt.id"
+                   [class.bg-orange-50]="answers()[cq.id] === opt.id">
+              <input type="radio" [name]="'q' + cq.id" [value]="opt.id"
+                     [checked]="answers()[cq.id] === opt.id"
+                     (change)="selectAnswer(cq.id, opt.id)"
+                     class="mt-1" />
+              <span>{{ opt.text }}</span>
+            </label>
+          }
+        </div>
+      }
+
+      <div class="flex justify-between mt-5">
+        <button (click)="prev()" [disabled]="currentIndex() === 0"
+                class="px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold disabled:opacity-50">
+          {{ 'common.previous' | translate }}
+        </button>
+        @if (currentIndex() < q.questions.length - 1) {
+          <button (click)="next()"
+                  class="px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-semibold">
+            {{ 'common.next' | translate }}
+          </button>
+        } @else {
+          <button (click)="submit()"
+                  class="px-4 py-2 rounded-full bg-green-600 text-white text-sm font-semibold">
+            {{ 'quiz.submitTest' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- 3. Results -->
+  @if (phase() === 'results' && quiz(); as q) {
+    <div class="rounded-xl border border-gray-200 bg-white p-5">
+      <h2 class="text-xl font-bold mb-1">{{ 'quiz.score' | translate }}</h2>
+      <p class="text-3xl font-bold text-orange-600 mb-4">{{ score() }} / {{ q.questions.length }}</p>
+
+      <div class="space-y-3">
+        @for (item of breakdown(); track item.question.id) {
+          <div class="rounded-lg border p-3"
+               [class.border-green-400]="item.correct"
+               [class.border-red-400]="!item.correct">
+            <p class="font-semibold text-sm mb-1">{{ item.question.text }}</p>
+            <p class="text-xs text-gray-600">
+              {{ item.correct ? ('quiz.correct' | translate) : ('quiz.incorrect' | translate) }}
+            </p>
+            @if (item.question.explanation) {
+              <p class="text-xs text-gray-500 mt-2">
+                <strong>{{ 'quiz.explanation' | translate }}:</strong> {{ item.question.explanation }}
+              </p>
+            }
+          </div>
+        }
+      </div>
+
+      <button (click)="reset()"
+              class="mt-5 px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold">
+        {{ 'common.tryAgain' | translate }}
+      </button>
+    </div>
+  }
+</div>

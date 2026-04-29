@@ -1,0 +1,109 @@
+{
+  "app": {
+    "name": "EduResolve",
+    "tagline": "सारी पढ़ाई, एक ही जगह।"
+  },
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "subjects": "विषय",
+    "chapters": "अध्याय",
+    "quiz": "प्रश्नोत्तरी",
+    "pyqs": "पिछले वर्ष के प्रश्न",
+    "revision": "पुनरावलोकन",
+    "bookmarks": "सहेजे गए",
+    "doubt": "शंका पूछें",
+    "logout": "लॉग आउट"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "submit": "जमा करें",
+    "next": "अगला",
+    "previous": "पिछला",
+    "search": "खोजें",
+    "language": "भाषा",
+    "english": "English",
+    "hindi": "हिन्दी",
+    "minutes": "मिनट",
+    "questions": "प्रश्न",
+    "noResults": "कोई परिणाम नहीं मिला।",
+    "tryAgain": "फिर से प्रयास करें"
+  },
+  "dashboard": {
+    "welcome": "वापसी पर स्वागत है",
+    "todaysPlan": "आज की अध्ययन योजना",
+    "continueLast": "जहाँ छोड़ा था वहीं से जारी रखें",
+    "weakTopics": "जिन विषयों पर ध्यान देना है",
+    "streak": "दिन की लय",
+    "xp": "अंक",
+    "topPercent": "आज के शीर्ष {{value}}% में"
+  },
+  "chapters": {
+    "title": "अध्याय",
+    "estimatedTime": "अनुमानित समय",
+    "summary": "सारांश",
+    "explanation": "विस्तृत व्याख्या",
+    "examples": "उदाहरण",
+    "importantQa": "महत्वपूर्ण प्रश्नोत्तर",
+    "flashcards": "फ्लैशकार्ड्स",
+    "onePageNotes": "एक-पन्ना नोट्स",
+    "startQuiz": "प्रश्नोत्तरी शुरू करें",
+    "viewPyqs": "पिछले प्रश्न देखें",
+    "addBookmark": "सहेजें",
+    "removeBookmark": "सहेजा गया"
+  },
+  "quiz": {
+    "title": "प्रश्नोत्तरी",
+    "configure": "अपनी प्रश्नोत्तरी सेट करें",
+    "difficulty": "कठिनाई स्तर",
+    "easy": "आसान",
+    "medium": "मध्यम",
+    "hard": "कठिन",
+    "count": "प्रश्नों की संख्या",
+    "generate": "प्रश्नोत्तरी बनाएँ",
+    "timer": "शेष समय",
+    "submitTest": "परीक्षा जमा करें",
+    "score": "आपका अंक",
+    "correct": "सही",
+    "incorrect": "गलत",
+    "explanation": "व्याख्या",
+    "noQuestions": "इस चयन के लिए कोई प्रश्न उपलब्ध नहीं है।"
+  },
+  "pyq": {
+    "title": "पिछले वर्ष के प्रश्न",
+    "filterYear": "वर्ष",
+    "filterDifficulty": "कठिनाई",
+    "marks": "अंक",
+    "modelAnswer": "आदर्श उत्तर",
+    "showAnswer": "उत्तर दिखाएँ",
+    "hideAnswer": "उत्तर छिपाएँ"
+  },
+  "revision": {
+    "title": "पुनरावलोकन मोड",
+    "fiveMin": "5 मिनट में दोहराएँ",
+    "flashcardOf": "कार्ड {{current}} / {{total}}",
+    "tapToFlip": "पलटने के लिए दबाएँ"
+  },
+  "bookmarks": {
+    "title": "बाद के लिए सहेजे गए",
+    "empty": "अभी कुछ सहेजा नहीं गया है।"
+  },
+  "doubt": {
+    "title": "शंका पूछें",
+    "placeholder": "अपना प्रश्न लिखें...",
+    "ask": "पूछें",
+    "answer": "उत्तर",
+    "source": {
+      "cache": "सहेजे गए उत्तरों से",
+      "db": "आपकी पाठ्यपुस्तक से",
+      "ai": "AI द्वारा निर्मित",
+      "fallback": "अभी पर्याप्त सामग्री नहीं"
+    }
+  },
+  "search": {
+    "title": "खोज",
+    "placeholder": "विषय, अध्याय, उदाहरण खोजें...",
+    "results": "परिणाम"
+  }
+}
