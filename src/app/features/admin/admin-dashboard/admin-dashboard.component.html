@@ -1,194 +1,312 @@
-<div class="dashboard-container">
-  <!-- Header Banner -->
-  <div class="header-banner">
-    <div class="header-content">
-      <h1 class="header-title">Administrative Overview</h1>
-      <p class="header-subtitle">Real-time school performance and operations dashboard.</p>
+<div class="space-y-8">
+
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div class="space-y-2">
+      <p class="hud-caps text-red-400">ADMIN CONSOLE</p>
+      <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight leading-none">
+        Administrative<br/>
+        <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Overview</span>
+      </h1>
+      <p class="text-base sm:text-lg text-[#e6bdb8] max-w-2xl">
+        Real-time school performance and operations dashboard.
+      </p>
     </div>
-    <div class="header-actions">
-      <button class="btn-export">
-        <span class="icon">⬇</span>
-        <span>Export PDF</span>
+    <div class="flex items-center gap-3 shrink-0">
+      <button class="hud-btn-ghost">
+        <span class="material-symbols-outlined">download</span>
+        Export PDF
       </button>
-      <button class="btn-broadcast">
-        <span class="icon">+</span>
-        <span>New Broadcast</span>
+      <button class="hud-btn-primary">
+        <span class="material-symbols-outlined fill">campaign</span>
+        New Broadcast
       </button>
     </div>
+  </header>
+
+  <!-- Top metric strip -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Revenue -->
+    <section class="hud-card">
+      <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center
+                    bg-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.3)]">
+          <span class="material-symbols-outlined fill text-emerald-400">payments</span>
+        </div>
+        <span class="hud-chip hud-chip-active" style="background:rgba(16,185,129,0.15); color:#34d399">
+          ▲ 12.5%
+        </span>
+      </div>
+      <p class="hud-caps text-[#e6bdb8]/80">TOTAL REVENUE</p>
+      <p class="hud-display text-3xl text-white mt-1 tabular-nums">
+        ${{ revenue() | number:'1.0-0' }}
+      </p>
+      <div class="hud-meter mt-4">
+        <div style="width:72%; background:#10b981; box-shadow:0 0 8px #10b981"></div>
+      </div>
+    </section>
+
+    <!-- Enrollment -->
+    <section class="hud-card">
+      <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center
+                    bg-blue-500/20 shadow-[inset_0_0_15px_rgba(59,130,246,0.3)]">
+          <span class="material-symbols-outlined fill text-blue-400">groups</span>
+        </div>
+        <span class="hud-chip hud-chip-active" style="background:rgba(16,185,129,0.15); color:#34d399">
+          ▲ 4.0%
+        </span>
+      </div>
+      <p class="hud-caps text-[#e6bdb8]/80">ENROLLMENT</p>
+      <p class="hud-display text-3xl text-white mt-1 tabular-nums">
+        {{ enrollment() | number }}
+      </p>
+      <p class="text-xs text-[#e6bdb8]/80 mt-1">
+        Target <span class="text-white">{{ enrollmentTarget() | number }}</span>
+      </p>
+      <div class="hud-meter mt-3">
+        <div [style.width.%]="enrollmentPct()" style="background:#3b82f6; box-shadow:0 0 8px #3b82f6"></div>
+      </div>
+    </section>
+
+    <!-- Active Tickets -->
+    <section class="hud-card">
+      <div class="hud-accent"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center
+                    bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.3)]">
+          <span class="material-symbols-outlined fill text-red-400">confirmation_number</span>
+        </div>
+        <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">LIVE</span>
+      </div>
+      <p class="hud-caps text-[#e6bdb8]/80">ACTIVE TICKET VOLUME</p>
+      <p class="hud-display text-3xl text-white mt-1 tabular-nums">
+        {{ activeTickets() }}<span class="text-sm text-[#e6bdb8] ml-1">open</span>
+      </p>
+      <!-- sparkline -->
+      <div class="flex items-end gap-1.5 h-10 mt-3">
+        @for (h of ticketSpark; track $index) {
+          <div class="flex-1 rounded-t-sm bg-red-500/70 transition-all"
+               [style.height.%]="h"
+               [style.box-shadow]="'0 0 6px rgba(220,38,38,0.6)'"></div>
+        }
+      </div>
+      <div class="flex items-center gap-4 mt-3 text-xs text-[#e6bdb8]">
+        <span class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-red-500"></span> Technical
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Billing
+        </span>
+      </div>
+    </section>
   </div>
 
-  <!-- Main Content Grid -->
-  <div class="main-grid">
-    <!-- Left Column -->
-    <div class="left-column">
-      <!-- Revenue Card -->
-      <div class="card metric-card revenue-card">
-        <div class="card-header">
-          <span class="metric-icon">📊</span>
-          <span class="metric-growth green">+12.5%</span>
-        </div>
-        <h3 class="metric-label">TOTAL REVENUE</h3>
-        <p class="metric-value">${{ revenue() | number:'1.0-0' }}</p>
-        <div class="metric-bar"></div>
-      </div>
+  <!-- Body grid: comm hub + fee table + ticket queue -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <!-- Enrollment Card -->
-      <div class="card metric-card enrollment-card">
-        <div class="card-header">
-          <span class="metric-icon">👥</span>
-          <span class="metric-growth green">+4%</span>
+    <!-- ===== LEFT: Bulk Communication Hub ================================ -->
+    <section class="hud-card space-y-5">
+      <div class="hud-accent"></div>
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined fill text-red-500">broadcast_on_home</span>
+          <h3 class="hud-display text-xl text-white">BULK COMMUNICATION HUB</h3>
         </div>
-        <h3 class="metric-label">ENROLLMENT</h3>
-        <p class="metric-value">{{ enrollment() | number }}</p>
-        <p class="metric-target">Target: {{ enrollmentTarget() | number }} students</p>
-      </div>
-
-      <!-- Active Ticket Volume -->
-      <div class="card ticket-volume-card">
-        <h3 class="card-title">ACTIVE TICKET VOLUME</h3>
-        <p class="volume-count">{{ activeTickets() }} Open</p>
-        <div class="volume-legend">
-          <div class="legend-item">
-            <span class="legend-dot technical"></span>
-            <span>Technical</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot billing"></span>
-            <span>Billing</span>
-          </div>
-        </div>
-        <div class="volume-chart">
-          <div class="chart-bar" style="height: 65%"></div>
-          <div class="chart-bar" style="height: 85%"></div>
-          <div class="chart-bar" style="height: 45%"></div>
-          <div class="chart-bar" style="height: 72%"></div>
-          <div class="chart-bar" style="height: 58%"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="right-column">
-      <!-- Bulk Communication Hub -->
-      <div class="card comm-hub-card">
-        <div class="hub-header">
-          <h3 class="card-title">Bulk Communication Hub</h3>
-          <span class="settings-icon">⚙️</span>
-        </div>
-
-        <!-- Broadcast Channel -->
-        <div class="channel-section">
-          <label class="channel-label">BROADCAST CHANNEL</label>
-          <div class="channel-buttons">
-            <button class="channel-btn whatsapp">
-              <span class="icon">📱</span>
-              <span>WhatsApp</span>
-            </button>
-            <button class="channel-btn sms">
-              <span class="icon">💬</span>
-              <span>SMS Gateway</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Recipients Selector -->
-        <div class="recipients-section">
-          <label class="recipients-label">RECIPIENTS</label>
-          <select class="recipients-select">
-            <option>All Parents (Grade 9-12)</option>
-            <option>Grade 9</option>
-            <option>Grade 10</option>
-            <option>Grade 11</option>
-            <option>Grade 12</option>
-          </select>
-        </div>
-
-        <!-- Message Input -->
-        <div class="message-section">
-          <textarea class="message-input" placeholder="Type your emergency or informative broadcast here..."></textarea>
-        </div>
-
-        <!-- Recipients Preview -->
-        <div class="recipients-preview">
-          <div class="recipient-avatars">
-            <div class="avatar">👨</div>
-            <div class="avatar">👩</div>
-            <div class="avatar">👨</div>
-            <div class="avatar">👩</div>
-          </div>
-          <span class="recipients-count">+1,402 Recipients Selected</span>
-        </div>
-      </div>
-
-      <!-- Fee Management Status -->
-      <div class="card fee-card">
-        <div class="fee-header">
-          <h3 class="card-title">Fee Management Status</h3>
-          <a href="#" class="view-link">View All Transactions</a>
-        </div>
-        <div class="fee-table">
-          <div class="table-header">
-            <div class="col-id">STUDENT ID</div>
-            <div class="col-name">PARENT NAME</div>
-            <div class="col-amount">AMOUNT</div>
-          </div>
-          <div class="table-body">
-            @for (fee of feeData(); track fee.studentId) {
-              <div class="table-row">
-                <div class="col-id">{{ fee.studentId }}</div>
-                <div class="col-name">{{ fee.parentName }}</div>
-                <div class="col-amount">{{ fee.amount }}</div>
-              </div>
-            } @empty {
-              <div class="table-row"><div class="col-id" colspan="3">No outstanding fees.</div></div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Ticket Queue -->
-      <div class="card ticket-queue-card">
-        <div class="queue-header">
-          <h3 class="card-title">TicketQueue</h3>
-          <span class="new-badge">NEW</span>
-        </div>
-        <div class="tickets-list">
-          <div class="ticket-item billing-inquiry">
-            <div class="ticket-icon">💰</div>
-            <div class="ticket-content">
-              <h4 class="ticket-title">Billing Inquiry</h4>
-              <p class="ticket-time">1 min ago</p>
-              <p class="ticket-text">Clarification on semester lab fees.</p>
-              <p class="ticket-user">📝 Stacy Connor (Grade 10)</p>
-            </div>
-          </div>
-
-          <div class="ticket-item it-support">
-            <div class="ticket-icon">🔧</div>
-            <div class="ticket-content">
-              <h4 class="ticket-title">IT Support</h4>
-              <p class="ticket-time">11 min ago</p>
-              <p class="ticket-text">Unable to access my password using the automated portal login issues.</p>
-              <p class="ticket-user">🔐 John Drake (Grade 10)</p>
-            </div>
-          </div>
-
-          <div class="ticket-item bus-route">
-            <div class="ticket-icon">🚌</div>
-            <div class="ticket-content">
-              <h4 class="ticket-title">Bus Route Update</h4>
-              <p class="ticket-time">27 min ago</p>
-              <p class="ticket-text">Route bus to have been rescheduled new shift...</p>
-              <p class="ticket-user">🎫 Marcus Ahmed (Grade 12)</p>
-            </div>
-          </div>
-        </div>
-
-        <button class="load-more-btn">
-          <span class="icon">✉️</span>
-          <span>Load Older Tickets</span>
+        <button class="hud-btn-ghost text-xs px-3 py-2" aria-label="Settings">
+          <span class="material-symbols-outlined" style="font-size:18px">tune</span>
         </button>
       </div>
+
+      <!-- Channel selector -->
+      <div>
+        <label class="hud-caps text-[#e6bdb8]/80 mb-2 block">BROADCAST CHANNEL</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button"
+                  (click)="broadcastChannel.set('whatsapp')"
+                  class="hud-chip justify-center py-3"
+                  [class.hud-chip-active]="broadcastChannel() === 'whatsapp'">
+            <span class="material-symbols-outlined" style="font-size:18px">chat</span>
+            WhatsApp
+          </button>
+          <button type="button"
+                  (click)="broadcastChannel.set('sms')"
+                  class="hud-chip justify-center py-3"
+                  [class.hud-chip-active]="broadcastChannel() === 'sms'">
+            <span class="material-symbols-outlined" style="font-size:18px">sms</span>
+            SMS Gateway
+          </button>
+        </div>
+      </div>
+
+      <!-- Recipients -->
+      <div>
+        <label class="hud-caps text-[#e6bdb8]/80 mb-2 block">RECIPIENTS</label>
+        <select [(ngModel)]="recipientGroup" class="hud-input cursor-pointer">
+          <option>All Parents (Grade 9-12)</option>
+          <option>Grade 9</option>
+          <option>Grade 10</option>
+          <option>Grade 11</option>
+          <option>Grade 12</option>
+        </select>
+      </div>
+
+      <!-- Message -->
+      <div>
+        <label class="hud-caps text-[#e6bdb8]/80 mb-2 block">MESSAGE</label>
+        <textarea [(ngModel)]="broadcastMessage"
+                  rows="4"
+                  placeholder="Type your emergency or informative broadcast here…"
+                  class="hud-input resize-none"></textarea>
+      </div>
+
+      <!-- Recipients preview + submit -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-2">
+          <div class="flex -space-x-2">
+            @for (a of [1,2,3,4]; track a) {
+              <div class="w-7 h-7 rounded-full border border-white/15
+                          bg-[#382523] flex items-center justify-center text-xs text-[#fbdbd7]">
+                <span class="material-symbols-outlined" style="font-size:14px">person</span>
+              </div>
+            }
+          </div>
+          <span class="hud-caps text-[#e6bdb8]/80">+1,402 RECIPIENTS</span>
+        </div>
+        <button class="hud-btn-primary" [disabled]="!broadcastMessage.trim()">
+          <span class="material-symbols-outlined fill">send</span>
+          Broadcast
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== RIGHT: Fee Management + Ticket Queue ======================== -->
+    <div class="space-y-6">
+
+      <!-- Fee Management Status -->
+      <section class="hud-card">
+        <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+        <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-400">receipt_long</span>
+            <h3 class="hud-display text-xl text-white">FEE MANAGEMENT</h3>
+          </div>
+          <a class="hud-caps text-red-400 hover:text-white transition-colors cursor-pointer">
+            VIEW ALL →
+          </a>
+        </div>
+
+        <!-- Header row -->
+        <div class="grid grid-cols-[1fr_1.4fr_0.9fr] gap-3 px-1 pb-2 border-b border-white/10">
+          <span class="hud-caps text-[#e6bdb8]/70">STUDENT ID</span>
+          <span class="hud-caps text-[#e6bdb8]/70">PARENT</span>
+          <span class="hud-caps text-[#e6bdb8]/70 text-right">AMOUNT</span>
+        </div>
+
+        <!-- Rows -->
+        @if (loading()) {
+          <div class="text-center text-[#e6bdb8] py-6">Loading…</div>
+        } @else {
+          <ul class="divide-y divide-white/5">
+            @for (fee of feeData(); track fee.studentId) {
+              <li class="grid grid-cols-[1fr_1.4fr_0.9fr] gap-3 py-3 px-1 items-center">
+                <span class="text-sm text-[#e6bdb8] tabular-nums">{{ fee.studentId }}</span>
+                <span class="text-sm text-white truncate">{{ fee.parentName }}</span>
+                <span class="text-sm text-red-400 tabular-nums text-right font-bold">{{ fee.amount }}</span>
+              </li>
+            } @empty {
+              <li class="text-center py-6">
+                <span class="material-symbols-outlined text-emerald-400" style="font-size:32px">task_alt</span>
+                <p class="text-sm text-[#e6bdb8] mt-2">No outstanding fees.</p>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- Ticket Queue -->
+      <section class="hud-card">
+        <div class="hud-accent"></div>
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-500">queue</span>
+            <h3 class="hud-display text-xl text-white">TICKET QUEUE</h3>
+          </div>
+          <span class="hud-chip hud-chip-active">NEW</span>
+        </div>
+
+        <ul class="space-y-3">
+          <!-- Billing -->
+          <li class="rounded-lg border border-white/10 bg-black/30 p-3 flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0
+                        bg-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.3)]">
+              <span class="material-symbols-outlined text-amber-400">attach_money</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="hud-display text-sm text-white">Billing Inquiry</h4>
+                <span class="hud-caps text-[#e6bdb8]/70">1 MIN AGO</span>
+              </div>
+              <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">
+                Clarification on semester lab fees.
+              </p>
+              <p class="text-xs text-[#e6bdb8]/80 mt-2 flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:12px">person</span>
+                Stacy Connor · Grade 10
+              </p>
+            </div>
+          </li>
+
+          <!-- IT -->
+          <li class="rounded-lg border border-white/10 bg-black/30 p-3 flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0
+                        bg-blue-500/20 shadow-[inset_0_0_15px_rgba(59,130,246,0.3)]">
+              <span class="material-symbols-outlined text-blue-400">build</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="hud-display text-sm text-white">IT Support</h4>
+                <span class="hud-caps text-[#e6bdb8]/70">11 MIN AGO</span>
+              </div>
+              <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">
+                Unable to access password using the automated portal.
+              </p>
+              <p class="text-xs text-[#e6bdb8]/80 mt-2 flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:12px">person</span>
+                John Drake · Grade 10
+              </p>
+            </div>
+          </li>
+
+          <!-- Bus -->
+          <li class="rounded-lg border border-white/10 bg-black/30 p-3 flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0
+                        bg-purple-500/20 shadow-[inset_0_0_15px_rgba(139,92,246,0.3)]">
+              <span class="material-symbols-outlined text-purple-400">directions_bus</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="hud-display text-sm text-white">Bus Route Update</h4>
+                <span class="hud-caps text-[#e6bdb8]/70">27 MIN AGO</span>
+              </div>
+              <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">
+                Bus routes have been rescheduled for next shift.
+              </p>
+              <p class="text-xs text-[#e6bdb8]/80 mt-2 flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:12px">person</span>
+                Marcus Ahmed · Grade 12
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <button class="hud-btn-ghost w-full mt-4">
+          <span class="material-symbols-outlined">inbox</span>
+          Load older tickets
+        </button>
+      </section>
     </div>
   </div>
 </div>

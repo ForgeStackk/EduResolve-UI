@@ -1,51 +1,59 @@
-<div class="min-h-full bg-surface-dim pb-12">
-  <header class="sticky top-0 z-10 bg-white border-b border-surface-line">
-    <div class="max-w-2xl mx-auto px-4 py-3">
-      <a href="/" class="text-body-md text-surface-mute hover:text-surface-ink">← {{ 'common.back' | translate }}</a>
+<div class="space-y-8">
+
+  <!-- Back link -->
+  <a routerLink="/learn/subjects"
+     class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+    <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
+    BACK TO SYSTEMS
+  </a>
+
+  <!-- Subject header -->
+  @if (subject(); as s) {
+    <header class="space-y-2">
+      <p class="hud-caps text-red-400">GRADE {{ s.grade }} · MODULE</p>
+      <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight">{{ s.name }}</h1>
+    </header>
+  }
+
+  <!-- Chapter list -->
+  <section class="space-y-4">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-red-500">view_list</span>
+      <h2 class="hud-display text-2xl text-white">{{ 'chapters.title' | translate }}</h2>
     </div>
-  </header>
 
-  <main class="max-w-2xl mx-auto px-4 py-5 space-y-4">
-    @if (subject(); as s) {
-      <section class="card card-pad">
-        <p class="eyebrow">Grade {{ s.grade }}</p>
-        <h1 class="text-display-md text-surface-ink mt-1">{{ s.name }}</h1>
-      </section>
-    }
-
-    <section>
-      <h2 class="text-title-lg mb-3">{{ 'chapters.title' | translate }}</h2>
-      
-      @if (loading()) {
-        <div class="card card-pad text-surface-mute text-body-md">{{ 'common.loading' | translate }}</div>
-      } @else if (chapters().length > 0) {
-        <ul class="space-y-3">
-          @for (c of chapters(); track c.id) {
-            <li>
-              <a [routerLink]="['/learn/chapters', c.id]"
-                 class="card p-4 hover:bg-surface-low transition-colors">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex-1">
-                    <h3 class="text-body-lg font-semibold text-surface-ink">{{ c.name }}</h3>
-                    @if (c.summary) {
-                      <p class="text-body-md text-surface-mute mt-1 line-clamp-2">{{ c.summary }}</p>
+    @if (loading()) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
+    } @else if (chapters().length === 0) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.noResults' | translate }}</div>
+    } @else {
+      <ul class="space-y-3">
+        @for (c of chapters(); track c.id; let idx = $index) {
+          <li>
+            <a [routerLink]="['/learn/chapters', c.id]"
+               class="hud-card-flat block group hover:border-white/30 transition-all relative">
+              <div class="hud-accent"></div>
+              <div class="flex items-start justify-between gap-4 pl-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 mb-1">
+                    <span class="hud-caps text-red-400">CH {{ idx + 1 | number:'2.0' }}</span>
+                    @if (c.estimatedMinutes) {
+                      <span class="hud-caps text-[#e6bdb8]/70">{{ c.estimatedMinutes }} MIN</span>
                     }
                   </div>
-                  @if (c.estimatedMinutes) {
-                    <span class="text-label-md text-surface-mute whitespace-nowrap flex-shrink-0">
-                      {{ c.estimatedMinutes }} {{ 'common.minutes' | translate }}
-                    </span>
+                  <h3 class="hud-display text-lg text-white group-hover:text-red-400 transition-colors">{{ c.name }}</h3>
+                  @if (c.summary) {
+                    <p class="text-sm text-[#e6bdb8]/80 mt-2 line-clamp-2 leading-relaxed">{{ c.summary }}</p>
                   }
                 </div>
-              </a>
-            </li>
-          }
-        </ul>
-      } @else {
-        <div class="card card-pad text-surface-mute text-body-md text-center py-8">
-          {{ 'common.noResults' | translate }}
-        </div>
-      }
-    </section>
-  </main>
+                <span class="material-symbols-outlined text-[#ac8884] group-hover:text-white transition-colors shrink-0 mt-1">
+                  chevron_right
+                </span>
+              </div>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
 </div>

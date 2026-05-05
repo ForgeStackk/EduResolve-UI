@@ -1,119 +1,180 @@
-<div class="p-6 max-w-3xl mx-auto">
-  <h1 class="text-2xl font-bold mb-4">{{ 'quiz.title' | translate }}</h1>
+<div class="space-y-6">
 
-  <!-- 1. Config -->
+  <!-- Header -->
+  <header class="flex items-center justify-between gap-4">
+    <a routerLink="/learn/subjects"
+       class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+      <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
+      EXIT
+    </a>
+    <h1 class="hud-display text-2xl sm:text-3xl text-white uppercase tracking-wider">
+      KNOWLEDGE CHECK
+    </h1>
+    <div class="w-10"></div>
+  </header>
+
+  <!-- 1. Configuration Phase ------------------------------------------------ -->
   @if (phase() === 'config') {
-    <div class="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
-      <h2 class="font-semibold">{{ 'quiz.configure' | translate }}</h2>
-
+    <section class="hud-card space-y-6">
+      <div class="hud-accent"></div>
       <div>
-        <label class="text-sm font-semibold text-gray-600">{{ 'quiz.difficulty' | translate }}</label>
-        <div class="flex gap-2 mt-1">
+        <span class="hud-caps text-red-400">SIMULATION SETUP</span>
+        <h2 class="hud-display text-2xl text-white mt-1">{{ 'quiz.configure' | translate }}</h2>
+      </div>
+
+      <!-- Difficulty -->
+      <div>
+        <label class="hud-caps text-[#e6bdb8]/80 mb-3 block">{{ 'quiz.difficulty' | translate }}</label>
+        <div class="grid grid-cols-3 gap-2">
           @for (d of difficulties; track d) {
             <button (click)="difficulty.set(d)"
-                    [class.bg-orange-500]="difficulty() === d"
-                    [class.text-white]="difficulty() === d"
-                    [class.border-gray-300]="difficulty() !== d"
-                    class="px-3 py-1.5 rounded-full text-sm font-semibold border">
+                    class="hud-chip justify-center py-2.5 text-sm"
+                    [class.hud-chip-active]="difficulty() === d">
               {{ ('quiz.' + d.toLowerCase()) | translate }}
             </button>
           }
         </div>
       </div>
 
+      <!-- Count -->
       <div>
-        <label class="text-sm font-semibold text-gray-600">{{ 'quiz.count' | translate }}</label>
-        <input type="number" min="1" max="50" [ngModel]="count()" (ngModelChange)="count.set($event)"
-               class="block mt-1 w-32 rounded-md border border-gray-300 px-3 py-1.5 text-sm" />
+        <label for="count" class="hud-caps text-[#e6bdb8]/80 mb-3 block">{{ 'quiz.count' | translate }}</label>
+        <input id="count" type="number" min="1" max="50"
+               [ngModel]="count()" (ngModelChange)="count.set($event)"
+               class="hud-input"/>
       </div>
 
-      <button (click)="generate()" [disabled]="!chapterId()"
-              class="rounded-full bg-orange-500 text-white px-5 py-2 font-semibold hover:bg-orange-600 disabled:opacity-50">
+      <button (click)="generate()" [disabled]="!chapterId()" class="hud-btn-primary w-full">
+        <span class="material-symbols-outlined fill">rocket_launch</span>
         {{ 'quiz.generate' | translate }}
       </button>
       @if (!chapterId()) {
-        <p class="text-xs text-gray-500">Open a chapter and tap "Start a quiz" to begin.</p>
+        <p class="text-sm text-[#e6bdb8]/80 text-center">
+          Select a chapter from the library to launch a drill.
+        </p>
       }
-    </div>
+    </section>
   }
 
-  <!-- 2. Quiz in progress -->
+  <!-- 2. Taking ------------------------------------------------------------- -->
   @if (phase() === 'taking' && quiz(); as q) {
-    <div class="rounded-xl border border-gray-200 bg-white p-5">
-      <div class="flex items-center justify-between mb-4">
-        <span class="text-sm text-gray-600">
+    <section class="hud-card">
+      <div class="hud-accent"></div>
+
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <span class="hud-caps text-red-400 tabular-nums">
           Q{{ currentIndex() + 1 }} / {{ q.questions.length }}
         </span>
-        <span class="text-sm font-semibold text-orange-600">
-          ⏱ {{ formatTime(remainingSeconds()) }}
+        <div class="hud-meter flex-1">
+          <div [style.width.%]="((currentIndex() + 1) / q.questions.length) * 100"></div>
+        </div>
+        <span class="hud-caps text-red-400 flex items-center gap-1 tabular-nums">
+          <span class="material-symbols-outlined" style="font-size:16px">timer</span>
+          {{ formatTime(remainingSeconds()) }}
         </span>
       </div>
 
       @if (currentQuestion(); as cq) {
-        <p class="font-semibold text-gray-800 mb-4">{{ cq.text }}</p>
-        <div class="space-y-2">
-          @for (opt of currentOptions(); track opt.id) {
-            <label class="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-gray-50"
-                   [class.border-orange-400]="answers()[cq.id] === opt.id"
-                   [class.bg-orange-50]="answers()[cq.id] === opt.id">
+        <h2 class="hud-display text-xl sm:text-2xl text-white mb-5 leading-snug">{{ cq.text }}</h2>
+
+        <div class="space-y-3 mb-6">
+          @for (opt of currentOptions(); track opt.id; let i = $index) {
+            <label class="flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all"
+                   [class.border-red-500]="answers()[cq.id] === opt.id"
+                   [class.bg-red-600/15]="answers()[cq.id] === opt.id"
+                   [class.shadow-[0_0_15px_rgba(220,38,38,0.25)]]="answers()[cq.id] === opt.id"
+                   [class.border-white/10]="answers()[cq.id] !== opt.id"
+                   [class.bg-black/30]="answers()[cq.id] !== opt.id"
+                   [class.hover:border-white/30]="answers()[cq.id] !== opt.id">
               <input type="radio" [name]="'q' + cq.id" [value]="opt.id"
                      [checked]="answers()[cq.id] === opt.id"
                      (change)="selectAnswer(cq.id, opt.id)"
-                     class="mt-1" />
-              <span>{{ opt.text }}</span>
+                     class="mt-1 hud-radio"/>
+              <span class="hud-caps text-red-400 mt-0.5 shrink-0">
+                {{ ['A','B','C','D','E'][i] }}
+              </span>
+              <span class="text-[15px] text-[#fbdbd7]">{{ opt.text }}</span>
             </label>
           }
         </div>
       }
 
-      <div class="flex justify-between mt-5">
+      <div class="flex gap-3 mt-6">
         <button (click)="prev()" [disabled]="currentIndex() === 0"
-                class="px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold disabled:opacity-50">
+                class="hud-btn-ghost flex-1 disabled:opacity-40">
+          <span class="material-symbols-outlined" style="font-size:18px">chevron_left</span>
           {{ 'common.previous' | translate }}
         </button>
         @if (currentIndex() < q.questions.length - 1) {
-          <button (click)="next()"
-                  class="px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-semibold">
+          <button (click)="next()" class="hud-btn-primary flex-1">
             {{ 'common.next' | translate }}
+            <span class="material-symbols-outlined" style="font-size:18px">chevron_right</span>
           </button>
         } @else {
-          <button (click)="submit()"
-                  class="px-4 py-2 rounded-full bg-green-600 text-white text-sm font-semibold">
+          <button (click)="submit()" class="hud-btn-primary flex-1">
+            <span class="material-symbols-outlined fill">check_circle</span>
             {{ 'quiz.submitTest' | translate }}
           </button>
         }
       </div>
-    </div>
+    </section>
   }
 
-  <!-- 3. Results -->
+  <!-- 3. Results ------------------------------------------------------------ -->
   @if (phase() === 'results' && quiz(); as q) {
-    <div class="rounded-xl border border-gray-200 bg-white p-5">
-      <h2 class="text-xl font-bold mb-1">{{ 'quiz.score' | translate }}</h2>
-      <p class="text-3xl font-bold text-orange-600 mb-4">{{ score() }} / {{ q.questions.length }}</p>
+    <section class="hud-card text-center">
+      <div class="hud-accent"></div>
 
-      <div class="space-y-3">
+      <span class="hud-caps text-red-400">MISSION DEBRIEF</span>
+      <div class="hud-display text-6xl sm:text-7xl text-red-500 leading-none mt-3
+                  drop-shadow-[0_0_20px_rgba(220,38,38,0.5)] tabular-nums">
+        {{ score() }}<span class="text-3xl text-[#e6bdb8]"> / {{ q.questions.length }}</span>
+      </div>
+      <p class="text-base text-[#e6bdb8] mt-2 mb-5">
+        {{ (score() / q.questions.length * 100) | number:'1.0-0' }}% accuracy
+      </p>
+
+      <div class="hud-meter">
+        <div [style.width.%]="(score() / q.questions.length) * 100"></div>
+      </div>
+
+      <!-- breakdown -->
+      <div class="space-y-3 mt-7 text-left">
         @for (item of breakdown(); track item.question.id) {
-          <div class="rounded-lg border p-3"
-               [class.border-green-400]="item.correct"
-               [class.border-red-400]="!item.correct">
-            <p class="font-semibold text-sm mb-1">{{ item.question.text }}</p>
-            <p class="text-xs text-gray-600">
-              {{ item.correct ? ('quiz.correct' | translate) : ('quiz.incorrect' | translate) }}
-            </p>
-            @if (item.question.explanation) {
-              <p class="text-xs text-gray-500 mt-2">
-                <strong>{{ 'quiz.explanation' | translate }}:</strong> {{ item.question.explanation }}
-              </p>
-            }
+          <div class="rounded-lg border p-4"
+               [class.border-emerald-500/50]="item.correct"
+               [class.bg-emerald-500/10]="item.correct"
+               [class.border-red-500/60]="!item.correct"
+               [class.bg-red-600/15]="!item.correct">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined fill shrink-0 mt-0.5"
+                    [class.text-emerald-400]="item.correct"
+                    [class.text-red-400]="!item.correct">
+                {{ item.correct ? 'check_circle' : 'cancel' }}
+              </span>
+              <div class="flex-1 min-w-0">
+                <p class="text-[15px] font-semibold text-white">{{ item.question.text }}</p>
+                <p class="hud-caps mt-1.5"
+                   [class.text-emerald-400]="item.correct"
+                   [class.text-red-400]="!item.correct">
+                  {{ item.correct ? ('quiz.correct' | translate) : ('quiz.incorrect' | translate) }}
+                </p>
+                @if (item.question.explanation && !item.correct) {
+                  <p class="text-sm text-[#fbdbd7] mt-2 leading-relaxed">
+                    <strong class="text-white">{{ 'quiz.explanation' | translate }}:</strong>
+                    {{ item.question.explanation }}
+                  </p>
+                }
+              </div>
+            </div>
           </div>
         }
       </div>
 
-      <button (click)="reset()"
-              class="mt-5 px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold">
+      <button (click)="reset()" class="hud-btn-primary w-full mt-7">
+        <span class="material-symbols-outlined fill">replay</span>
         {{ 'common.tryAgain' | translate }}
       </button>
-    </div>
+    </section>
   }
 </div>

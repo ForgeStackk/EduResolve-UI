@@ -1,9 +1,9 @@
-<div class="mb-4">
-  <div class="flex justify-between mb-1">
-    <span class="text-sm font-medium text-brand-black">{{ label() }}</span>
-    <span class="text-sm font-medium text-brand-black">{{ progress() }}%</span>
+<div class="w-full">
+  <div class="flex items-center justify-between gap-2 mb-2">
+    <span class="text-label-md uppercase text-surface-mute font-semibold">{{ label() }}</span>
+    <span class="text-label-md font-semibold text-surface-ink">{{ progress() }}%</span>
   </div>
-  <div class="w-full bg-gray-200 rounded-full h-2">
-    <div class="h-2 rounded-full {{ colorClass() }}" [style.width.%]="progress()"></div>
+  <div class="w-full bg-surface-low rounded-full h-2.5 overflow-hidden">
+    <div class="h-full rounded-full bg-brand-700 transition-all duration-300" [style.width.%]="progress()"></div>
   </div>
 </div>

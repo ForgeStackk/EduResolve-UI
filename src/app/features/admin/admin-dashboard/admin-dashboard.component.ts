@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminApiService } from '../../../core/api/admin-api.service';
 
 interface FeeRecord {
@@ -11,7 +12,7 @@ interface FeeRecord {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -26,6 +27,20 @@ export class AdminDashboardComponent implements OnInit {
 
   feeData = signal<FeeRecord[]>([]);
   loading = signal(true);
+
+  /** Broadcast composer state. */
+  broadcastChannel = signal<'whatsapp' | 'sms'>('whatsapp');
+  broadcastMessage = '';
+  recipientGroup = 'All Parents (Grade 9-12)';
+
+  /** Enrollment fill percentage toward target. */
+  enrollmentPct = computed(() => {
+    const t = this.enrollmentTarget() || 1;
+    return Math.max(0, Math.min(100, Math.round((this.enrollment() / t) * 100)));
+  });
+
+  /** Static ticket-volume sparkline heights (backend doesn't expose history yet). */
+  readonly ticketSpark = [65, 85, 45, 72, 58, 78, 90];
 
   ngOnInit(): void {
     this.adminApi.dashboard().subscribe({

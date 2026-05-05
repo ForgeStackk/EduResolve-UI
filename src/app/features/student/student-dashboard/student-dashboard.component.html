@@ -1,131 +1,242 @@
-<div class="min-h-full bg-surface-dim pb-12">
+<div class="space-y-10">
 
-  <!-- Top header bar -->
-  <header class="sticky top-0 z-10 bg-white border-b border-surface-line">
-    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-full bg-brand-700 text-white flex items-center justify-center font-semibold text-sm">
-          {{ initials() || (firstName() | slice:0:1) }}
+  <!-- =============================================================
+       HERO BENTO: Active Module + Daily Directives
+       ============================================================= -->
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Active Module card -->
+    <div class="hud-card lg:col-span-8 overflow-hidden">
+      <div class="hud-accent"
+           [style.background]="subjectAccent(recommendedSubjectName())"
+           [style.box-shadow]="'0 0 10px ' + subjectAccent(recommendedSubjectName()) + '99'"></div>
+
+      <div class="flex flex-col md:flex-row items-center gap-6 relative">
+        <!-- Mascot / artwork -->
+        <div class="w-40 h-40 md:w-48 md:h-48 rounded-xl border border-white/10
+                    bg-black/40 flex items-center justify-center relative overflow-hidden shrink-0"
+             [style.box-shadow]="'inset 0 0 30px ' + subjectAccent(recommendedSubjectName()) + '40'">
+          <span class="material-symbols-outlined fill"
+                style="font-size:96px"
+                [style.color]="subjectAccent(recommendedSubjectName())">
+            {{ subjectIconFor(recommendedSubjectName()) }}
+          </span>
         </div>
-        <span class="font-bold text-lg text-brand-700">EduResolve</span>
-      </div>
-      <div class="flex items-center gap-2 chip">
-        <span>🔥</span>
-        <span>{{ streakDays() }}</span>
+
+        <div class="flex-1 space-y-3 w-full text-center md:text-left">
+          <span class="hud-caps"
+                [style.color]="subjectAccent(recommendedSubjectName())">
+            ACTIVE MODULE
+          </span>
+
+          @if (recommendedChapter(); as c) {
+            <h1 class="hud-display text-3xl sm:text-4xl text-white leading-tight">
+              {{ c.name }}
+            </h1>
+            <p class="text-[#e6bdb8] text-base leading-relaxed">
+              @if (recommendedAccuracy() != null) {
+                You are <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span> through the current module. Final boss quiz unlocks next.
+              } @else {
+                Press resume to begin the next training module.
+              }
+            </p>
+
+            <!-- Progress meter -->
+            <div class="hud-meter mt-2">
+              <div [style.width.%]="recommendedProgressPercent()"
+                   [style.background]="subjectAccent(recommendedSubjectName())"
+                   [style.box-shadow]="'0 0 10px ' + subjectAccent(recommendedSubjectName())"></div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
+              <button (click)="continueLearning()" class="hud-btn-primary">
+                <span class="material-symbols-outlined fill">play_arrow</span>
+                RESUME TRAINING
+              </button>
+              <a [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
+                 class="hud-btn-ghost">
+                <span class="material-symbols-outlined">quiz</span>
+                QUIZ DRILL
+              </a>
+            </div>
+          } @else {
+            <h1 class="hud-display text-3xl sm:text-4xl text-white">Initializing...</h1>
+            <p class="text-[#e6bdb8]">Loading your active training module.</p>
+          }
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-2xl mx-auto px-4 py-5 space-y-5">
-
-    <!-- Greeting + weekly goal -->
-    <section class="card card-pad">
-      <h1 class="text-display-md text-surface-ink">
-        {{ 'dashboard.welcome' | translate }}, {{ firstName() || '...' }}
-      </h1>
-      <p class="text-body-md text-surface-mute mt-1">
-        {{ 'dashboard.todaysPlan' | translate }}
-      </p>
-      <div class="mt-4 pt-4 border-t border-surface-line flex items-center justify-between">
-        <span class="eyebrow">{{ 'dashboard.weeklyGoal' | translate }}</span>
-        <span class="text-body-md font-semibold">{{ streakDays() }} / 7 {{ 'common.days' | translate }}</span>
+    <!-- Daily Directives -->
+    <div class="hud-card lg:col-span-4 flex flex-col">
+      <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined" style="color:#10b981">checklist</span>
+        <h3 class="hud-display text-xl text-white">Daily Directives</h3>
       </div>
-    </section>
 
-    <!-- XP + rank card (red accent) -->
-    <section class="rounded-lg p-4 bg-brand-50 border border-brand-100">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-brand-700 text-white flex items-center justify-center">⭐</div>
-          <div>
-            <p class="text-display-md text-brand-700 leading-none">{{ experiencePoints() }} <span class="text-body-md font-normal">{{ 'dashboard.xp' | translate }}</span></p>
-            <p class="text-body-md text-brand-900">{{ rankLabel() }}</p>
+      <div class="space-y-3 flex-1">
+        @for (item of dailyPlan(); track item.chapterId; let i = $index) {
+          <div class="flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer"
+               [class.bg-black/40]="!item.done && i !== 0"
+               [class.border-white/5]="!item.done && i !== 0"
+               [class.bg-white/5]="i === 0 && !item.done"
+               [class.border-white/20]="i === 0 && !item.done"
+               [class.bg-emerald-500/10]="item.done"
+               [class.border-emerald-500/40]="item.done"
+               (click)="toggleDirective(item.chapterId)">
+            <div class="w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+                 [class.border-emerald-400]="item.done"
+                 [class.bg-emerald-500/30]="item.done"
+                 [class.border-white/40]="!item.done">
+              @if (item.done) {
+                <span class="material-symbols-outlined fill text-white" style="font-size:16px">check</span>
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold truncate"
+                 [class.text-white]="!item.done"
+                 [class.line-through]="item.done"
+                 [class.opacity-70]="item.done">
+                {{ item.title }}
+              </p>
+              <p class="text-xs text-[#e6bdb8]/80 truncate">{{ item.subject }} · {{ item.minutes }}m</p>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="h-2 rounded-full bg-white overflow-hidden">
-        <div class="h-full bg-brand-700 transition-all" [style.width.%]="xpProgressPercent()"></div>
-      </div>
-      <div class="mt-2 flex justify-between text-xs text-brand-900">
-        <span>{{ 'dashboard.next' | translate }}: {{ nextRankLabel() }}</span>
-        <span>{{ xpToNextRank() }} {{ 'dashboard.xpNeeded' | translate }}</span>
-      </div>
-    </section>
-
-    <!-- Continue Learning -->
-    <section>
-      <h2 class="text-title-lg mb-3">{{ 'dashboard.continueLearning' | translate }}</h2>
-      @if (recommendedChapter(); as c) {
-        <article class="card card-pad">
-          <div class="flex items-center justify-between gap-3">
-            <span class="chip">{{ recommendedSubjectName() || 'Subject' }}</span>
-            @if (recommendedAccuracy() != null) {
-              <span class="chip-neutral">{{ recommendedAccuracy() }}%</span>
-            }
-          </div>
-          <h3 class="text-title-lg mt-2">{{ c.name }}</h3>
-          @if (c.summary) {
-            <p class="text-body-md text-surface-mute mt-1 line-clamp-2">{{ c.summary }}</p>
-          }
-          <div class="mt-3 h-1.5 rounded-full bg-surface-low overflow-hidden">
-            <div class="h-full bg-brand-700" [style.width.%]="recommendedProgressPercent()"></div>
-          </div>
-          <button (click)="continueLearning()"
-                  class="btn-primary w-full mt-4">
-            {{ 'dashboard.resumeLesson' | translate }} →
-          </button>
-        </article>
-      } @else {
-        <div class="card card-pad text-surface-mute text-body-md">
-          {{ 'common.loading' | translate }}
-        </div>
-      }
-    </section>
-
-    <!-- Daily Study Plan -->
-    <section>
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-title-lg">{{ 'dashboard.dailyPlan' | translate }}</h2>
-        <a routerLink="/learn/subjects" class="text-body-md text-brand-700 font-semibold">{{ 'common.viewAll' | translate }}</a>
-      </div>
-      <ul class="card divide-y divide-surface-line">
-        @for (item of dailyPlan(); track item.chapterId) {
-          <li>
-            <a [routerLink]="['/learn/chapters', item.chapterId]"
-               class="flex items-center gap-3 p-4 hover:bg-surface-low">
-              <span class="w-5 h-5 rounded-full border-2 border-surface-ring shrink-0"></span>
-              <div class="flex-1 min-w-0">
-                <p class="text-body-lg font-semibold truncate">{{ item.title }}</p>
-                <p class="text-body-md text-surface-mute">
-                  {{ item.subject }} · {{ item.minutes }} {{ 'common.minutes' | translate }}
-                </p>
-              </div>
-              <span class="text-surface-ring">›</span>
-            </a>
-          </li>
         }
         @if (dailyPlan().length === 0) {
-          <li class="p-4 text-body-md text-surface-mute">{{ 'common.loading' | translate }}</li>
+          <p class="text-sm text-[#e6bdb8]/70 italic">{{ 'common.loading' | translate }}</p>
         }
-      </ul>
-    </section>
+      </div>
 
-    <!-- Focus Areas -->
-    @if (weakTopics().length > 0) {
-      <section>
-        <h2 class="text-title-lg mb-3">{{ 'dashboard.focusAreas' | translate }}</h2>
-        <div class="grid grid-cols-2 gap-3">
-          @for (w of weakTopics(); track w.id) {
-            <article class="rounded-lg p-3 bg-brand-50 border border-brand-200">
-              <p class="text-label-md uppercase text-brand-700 flex items-center gap-1">
-                <span>📉</span> {{ w.subject || 'Topic' }}
-              </p>
-              <p class="text-body-lg font-semibold mt-1 truncate">{{ w.topicName || ('#' + w.topicId) }}</p>
-              <p class="text-body-md text-brand-900">{{ w.accuracy }}% {{ 'dashboard.accuracy' | translate }}</p>
-            </article>
-          }
+      <!-- Streak / XP mini-row -->
+      <div class="mt-5 pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
+        <div class="text-center">
+          <p class="hud-caps text-[#e6bdb8]/70 mb-1">STREAK</p>
+          <p class="hud-display text-2xl text-red-500">🔥 {{ streakDays() }}</p>
         </div>
-      </section>
+        <div class="text-center">
+          <p class="hud-caps text-[#e6bdb8]/70 mb-1">XP · {{ rankLabel() }}</p>
+          <p class="hud-display text-2xl text-white">{{ experiencePoints() }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================
+       STRATEGIC FOCUS chips
+       ============================================================= -->
+  <section class="space-y-4">
+    <h2 class="hud-display text-2xl sm:text-3xl text-white">Strategic Focus</h2>
+    <div class="flex flex-wrap gap-3">
+      @for (chip of focusChips(); track chip.id) {
+        <a [routerLink]="['/learn/subjects', chip.id]"
+           class="hud-chip"
+           [class.hud-chip-active]="chip.active">
+          <span class="material-symbols-outlined" style="font-size:18px">{{ chip.icon }}</span>
+          {{ chip.name }}
+          @if (chip.active) { <span class="opacity-80">· ACTIVE</span> }
+        </a>
+      }
+      @if (focusChips().length === 0) {
+        <span class="hud-chip">Loading subjects...</span>
+      }
+    </div>
+  </section>
+
+  <!-- =============================================================
+       TACTICAL INTEL: weak topics + recommended actions
+       ============================================================= -->
+  <section class="space-y-4">
+    <div class="flex items-end justify-between">
+      <h2 class="hud-display text-2xl sm:text-3xl text-white">Tactical Intel</h2>
+      <a routerLink="/learn/subjects"
+         class="text-red-500 hover:text-white font-bold text-xs tracking-widest uppercase transition-colors">
+        VIEW ALL
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- Quiz drill card -->
+      @if (recommendedChapter(); as c) {
+        <a [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
+           class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
+          <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+          <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+                      flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"></div>
+            <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                  style="font-size:56px; color:#f59e0b; filter:drop-shadow(0 0 15px rgba(245,158,11,.6))">
+              quiz
+            </span>
+          </div>
+          <div>
+            <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">KNOWLEDGE CHECK</span>
+            <h4 class="text-white font-bold leading-tight">{{ c.name }} Drill</h4>
+            <p class="text-sm text-[#e6bdb8]/80 mt-2">5 Questions · +50 XP</p>
+          </div>
+        </a>
+      }
+
+      <!-- Doubt solver card -->
+      <a routerLink="/learn/doubt"
+         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
+        <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+                    flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent"></div>
+          <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                style="font-size:56px; color:#3b82f6; filter:drop-shadow(0 0 15px rgba(59,130,246,.6))">
+            psychology_alt
+          </span>
+        </div>
+        <div>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">SUPPORT BRIEFING</span>
+          <h4 class="text-white font-bold leading-tight">Ask a Doubt</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">Instant AI &amp; textbook answers</p>
+        </div>
+      </a>
+
+      <!-- Weak topic / focus area card -->
+      @if (weakTopics().length > 0) {
+        @for (w of weakTopics().slice(0,1); track w.id) {
+          <button type="button"
+                  (click)="drillWeakTopic(w)"
+                  class="hud-card-flat flex flex-col gap-3 text-left w-full cursor-pointer
+                         hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(220,38,38,0.25)]
+                         transition-all group">
+            <div class="hud-accent"></div>
+            <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+                        flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-br from-red-600/25 to-transparent"></div>
+              <span class="material-symbols-outlined fill group-hover:scale-110 transition-transform"
+                    style="font-size:56px; color:#dc2626; filter:drop-shadow(0 0 15px rgba(220,38,38,.6))">
+                target
+              </span>
+            </div>
+            <div>
+              <span class="hud-caps text-red-400 mb-1 block">PRIORITY TARGET</span>
+              <h4 class="text-white font-bold leading-tight truncate">
+                {{ w.topicName || ('Topic #' + w.topicId) }}
+              </h4>
+              <p class="text-sm text-[#e6bdb8]/80 mt-2">
+                Current accuracy <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
+              </p>
+              <span class="hud-caps text-red-400 mt-3 inline-flex items-center gap-1 group-hover:text-white transition-colors">
+                LAUNCH DRILL
+                <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
+              </span>
+            </div>
+          </button>
+        }
+      }
+    </div>
+
+    @if (dailyPlan().length === 0 && weakTopics().length === 0) {
+      <div class="hud-card-flat text-center text-[#e6bdb8]/80 py-10">
+        {{ 'common.loading' | translate }}
+      </div>
     }
-  </main>
+  </section>
 </div>

@@ -1,9 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { Chapter, ChunkType, ContentChunk, LearningApiService, Topic } from '../../../core/api/learning-api.service';
+import { PerformanceApiService, WeakTopic } from '../../../core/api/performance-api.service';
+import { AuthService, MOCK_STUDENT_PROFILE } from '../../../core/auth/auth.service';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-chapter-detail',
@@ -14,6 +17,8 @@ import { LanguageService } from '../../../core/i18n/language.service';
 })
 export class ChapterDetailComponent implements OnInit {
   private api = inject(LearningApiService);
+  private performanceApi = inject(PerformanceApiService);
+  private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   protected lang = inject(LanguageService);
 
@@ -33,6 +38,24 @@ export class ChapterDetailComponent implements OnInit {
   /** topicId -> currently loaded chunks. */
   chunksByTopic = signal<Record<number, ContentChunk[]>>({});
 
+  /** Performance records for the current student across all topics. */
+  private weakTopics = signal<WeakTopic[]>([]);
+
+  /**
+   * Chapter mastery as a percentage (0 - 100). Averages the accuracy across
+   * every weak-topic record that belongs to a topic in this chapter. If we
+   * have no performance data yet, returns 0 so the meter honestly shows
+   * "not started" instead of a misleading placeholder value.
+   */
+  progressPercent = computed<number>(() => {
+    const topicIds = new Set(this.topics().map(t => t.id));
+    if (topicIds.size === 0) return 0;
+    const relevant = this.weakTopics().filter(w => topicIds.has(w.topicId));
+    if (relevant.length === 0) return 0;
+    const avg = relevant.reduce((s, w) => s + (w.accuracy ?? 0), 0) / relevant.length;
+    return Math.max(0, Math.min(100, Math.round(avg)));
+  });
+
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.api.getChapter(id).subscribe(c => this.chapter.set(c));
@@ -43,6 +66,12 @@ export class ChapterDetailComponent implements OnInit {
       this.active.set(initial);
       this.loading.set(false);
     });
+
+    // Pull the student's performance snapshot to drive the real progress meter.
+    const studentId = this.auth.currentStudentId() ?? MOCK_STUDENT_PROFILE.id;
+    this.performanceApi.weakTopics(studentId, 50).pipe(
+      catchError(() => of([] as WeakTopic[]))
+    ).subscribe(rows => this.weakTopics.set(rows));
   }
 
   setActive(topicId: number, type: ChunkType) {

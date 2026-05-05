@@ -1,52 +1,95 @@
-<div class="p-6 max-w-4xl mx-auto">
+<div class="space-y-6">
+  <a routerLink="/learn/subjects"
+     class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+    <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
+    BACK TO LIBRARY
+  </a>
+
   @if (chapter(); as c) {
-    <h1 class="text-2xl font-bold mb-1">{{ c.name }}</h1>
-    @if (c.summary) { <p class="text-gray-500 mb-3">{{ c.summary }}</p> }
-    <div class="flex flex-wrap gap-3 mb-6">
-      <a [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
-         class="rounded-full bg-orange-500 text-white px-4 py-2 text-sm font-semibold hover:bg-orange-600">
-        {{ 'chapters.startQuiz' | translate }}
-      </a>
-      <a [routerLink]="['/learn/pyqs']" [queryParams]="{ chapterId: c.id }"
-         class="rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50">
-        {{ 'chapters.viewPyqs' | translate }}
-      </a>
-    </div>
-  }
 
-  @if (topics().length > 0) {
-    <div class="space-y-4">
-      @for (t of topics(); track t.id) {
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-          <h3 class="font-semibold mb-2">{{ t.name }}</h3>
-
-          <!-- chunk-type tabs -->
-          <div class="flex flex-wrap gap-2 mb-3">
-            @for (tab of tabs; track tab.type) {
-              <button (click)="setActive(t.id, tab.type)"
-                      [class.bg-orange-500]="active()[t.id] === tab.type"
-                      [class.text-white]="active()[t.id] === tab.type"
-                      [class.bg-gray-100]="active()[t.id] !== tab.type"
-                      class="text-xs px-3 py-1 rounded-full font-semibold">
-                {{ tab.labelKey | translate }}
-              </button>
-            }
-          </div>
-
-          @if (chunksByTopic()[t.id]?.length) {
-            @for (chunk of chunksByTopic()[t.id]; track chunk.id) {
-              <article class="prose prose-sm max-w-none mt-3">
-                @if (chunk.title) { <h4 class="text-sm font-semibold text-gray-700">{{ chunk.title }}</h4> }
-                <p class="text-gray-700 whitespace-pre-line">{{ chunk.body }}</p>
-              </article>
-            }
-          } @else {
-            <p class="text-sm text-gray-400">{{ 'common.noResults' | translate }}</p>
-          }
-        </div>
+    <!-- Briefing card -->
+    <section class="hud-card overflow-hidden">
+      <div class="hud-accent"></div>
+      <span class="hud-caps text-red-400">CHAPTER BRIEFING</span>
+      <h1 class="hud-display text-3xl sm:text-4xl text-white mt-2 leading-tight">{{ c.name }}</h1>
+      @if (c.summary) {
+        <p class="text-base text-[#e6bdb8] mt-3 leading-relaxed">{{ c.summary }}</p>
       }
+
+      <!-- Progress -->
+      <div class="mt-5 pt-4 border-t border-white/10">
+        <div class="flex items-center justify-between mb-2">
+          <span class="hud-caps text-[#e6bdb8]/80">MODULE PROGRESS</span>
+          <span class="text-base font-bold text-red-400 tabular-nums">{{ progressPercent() }}%</span>
+        </div>
+        <div class="hud-meter">
+          <div [style.width.%]="progressPercent()"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Action row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
+              class="hud-btn-primary w-full">
+        <span class="material-symbols-outlined fill">rocket_launch</span>
+        {{ 'chapters.startQuiz' | translate }}
+      </button>
+      <button [routerLink]="['/learn/pyqs']" [queryParams]="{ chapterId: c.id }"
+              class="hud-btn-ghost w-full">
+        <span class="material-symbols-outlined">history_edu</span>
+        {{ 'chapters.viewPyqs' | translate }}
+      </button>
     </div>
-  } @else if (!loading()) {
-    <p class="text-gray-500">{{ 'common.noResults' | translate }}</p>
+
+    <!-- Topics -->
+    @if (topics().length > 0) {
+      <section class="space-y-4">
+        <h2 class="hud-display text-2xl text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-red-500">topic</span>
+          MISSION TOPICS
+        </h2>
+        @for (t of topics(); track t.id) {
+          <article class="hud-card-flat">
+            <div class="hud-accent"></div>
+            <div class="flex items-center gap-2 mb-4 pl-2">
+              <span class="hud-caps text-red-400">TOPIC</span>
+              <h3 class="hud-display text-lg text-white">{{ t.name }}</h3>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+              @for (tab of tabs; track tab.type) {
+                <button (click)="setActive(t.id, tab.type)"
+                        class="hud-chip whitespace-nowrap"
+                        [class.hud-chip-active]="active()[t.id] === tab.type">
+                  {{ tab.labelKey | translate }}
+                </button>
+              }
+            </div>
+
+            <!-- Content -->
+            @if (chunksByTopic()[t.id]?.length) {
+              <div class="space-y-4">
+                @for (chunk of chunksByTopic()[t.id]; track chunk.id) {
+                  <div class="space-y-2">
+                    @if (chunk.title) {
+                      <h4 class="hud-display text-base text-white">{{ chunk.title }}</h4>
+                    }
+                    <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ chunk.body }}</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="text-sm text-[#e6bdb8]/70 text-center py-6">{{ 'common.noResults' | translate }}</p>
+            }
+          </article>
+        }
+      </section>
+    } @else if (!loading()) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
+        {{ 'common.noResults' | translate }}
+      </div>
+    }
   }
 </div>

@@ -1,23 +1,70 @@
-<div class="p-6 max-w-3xl mx-auto">
-  <h1 class="text-2xl font-bold mb-4">{{ 'bookmarks.title' | translate }}</h1>
+<div class="space-y-6">
+
+  <a routerLink="/student/dashboard"
+     class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+    <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
+    BACK TO HUD
+  </a>
+
+  <header class="space-y-2">
+    <p class="hud-caps text-red-400">PERSONAL ARCHIVE</p>
+    <h1 class="hud-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
+      {{ 'bookmarks.title' | translate }}
+    </h1>
+  </header>
 
   @if (loading()) {
-    <p class="text-gray-500">{{ 'common.loading' | translate }}</p>
+    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
   } @else if (rows().length === 0) {
-    <div class="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
-      <p class="text-gray-500">{{ 'bookmarks.empty' | translate }}</p>
+    <div class="hud-card-flat text-center py-12 border-dashed">
+      <span class="material-symbols-outlined text-[#ac8884]" style="font-size:48px">bookmark_border</span>
+      <p class="hud-display text-lg text-white mt-3">{{ 'bookmarks.empty' | translate }}</p>
+      <p class="text-sm text-[#e6bdb8] mt-2">
+        Tap the bookmark icon on any chapter, question, or doubt to save it here.
+      </p>
     </div>
   } @else {
-    <div class="space-y-3">
+    <ul class="space-y-3">
       @for (b of rows(); track b.id) {
-        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
-          <div>
-            <span class="text-xs uppercase tracking-wide text-gray-400">{{ b.targetType }}</span>
-            <p class="font-semibold">{{ b.label || ('#' + b.targetId) }}</p>
+        <li class="hud-card-flat">
+          <div class="hud-accent"
+               [style.background]="colorFor(b.targetType)"
+               [style.box-shadow]="'0 0 10px ' + colorFor(b.targetType) + '99'"></div>
+          <div class="flex items-center justify-between gap-3 pl-2">
+            <button type="button"
+                    (click)="open(b)"
+                    class="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer
+                           hover:opacity-90 transition-opacity group">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                          group-hover:scale-105 transition-transform"
+                   [style.background]="colorFor(b.targetType) + '20'"
+                   [style.box-shadow]="'inset 0 0 15px ' + colorFor(b.targetType) + '40'">
+                <span class="material-symbols-outlined" [style.color]="colorFor(b.targetType)">
+                  {{ iconFor(b.targetType) }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="hud-caps" [style.color]="colorFor(b.targetType)">
+                  {{ b.targetType.replace('_',' ') }}
+                </span>
+                <p class="hud-display text-base text-white mt-1 truncate group-hover:text-red-400 transition-colors">
+                  {{ b.label || ('#' + b.targetId) }}
+                </p>
+              </div>
+              <span class="material-symbols-outlined text-[#ac8884] group-hover:text-white transition-colors shrink-0"
+                    style="font-size:20px">
+                chevron_right
+              </span>
+            </button>
+            <button type="button"
+                    (click)="remove(b); $event.stopPropagation()"
+                    class="hud-btn-ghost text-xs px-3 py-2 shrink-0"
+                    aria-label="Remove">
+              <span class="material-symbols-outlined" style="font-size:18px">close</span>
+            </button>
           </div>
-          <button (click)="remove(b)" class="text-sm text-red-600 hover:text-red-700">Remove</button>
-        </div>
+        </li>
       }
-    </div>
+    </ul>
   }
 </div>

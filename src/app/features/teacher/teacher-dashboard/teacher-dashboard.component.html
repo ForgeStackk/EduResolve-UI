@@ -1,180 +1,248 @@
-<div class="dashboard-container">
-  <!-- Header Banner -->
-  <div class="header-banner">
-    <div class="banner-top">
-      <div class="teacher-label">TEACHER SUITE</div>
-      <div class="banner-info">
-        <h1 class="banner-title">Workflows & Insights</h1>
-        <p class="banner-description">Optimized orchestration for Advanced Calculus - Section II</p>
-      </div>
+<div class="space-y-8">
+
+  <!-- Header briefing -->
+  <header class="space-y-3">
+    <div class="flex items-center gap-2">
+      <span class="hud-caps text-red-400">TEACHER SUITE</span>
+      <span class="hud-caps text-[#e6bdb8]/70">· ADVANCED CALCULUS — SEC II</span>
     </div>
-    <button class="create-assignment-btn">
-      <span class="btn-icon">➕</span>
-      <span class="btn-text">Create Assignment</span>
-    </button>
-  </div>
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div>
+        <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight leading-none">
+          Workflows &amp; <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Insights</span>
+        </h1>
+        <p class="text-base sm:text-lg text-[#e6bdb8] mt-2 max-w-2xl">
+          Optimized orchestration for your class. Intervene on bottlenecks and dispatch drills without leaving the HUD.
+        </p>
+      </div>
+      <button class="hud-btn-primary shrink-0">
+        <span class="material-symbols-outlined fill">add_circle</span>
+        Create Assignment
+      </button>
+    </div>
+  </header>
 
-  <!-- Main Content Grid -->
-  <div class="main-content">
-    <!-- Left Column -->
-    <div class="left-column">
+  <!-- Grid body -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- ===== LEFT COLUMN ============================================== -->
+    <div class="space-y-6">
+
       <!-- ForgeAI Bottleneck Analysis -->
-      <div class="card analysis-card">
-        <div class="card-header">
-          <span class="icon">⚡</span>
-          <h3 class="card-title">ForgeAI Bottleneck Analysis</h3>
+      <section class="hud-card space-y-4">
+        <div class="hud-accent"></div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined fill text-red-500">auto_awesome</span>
+          <span class="hud-caps text-red-400">FORGEAI BOTTLENECK ANALYSIS</span>
         </div>
-      </div>
 
-      <!-- Doubt Cluster -->
-      <div class="card doubt-card">
-        <h4 class="card-subtitle">DoubtCluster: Integration by Parts</h4>
-        <p class="card-text">65% of students failed to identify u/v substitution in the mid-week quiz. Recommend targeted drill</p>
-      </div>
+        <!-- Doubt Cluster -->
+        <div class="rounded-lg border border-red-500/40 bg-red-600/10 p-4
+                    shadow-[0_0_15px_rgba(220,38,38,0.15)]">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="material-symbols-outlined text-red-400" style="font-size:18px">warning</span>
+            <h4 class="hud-display text-base text-white">DoubtCluster: Integration by Parts</h4>
+          </div>
+          <p class="text-sm text-[#fbdbd7] leading-relaxed">
+            65% of students failed to identify <strong class="text-white">u/v substitution</strong>
+            in the mid-week quiz. Recommend targeted drill.
+          </p>
+        </div>
 
-      <!-- Velocity Alert -->
-      <div class="card velocity-card">
-        <h4 class="card-subtitle">Velocity Alert: Rapid Completion</h4>
-        <p class="card-text">Top 15% are finishing 'Vector Species' 2 days ahead of schedule. Auto-unlock advanced modules</p>
-      </div>
+        <!-- Velocity Alert -->
+        <div class="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4
+                    shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="material-symbols-outlined text-amber-400" style="font-size:18px">rocket_launch</span>
+            <h4 class="hud-display text-base text-white">Velocity Alert: Rapid Completion</h4>
+          </div>
+          <p class="text-sm text-[#fbdbd7] leading-relaxed">
+            Top 15% finishing <strong class="text-white">Vector Spaces</strong> 2 days ahead of
+            schedule. Auto-unlock advanced modules?
+          </p>
+        </div>
+      </section>
 
       <!-- Homework Dispatch -->
-      <div class="card homework-card">
-        <h3 class="card-title">Homework Dispatch</h3>
-        <div class="homework-options">
-          <div class="homework-option">
-            <div class="option-icon">📝</div>
-            <div class="option-content">
-              <h5 class="option-title">Text Instruction</h5>
-              <p class="option-desc">Write custom text</p>
-            </div>
-          </div>
-          <div class="homework-option">
-            <div class="option-icon">🖼️</div>
-            <div class="option-content">
-              <h5 class="option-title">Capture Whiteboard</h5>
-              <p class="option-desc">Auto-OCR text</p>
-            </div>
-          </div>
-          <div class="homework-option">
-            <div class="option-icon">🎙️</div>
-            <div class="option-content">
-              <h5 class="option-title">Voice Memo</h5>
-              <p class="option-desc">Audio feedback & guidance</p>
-            </div>
-          </div>
+      <section class="hud-card space-y-4">
+        <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-blue-400">send</span>
+          <h3 class="hud-display text-xl text-white">HOMEWORK DISPATCH</h3>
         </div>
-      </div>
 
-      <!-- File Upload Area -->
-      <div class="file-upload-area">
-        <div class="upload-placeholder">
-          Drop PDF or Asset here
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
+                        bg-blue-500/20 shadow-[inset_0_0_15px_rgba(59,130,246,0.3)]">
+              <span class="material-symbols-outlined text-blue-400">edit_note</span>
+            </div>
+            <h5 class="hud-display text-sm text-white">Text Instruction</h5>
+            <p class="text-xs text-[#e6bdb8]/80 mt-1">Write custom text prompts.</p>
+          </button>
+
+          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
+                        bg-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.3)]">
+              <span class="material-symbols-outlined text-emerald-400">photo_camera</span>
+            </div>
+            <h5 class="hud-display text-sm text-white">Capture Whiteboard</h5>
+            <p class="text-xs text-[#e6bdb8]/80 mt-1">Auto-OCR to text.</p>
+          </button>
+
+          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
+                        bg-purple-500/20 shadow-[inset_0_0_15px_rgba(139,92,246,0.3)]">
+              <span class="material-symbols-outlined text-purple-400">mic</span>
+            </div>
+            <h5 class="hud-display text-sm text-white">Voice Memo</h5>
+            <p class="text-xs text-[#e6bdb8]/80 mt-1">Audio feedback &amp; guidance.</p>
+          </button>
         </div>
-      </div>
+
+        <!-- Drop target -->
+        <label class="block border-2 border-dashed border-white/15 rounded-lg
+                      bg-black/30 p-6 text-center cursor-pointer
+                      hover:border-red-500/50 hover:bg-red-600/5 transition-all">
+          <span class="material-symbols-outlined text-[#ac8884] block mx-auto" style="font-size:32px">upload_file</span>
+          <p class="hud-caps text-[#e6bdb8] mt-2">Drop PDF or asset here</p>
+        </label>
+      </section>
     </div>
 
-    <!-- Right Column -->
-    <div class="right-column">
+    <!-- ===== RIGHT COLUMN ============================================= -->
+    <div class="space-y-6">
+
       <!-- Class Roster -->
-      <div class="card roster-card">
-        <div class="roster-header">
-          <h3 class="card-title">Class Roster</h3>
-          <span class="roster-count">32 Active</span>
-          <span class="at-risk-badge">4 AT RISK</span>
-        </div>
-        <div class="roster-table">
-          <div class="table-header">
-            <div class="col-student">STUDENT</div>
-            <div class="col-engagement">ENGAGEMENT</div>
-            <div class="col-grade">LAST GRADE</div>
-            <div class="col-status">STATUS</div>
+      <section class="hud-card space-y-4">
+        <div class="hud-accent"></div>
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-500">groups</span>
+            <h3 class="hud-display text-xl text-white">CLASS ROSTER</h3>
           </div>
-          <div class="table-body">
-            @if (loading()) {
-              <div class="table-row"><div class="col-student">Loading roster...</div></div>
-            } @else if (error()) {
-              <div class="table-row"><div class="col-student">{{ error() }}</div></div>
-            } @else {
-              @for (student of students(); track student.id) {
-                <div class="table-row">
-                  <div class="col-student">
-                    <div class="student-avatar" [style.backgroundColor]="student.color">{{ student.initials }}</div>
-                    <span class="student-name">{{ student.name }}</span>
-                  </div>
-                  <div class="col-engagement">
-                    <div class="engagement-bar">
-                      <div class="engagement-fill" [style.width]="student.engagement + '%'"></div>
-                    </div>
-                    <span class="engagement-text">{{ student.engagement }}%</span>
-                  </div>
-                  <div class="col-grade">
-                    <span class="grade-badge" [ngClass]="'grade-' + (student.grade || '').toLowerCase()">{{ student.grade }}</span>
-                  </div>
-                  <div class="col-status">
-                    <span class="status-indicator" [ngClass]="student.status"></span>
-                  </div>
-                </div>
-              } @empty {
-                <div class="table-row"><div class="col-student">No students yet.</div></div>
-              }
+          <div class="flex items-center gap-2">
+            <span class="hud-chip hud-chip-active">{{ totalCount() }} ACTIVE</span>
+            @if (atRiskCount() > 0) {
+              <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">
+                {{ atRiskCount() }} AT RISK
+              </span>
             }
           </div>
         </div>
-      </div>
+
+        <!-- Column headers -->
+        <div class="grid grid-cols-[1.8fr_1.4fr_0.7fr_0.3fr] gap-3 px-1 pb-2 border-b border-white/10">
+          <span class="hud-caps text-[#e6bdb8]/70">STUDENT</span>
+          <span class="hud-caps text-[#e6bdb8]/70">ENGAGEMENT</span>
+          <span class="hud-caps text-[#e6bdb8]/70">GRADE</span>
+          <span class="hud-caps text-[#e6bdb8]/70 text-right">STATUS</span>
+        </div>
+
+        <!-- Rows -->
+        @if (loading()) {
+          <div class="text-center text-[#e6bdb8] py-6">Loading roster…</div>
+        } @else if (error()) {
+          <div class="text-center text-red-400 py-6">{{ error() }}</div>
+        } @else if (students().length === 0) {
+          <div class="text-center text-[#e6bdb8] py-6">No students yet.</div>
+        } @else {
+          <ul class="divide-y divide-white/5">
+            @for (s of students(); track s.id) {
+              <li class="grid grid-cols-[1.8fr_1.4fr_0.7fr_0.3fr] gap-3 items-center py-3 px-1">
+                <!-- student -->
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center
+                              text-sm font-bold text-white shrink-0
+                              border border-white/10"
+                       [style.background]="s.color || '#374151'">
+                    {{ s.initials }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm text-white truncate">{{ s.name }}</p>
+                    <p class="hud-caps text-[#e6bdb8]/60">{{ s.className || '10A' }}</p>
+                  </div>
+                </div>
+                <!-- engagement -->
+                <div class="flex items-center gap-2">
+                  <div class="hud-meter flex-1">
+                    <div [style.width.%]="s.engagement"></div>
+                  </div>
+                  <span class="text-xs text-white tabular-nums w-9 text-right">{{ s.engagement }}%</span>
+                </div>
+                <!-- grade -->
+                <span class="hud-chip hud-chip-active justify-center">
+                  {{ s.grade || '—' }}
+                </span>
+                <!-- status dot -->
+                <div class="flex justify-end">
+                  <span class="w-3 h-3 rounded-full"
+                        [style.background]="statusColor(s.status)"
+                        [style.box-shadow]="'0 0 8px ' + statusColor(s.status)"
+                        [title]="s.status"></span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
 
       <!-- ForgeAI Test Builder -->
-      <div class="card test-builder-card">
-        <div class="card-header-orange">
-          <span class="builder-icon">⚙️</span>
+      <section class="hud-card space-y-5">
+        <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined fill text-amber-400">settings_suggest</span>
           <div>
-            <h3 class="card-title-white">ForgeAI Test Builder</h3>
-            <p class="builder-subtitle">Generate tests for Assessment Wizard</p>
+            <h3 class="hud-display text-xl text-white">FORGEAI TEST BUILDER</h3>
+            <p class="text-xs text-[#e6bdb8]/80">Generate tests with the Assessment Wizard.</p>
           </div>
         </div>
 
-        <!-- Select Syllabus Scope -->
-        <div class="builder-section">
-          <label class="section-label">Select Syllabus Scope</label>
-          <div class="scope-buttons">
-            <button class="scope-btn">Chapter 5 (Integrals)</button>
+        <!-- Syllabus scope -->
+        <div>
+          <label class="hud-caps text-[#e6bdb8]/80 mb-2 block">SELECT SYLLABUS SCOPE</label>
+          <div class="flex flex-wrap gap-2">
+            <span class="hud-chip hud-chip-active">Chapter 5 — Integrals</span>
+            <span class="hud-chip">+ Add Chapter</span>
           </div>
         </div>
 
         <!-- Difficulty Matrix -->
-        <div class="builder-section">
-          <label class="section-label">Difficulty Matrix</label>
-          <div class="difficulty-matrix">
-            <div class="difficulty-item">
-              <span class="diff-label">REMEMBERING</span>
-              <div class="difficulty-bar">
-                <div class="difficulty-dot"></div>
+        <div>
+          <label class="hud-caps text-[#e6bdb8]/80 mb-3 block">DIFFICULTY MATRIX</label>
+          <div class="space-y-3">
+            @for (row of [
+              { label: 'REMEMBERING', pct: 20, color: '#3b82f6' },
+              { label: 'APPLYING',    pct: 50, color: '#f59e0b' },
+              { label: 'ANALYSING',   pct: 80, color: '#dc2626' }
+            ]; track row.label) {
+              <div class="grid grid-cols-[90px_1fr_34px] items-center gap-3">
+                <span class="hud-caps text-[#e6bdb8]">{{ row.label }}</span>
+                <div class="h-[6px] rounded-full border border-white/10 bg-[#44302e] relative">
+                  <div class="h-full rounded-full"
+                       [style.width.%]="row.pct"
+                       [style.background]="row.color"
+                       [style.box-shadow]="'0 0 8px ' + row.color"></div>
+                </div>
+                <span class="text-xs text-white text-right tabular-nums">{{ row.pct }}%</span>
               </div>
-            </div>
-            <div class="difficulty-item">
-              <span class="diff-label">APPLYING</span>
-              <div class="difficulty-bar">
-                <div class="difficulty-dot" style="left: 50%"></div>
-              </div>
-            </div>
-            <div class="difficulty-item">
-              <span class="diff-label">BITE</span>
-              <div class="difficulty-bar">
-                <div class="difficulty-dot" style="left: 80%"></div>
-              </div>
-            </div>
+            }
           </div>
         </div>
 
-        <!-- Draft Preview -->
-        <div class="draft-preview">
-          <div class="draft-item">▪ MCQ on Chain Rule and Application</div>
-          <div class="draft-item">▪ Filled Fundamental Theorem</div>
-          <div class="draft-item">▪ [Read] Supplemental Question...</div>
+        <!-- Draft preview -->
+        <div class="rounded-lg border border-white/10 bg-black/30 p-4 space-y-1.5">
+          <p class="hud-caps text-[#e6bdb8]/70 mb-2">DRAFT PREVIEW</p>
+          <p class="text-sm text-[#fbdbd7]">▸ MCQ on Chain Rule and Applications</p>
+          <p class="text-sm text-[#fbdbd7]">▸ Fill — Fundamental Theorem</p>
+          <p class="text-sm text-[#e6bdb8]/70 italic">▸ [Read] Supplemental question…</p>
         </div>
 
-        <button class="forge-assessment-btn">Forge Assessment</button>
-      </div>
+        <button class="hud-btn-primary w-full">
+          <span class="material-symbols-outlined fill">bolt</span>
+          Forge Assessment
+        </button>
+      </section>
     </div>
   </div>
 </div>
