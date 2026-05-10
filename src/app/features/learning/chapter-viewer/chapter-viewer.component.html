@@ -1,0 +1,181 @@
+<div class="chapter-viewer-container">
+  <!-- Header -->
+  <div class="chapter-header">
+    <div class="header-left">
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Books
+      </button>
+      @if (book()) {
+        <div class="book-info">
+          <h2 class="book-title">{{ book()?.title }}</h2>
+          <p class="book-meta">{{ book()?.classGrade }} • {{ book()?.subject }}</p>
+        </div>
+      }
+    </div>
+    <div class="header-actions">
+      <button mat-button (click)="printChapter()">
+        <mat-icon>print</mat-icon>
+        Print
+      </button>
+      <button mat-button (click)="viewPdf()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        View PDF
+      </button>
+      <button mat-raised-button color="primary" (click)="startQuiz()">
+        <mat-icon>quiz</mat-icon>
+        Take Quiz
+      </button>
+      <button mat-raised-button color="accent" (click)="askAI()">
+        <mat-icon>smart_toy</mat-icon>
+        Ask AI
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      <p>Loading chapter content...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-container">
+      <mat-icon class="error-icon">error</mat-icon>
+      <h3>Error Loading Content</h3>
+      <p>{{ error() }}</p>
+      <button mat-button color="primary" (click)="loadChapterContent()">Try Again</button>
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading() && !error() && contentBlocks().length > 0) {
+    <div class="content-layout">
+      <!-- Table of Contents Sidebar -->
+      <aside class="table-of-contents" *ngIf="getTableOfContents().length > 0">
+        <h3 class="toc-title">Table of Contents</h3>
+        <nav class="toc-nav">
+          @for (heading of getTableOfContents(); track heading.id) {
+            <button 
+              class="toc-item" 
+              (click)="scrollToBlock(heading.id)"
+              [class.active]="false">
+              <mat-icon>subdirectory_arrow_right</mat-icon>
+              <span>{{ heading.heading || heading.contentText.substring(0, 50) + '...' }}</span>
+            </button>
+          }
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        @for (block of contentBlocks(); track block.id) {
+          <div 
+            class="content-block" 
+            [class.heading-block]="isHeadingBlock(block)"
+            [class.text-block]="isTextBlock(block)"
+            [class.image-block]="isImageBlock(block)"
+            [class.table-block]="isTableBlock(block)"
+            id="block-{{ block.id }}">
+
+            <!-- Heading Block -->
+            @if (isHeadingBlock(block)) {
+              <div class="heading-content">
+                <h2 class="heading-text">{{ block.heading || block.contentText }}</h2>
+                @if (block.pageNumber) {
+                  <span class="page-indicator">Page {{ block.pageNumber }}</span>
+                }
+              </div>
+            }
+
+            <!-- Text Block -->
+            @if (isTextBlock(block)) {
+              <div class="text-content">
+                <div class="text-block-header">
+                  <mat-icon class="block-icon">{{ getBlockIcon(block) }}</mat-icon>
+                  <span class="block-type">{{ getBlockTitle(block) }}</span>
+                  @if (block.pageNumber) {
+                    <span class="page-indicator">Page {{ block.pageNumber }}</span>
+                  }
+                </div>
+                <div class="text-body" [innerHTML]="formatContentText(block.contentText)"></div>
+              </div>
+            }
+
+            <!-- Image Block -->
+            @if (isImageBlock(block)) {
+              <div class="image-content">
+                <div class="image-block-header">
+                  <mat-icon class="block-icon">{{ getBlockIcon(block) }}</mat-icon>
+                  <span class="block-type">{{ getBlockTitle(block) }}</span>
+                  @if (block.pageNumber) {
+                    <span class="page-indicator">Page {{ block.pageNumber }}</span>
+                  }
+                </div>
+                <div class="image-container">
+                  @if (block.imageUrl && block.imageUrl !== '') {
+                    <img [src]="block.imageUrl" [alt]="block.contentText" class="content-image" />
+                  } @else {
+                    <div class="image-placeholder">
+                      <mat-icon>image</mat-icon>
+                      <p>{{ block.contentText }}</p>
+                    </div>
+                  }
+                  @if (block.contentText) {
+                    <p class="image-caption">{{ block.contentText }}</p>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Table Block -->
+            @if (isTableBlock(block)) {
+              <div class="table-content">
+                <div class="table-block-header">
+                  <mat-icon class="block-icon">{{ getBlockIcon(block) }}</mat-icon>
+                  <span class="block-type">{{ getBlockTitle(block) }}</span>
+                  @if (block.pageNumber) {
+                    <span class="page-indicator">Page {{ block.pageNumber }}</span>
+                  }
+                </div>
+                <div class="table-container">
+                  <div class="table-placeholder">
+                    <mat-icon>table_chart</mat-icon>
+                    <p>{{ block.contentText }}</p>
+                    <small>Table content would be rendered here</small>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Block Actions -->
+            <div class="block-actions">
+              <button mat-icon-button (click)="askAI()" class="action-button" title="Ask AI about this content">
+                <mat-icon>smart_toy</mat-icon>
+              </button>
+              <button mat-icon-button (click)="printChapter()" class="action-button" title="Print this section">
+                <mat-icon>print</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </main>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !error() && contentBlocks().length === 0) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">article</mat-icon>
+      <h3>No Content Available</h3>
+      <p>This chapter doesn't have any content yet. Please check back later or view the PDF version.</p>
+      <button mat-raised-button color="primary" (click)="viewPdf()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        View PDF Instead
+      </button>
+    </div>
+  }
+</div>

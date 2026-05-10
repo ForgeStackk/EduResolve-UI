@@ -1,0 +1,220 @@
+<div class="ai-qa-container">
+  <!-- Header -->
+  <div class="qa-header">
+    <div class="header-left">
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+      <div class="header-title">
+        <h1>AI Learning Assistant</h1>
+        <p>Get personalized help with your NCERT studies</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-button (click)="clearChat()">
+        <mat-icon>clear</mat-icon>
+        Clear Chat
+      </button>
+      <button mat-button (click)="exportChat()">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Configuration Section -->
+  <div class="config-section">
+    <mat-card class="config-card">
+      <mat-card-content>
+        <div class="config-row">
+          <mat-form-field appearance="outline" class="config-field">
+            <mat-label>Class Level</mat-label>
+            <mat-select [(ngModel)]="selectedClass" (selectionChange)="onClassChange()">
+              @for (cls of classes; track cls) {
+                <mat-option [value]="cls">{{ getClassLabel(cls) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="config-field">
+            <mat-label>Subject</mat-label>
+            <mat-select [(ngModel)]="selectedSubject">
+              @for (subject of subjects; track subject) {
+                <mat-option [value]="subject">{{ subject }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="config-field context-field">
+            <mat-label>Context (Optional)</mat-label>
+            <input matInput 
+                   [(ngModel)]="context" 
+                   placeholder="e.g., Currently studying Chapter 3: Algebra">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Suggested Questions -->
+  @if (suggestedQuestions().length > 0) {
+    <div class="suggested-section">
+      <h3 class="section-title">Suggested Questions</h3>
+      <div class="suggested-chips">
+        @for (question of suggestedQuestions(); track $index) {
+          <mat-chip 
+            class="suggested-chip" 
+            (click)="useSuggestedQuestion(question)"
+            [color]="selectedSubject === question.category ? 'primary' : 'default'">
+            <mat-icon class="chip-icon">help_outline</mat-icon>
+            {{ question.text }}
+            <span class="chip-meta">{{ question.category }} • Class {{ question.classLevel }}</span>
+          </mat-chip>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Chat Messages -->
+  <div class="chat-section">
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        @for (message of messages(); track message.id) {
+          <div class="message-wrapper" [class.user-message]="message.type === 'user'" [class.ai-message]="message.type === 'ai'">
+            <div class="message-avatar">
+              @if (message.type === 'user') {
+                <mat-icon class="user-icon">person</mat-icon>
+              } @else {
+                <mat-icon class="ai-icon">smart_toy</mat-icon>
+              }
+            </div>
+            
+            <div class="message-content">
+              <div class="message-header">
+                <span class="message-sender">
+                  {{ message.type === 'user' ? 'You' : 'AI Assistant' }}
+                </span>
+                <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+                @if (message.classLevel && message.subject) {
+                  <span class="message-context">
+                    {{ getClassLabel(message.classLevel) }} • {{ message.subject }}
+                  </span>
+                }
+              </div>
+              
+              <div class="message-text">
+                @if (message.isTyping) {
+                  <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                } @else {
+                  <p>{{ message.content }}</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        
+        @if (isLoading()) {
+          <div class="message-wrapper ai-message">
+            <div class="message-avatar">
+              <mat-icon class="ai-icon">smart_toy</mat-icon>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <span class="message-sender">AI Assistant</span>
+              </div>
+              <div class="message-text">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Section -->
+  <div class="input-section">
+    <mat-card class="input-card">
+      <mat-card-content>
+        <div class="input-container">
+          <mat-form-field appearance="outline" class="question-input">
+            <mat-label>Ask your question...</mat-label>
+            <textarea matInput 
+                      [(ngModel)]="question" 
+                      (keypress)="onKeyPress($event)"
+                      placeholder="Type your question here..."
+                      rows="3"
+                      [disabled]="isLoading()">
+            </textarea>
+            <mat-hint>Press Enter to send, Shift+Enter for new line</mat-hint>
+          </mat-form-field>
+          
+          <button 
+            mat-raised-button 
+            color="primary" 
+            class="send-button"
+            (click)="askQuestion()"
+            [disabled]="isLoading() || !question.trim()">
+            @if (isLoading()) {
+              <mat-progress-spinner diameter="20"></mat-progress-spinner>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            {{ isLoading() ? 'Sending...' : 'Send' }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Features Section -->
+  <div class="features-section">
+    <mat-card class="features-card">
+      <mat-card-content>
+        <h3 class="features-title">AI Assistant Features</h3>
+        <div class="features-grid">
+          <div class="feature-item">
+            <mat-icon class="feature-icon">school</mat-icon>
+            <div class="feature-content">
+              <h4>Class-Appropriate Answers</h4>
+              <p>Responses tailored to your class level and curriculum</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <mat-icon class="feature-icon">psychology</mat-icon>
+            <div class="feature-content">
+              <h4>Concept Explanations</h4>
+              <p>Simple, clear explanations with real-world examples</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <mat-icon class="feature-icon">lightbulb</mat-icon>
+            <div class="feature-content">
+              <h4>Study Tips</h4>
+              <p>Personalized study strategies and learning tips</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <mat-icon class="feature-icon">quiz</mat-icon>
+            <div class="feature-content">
+              <h4>Practice Questions</h4>
+              <p>Get practice problems based on your topics</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -39,7 +39,7 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
     ]
   },
   teacher: {
-    brand: 'TEACHER_SUITE',
+    brand: 'TEACHER_SUeITE',
     homeLink: '/teacher/dashboard',
     nav: [
       { icon: 'dashboard',      label: 'Overview',    link: '/teacher/dashboard' },

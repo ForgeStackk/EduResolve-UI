@@ -1,0 +1,180 @@
+<div class="book-browser-container">
+  <div class="header">
+    <h1 class="page-title">NCERT Learning Platform</h1>
+    <p class="page-subtitle">Explore NCERT books by class and subject</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <mat-card class="filter-card">
+      <mat-card-content>
+        <div class="filter-row">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Select Class</mat-label>
+            <mat-select [(ngModel)]="selectedClass" (selectionChange)="onClassChange()">
+              <mat-option value="">-- Select Class --</mat-option>
+              @for (cls of classes(); track cls) {
+                <mat-option [value]="cls">{{ cls }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Select Subject</mat-label>
+            <mat-select [(ngModel)]="selectedSubject" (selectionChange)="onSubjectChange()" [disabled]="!selectedClass">
+              <mat-option value="">-- Select Subject --</mat-option>
+              @for (subject of subjects(); track subject) {
+                <mat-option [value]="subject">{{ subject }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading Indicator -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      <p>Loading...</p>
+    </div>
+  }
+
+  <!-- Books Grid -->
+  @if (books().length > 0 && !loading()) {
+    <div class="books-section">
+      <h2 class="section-title">Available Books</h2>
+      <div class="books-grid">
+        @for (book of books(); track book.id) {
+          <mat-card 
+            class="book-card" 
+            [class.selected]="selectedBook()?.id === book.id"
+            (click)="selectBook(book)"
+            [style.border-left-color]="getBookColor(book.subject)">
+            <mat-card-header>
+              <mat-card-title class="book-title">{{ book.title }}</mat-card-title>
+              <mat-card-subtitle class="book-subtitle">
+                {{ book.classGrade }} • {{ book.subject }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="book-info">
+                <div class="info-item">
+                  <mat-icon>description</mat-icon>
+                  <span>{{ book.totalPages }} pages</span>
+                </div>
+                <div class="info-item">
+                  <mat-icon>cloud_download</mat-icon>
+                  <span>Available on GitHub</span>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">
+                <mat-icon>menu_book</mat-icon>
+                View Chapters
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Chapters Section -->
+  @if (selectedBook() && chapters().length > 0 && !loading()) {
+    <div class="chapters-section">
+      <div class="section-header">
+        <h2 class="section-title">Chapters</h2>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="viewPdf()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            View PDF
+          </button>
+          <button mat-raised-button color="accent" (click)="startQuiz()">
+            <mat-icon>quiz</mat-icon>
+            Start Quiz
+          </button>
+          <button mat-raised-button color="warn" (click)="askAI()">
+            <mat-icon>smart_toy</mat-icon>
+            Ask AI
+          </button>
+          <button mat-raised-button color="secondary" (click)="viewVisualization()">
+            <mat-icon>view_in_ar</mat-icon>
+            3D View
+          </button>
+        </div>
+      </div>
+
+      <div class="chapters-grid">
+        @for (chapter of chapters(); track chapter.id) {
+          <mat-card class="chapter-card" (click)="viewChapter(chapter)">
+            <mat-card-content>
+              <div class="chapter-header">
+                <h3 class="chapter-title">{{ chapter.title }}</h3>
+                <span class="chapter-number">Chapter {{ chapter.chapterNumber }}</span>
+              </div>
+              @if (chapter.summary) {
+                <p class="chapter-summary">{{ chapter.summary }}</p>
+              }
+              <div class="chapter-meta">
+                <span class="page-range">Pages {{ chapter.startPage }}-{{ chapter.endPage }}</span>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">
+                <mat-icon>arrow_forward</mat-icon>
+                Start Reading
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && books().length === 0 && selectedClass && selectedSubject) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">menu_book</mat-icon>
+      <h3>No Books Found</h3>
+      <p>No NCERT books are available for {{ selectedClass }} {{ selectedSubject }}.</p>
+    </div>
+  }
+
+  <!-- Welcome State -->
+  @if (!selectedClass && !loading()) {
+    <div class="welcome-state">
+      <mat-icon class="welcome-icon">school</mat-icon>
+      <h2>Welcome to NCERT Learning Platform</h2>
+      <p>Select your class and subject to start exploring NCERT books and chapters.</p>
+      <div class="feature-highlights">
+        <div class="feature-item">
+          <mat-icon>menu_book</mat-icon>
+          <span>Browse NCERT Books</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>article</mat-icon>
+          <span>Read Chapter Content</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>quiz</mat-icon>
+          <span>Take Quizzes</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>smart_toy</mat-icon>
+          <span>AI-Powered Q&A</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>view_in_ar</mat-icon>
+          <span>3D Visualizations</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>PDF Viewer</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,204 @@
+<div class="pdf-viewer-container" 
+     [class.fullscreen]="isFullscreen" 
+     [class.dark-mode]="darkMode"
+     [class.menu-open]="showShareMenu || showMoreMenu"
+     (click)="closeMenus()">
+  
+  <!-- Top Toolbar -->
+  <div class="pdf-toolbar top-toolbar" *ngIf="showToolbar" (click)="$event.stopPropagation()">
+    <!-- Left: Back & Title -->
+    <div class="toolbar-section left">
+      <button (click)="close()" class="toolbar-btn" title="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="title-container">
+        <h1 class="pdf-title">Chapter {{ page }}</h1>
+        <span class="page-indicator">Page {{ page }} of {{ totalPages }}</span>
+      </div>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="toolbar-section right">
+      <!-- Bookmark -->
+      <button (click)="toggleBookmark()" class="toolbar-btn" [class.active]="isBookmarked()" title="Bookmark">
+        <span class="material-symbols-outlined">{{ isBookmarked() ? 'bookmark' : 'bookmark_border' }}</span>
+      </button>
+      
+      <!-- Search -->
+      <button (click)="toggleSearch()" class="toolbar-btn" [class.active]="showSearch" title="Search">
+        <span class="material-symbols-outlined">search</span>
+      </button>
+      
+      <!-- More Options -->
+      <button (click)="toggleMoreMenu(); $event.stopPropagation()" class="toolbar-btn" [class.active]="showMoreMenu" title="More Options">
+        <span class="material-symbols-outlined">more_vert</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- More Options Dropdown -->
+  <div class="dropdown-menu more-dropdown" *ngIf="showMoreMenu" (click)="$event.stopPropagation()">
+    <div class="menu-item" (click)="toggleToolbar()">
+      <span class="material-symbols-outlined">hide_image</span>
+      <span>Hide Toolbar</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" (click)="toggleDarkMode()">
+      <span class="material-symbols-outlined">{{ darkMode ? 'light_mode' : 'dark_mode' }}</span>
+      <span>{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</span>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar" *ngIf="showSearch" (click)="$event.stopPropagation()">
+    <div class="search-input-container">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        placeholder="Search in PDF..."
+        class="search-input"
+        (click)="$event.stopPropagation()"
+        (keyup.enter)="toggleSearch()">
+      <button (click)="toggleSearch()" class="close-search">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PDF Content Area -->
+  <div class="pdf-content-area" (click)="toggleToolbar()" *ngIf="pdfSrc()">
+    <pdf-viewer
+      [src]="pdfSrc()"
+      [page]="page"
+      (after-load-complete)="afterLoadComplete($event)"
+      [show-all]="false"
+      [original-size]="false"
+      [zoom]="zoom"
+      [render-text]="true"
+      [autoresize]="true"
+      [fit-to-page]="fitToPage"
+      style="display: block; width: 100%; height: 100%;">
+    </pdf-viewer>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="!isLoaded || !pdfSrc()" class="pdf-loading">
+    <div class="loading-content">
+      <span class="material-symbols-outlined animate-spin">sync</span>
+      <span class="loading-text">{{ pdfSrc() ? 'Loading PDF...' : 'No PDF available' }}</span>
+      <div class="progress-bar" *ngIf="pdfSrc()">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Toolbar (Navigation & Zoom) -->
+  <div class="pdf-toolbar bottom-toolbar" *ngIf="showToolbar && isLoaded">
+    <!-- Zoom Controls -->
+    <div class="toolbar-section zoom-section">
+      <button (click)="resetZoom()" class="toolbar-btn" title="Fit to Screen">
+        <span class="material-symbols-outlined">fit_screen</span>
+      </button>
+      <button (click)="zoomOut()" class="toolbar-btn" [disabled]="zoom <= 0.4" title="Zoom Out">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <span class="zoom-level">{{ zoom * 100 | number:'1.0-0' }}%</span>
+      <button (click)="zoomIn()" class="toolbar-btn" [disabled]="zoom >= 3.0" title="Zoom In">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+
+    <!-- Page Navigation -->
+    <div class="toolbar-section nav-section">
+      <button (click)="prevPage()" [disabled]="page <= 1" class="nav-btn" title="Previous Page">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+      </button>
+      
+      <div class="page-jump">
+        <input 
+          type="number" 
+          [(ngModel)]="page" 
+          (change)="goToPage(page)"
+          [min]="1"
+          [max]="totalPages"
+          class="page-input">
+        <span class="total-pages">/ {{ totalPages }}</span>
+      </div>
+      
+      <button (click)="nextPage()" [disabled]="page >= totalPages" class="nav-btn" title="Next Page">
+        <span class="material-symbols-outlined">arrow_forward_ios</span>
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="toolbar-section actions-section" (click)="$event.stopPropagation()">
+      <button (click)="downloadPdf()" class="toolbar-btn" [disabled]="isDownloading" title="Download">
+        <span class="material-symbols-outlined">{{ isDownloading ? 'downloading' : 'download' }}</span>
+      </button>
+      <button (click)="toggleShareMenu(); $event.stopPropagation()" class="toolbar-btn share-btn" [class.active]="showShareMenu" title="Share">
+        <span class="material-symbols-outlined">share</span>
+      </button>
+      <button (click)="toggleFullscreen()" class="toolbar-btn" title="Fullscreen">
+        <span class="material-symbols-outlined">{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Share Sheet -->
+  <div class="share-sheet" *ngIf="showShareMenu" (click)="$event.stopPropagation()">
+    <div class="share-header">
+      <h3>Share PDF</h3>
+      <button (click)="toggleShareMenu()" class="close-btn">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="share-grid">
+      <button 
+        *ngFor="let option of shareOptions" 
+        (click)="option.action()"
+        class="share-option"
+        [style.--brand-color]="option.color">
+        <div class="share-icon" [style.background-color]="option.color + '20'">
+          <span class="material-symbols-outlined" [style.color]="option.color">{{ option.icon }}</span>
+        </div>
+        <span class="share-label">{{ option.name }}</span>
+      </button>
+    </div>
+    <div class="share-preview">
+      <span class="preview-title">{{ title() }}</span>
+      <span class="preview-url">{{ getLocationHostname() }}</span>
+    </div>
+  </div>
+
+  <!-- Overlay for menus -->
+  <div class="menu-overlay" *ngIf="showShareMenu || showMoreMenu" (click)="closeMenus()"></div>
+
+  <!-- Floating Action Button (when toolbar hidden) -->
+  <button 
+    *ngIf="!showToolbar" 
+    (click)="toggleToolbar()"
+    class="fab-button"
+    title="Show Controls">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+
+  <!-- Progress Bar -->
+  <div class="progress-indicator" *ngIf="isLoaded">
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="(page / totalPages) * 100"></div>
+    </div>
+  </div>
+
+  <!-- Gesture Hint -->
+  <div class="gesture-hint" *ngIf="isLoaded && !showToolbar">
+    <div class="hint-item">
+      <span class="material-symbols-outlined">swipe</span>
+      <span>Swipe to navigate</span>
+    </div>
+    <div class="hint-item">
+      <span class="material-symbols-outlined">touch_app</span>
+      <span>Double tap to zoom</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,259 @@
+<div class="enhanced-quiz-container" (keydown)="onKeyPress($event)">
+  <!-- Header -->
+  <div class="quiz-header">
+    <div class="header-left">
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+      <div class="header-title">
+        <h1>NCERT Quiz</h1>
+        <p>Test your knowledge with personalized quizzes</p>
+      </div>
+    </div>
+    <div class="header-right">
+      @if (currentStep() === 'quiz') {
+        <div class="timer-display">
+          <mat-icon [color]="timeRemaining() < 60 ? 'warn' : 'primary'">timer</mat-icon>
+          <span [class.warning]="timeRemaining() < 60">{{ formatTime(timeRemaining()) }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Configuration Step -->
+  @if (currentStep() === 'config') {
+    <div class="config-step">
+      <mat-card class="config-card">
+        <mat-card-header>
+          <mat-card-title>Quiz Configuration</mat-card-title>
+          <mat-card-subtitle>Customize your quiz experience</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="config-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Class Level</mat-label>
+              <mat-select [(ngModel)]="config().classLevel" (ngModelChange)="config.update(c => ({...c, classLevel: $event}))">
+                @for (cls of classes; track cls) {
+                  <mat-option [value]="cls">Class {{ cls }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Subject</mat-label>
+              <mat-select [(ngModel)]="config().subject" (ngModelChange)="config.update(c => ({...c, subject: $event}))">
+                @for (subject of subjects; track subject) {
+                  <mat-option [value]="subject">{{ subject }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Difficulty</mat-label>
+              <mat-select [(ngModel)]="config().difficulty" (ngModelChange)="config.update(c => ({...c, difficulty: $event}))">
+                @for (difficulty of difficulties; track difficulty) {
+                  <mat-option [value]="difficulty">{{ difficulty }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Number of Questions</mat-label>
+              <input matInput type="number" [(ngModel)]="config().count" (ngModelChange)="config.update(c => ({...c, count: $event}))" min="5" max="50">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Chapter Coverage (Max)</mat-label>
+              <input matInput type="number" [(ngModel)]="config().maxChapterId" (ngModelChange)="config.update(c => ({...c, maxChapterId: $event}))" min="1" max="20">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Time Limit (minutes)</mat-label>
+              <input matInput type="number" [(ngModel)]="config().timeLimit" (ngModelChange)="config.update(c => ({...c, timeLimit: $event}))" min="5" max="120">
+            </mat-form-field>
+          </div>
+
+          <div class="config-options">
+            <mat-checkbox [(ngModel)]="config().randomize" (ngModelChange)="config.update(c => ({...c, randomize: $event}))">
+              Randomize question order
+            </mat-checkbox>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="startQuiz()" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <ng-container>
+                <mat-progress-spinner diameter="20"></mat-progress-spinner>
+                Generating Quiz...
+              </ng-container>
+            } @else {
+              <ng-container>
+                <mat-icon>play_arrow</mat-icon>
+                Start Quiz
+              </ng-container>
+            }
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Quiz Step -->
+  @if (currentStep() === 'quiz') {
+    <div class="quiz-step">
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <mat-progress-bar mode="determinate" [value]="getProgress()" color="primary"></mat-progress-bar>
+        <div class="progress-info">
+          <span>Question {{ getQuestionNumber() }} of {{ getTotalQuestions() }}</span>
+          <span>{{ Math.round(getProgress()) }}% Complete</span>
+        </div>
+      </div>
+
+      @if (getCurrentQuestion()) {
+        <mat-card class="question-card">
+          <mat-card-content>
+            <div class="question-content">
+              <h2 class="question-text">{{ getCurrentQuestion()!.question }}</h2>
+            </div>
+
+            <div class="options-container">
+              @for (option of getCurrentQuestion()!.options; track $index) {
+                <div class="option-wrapper">
+                  <mat-radio-button 
+                    class="option-radio"
+                    [value]="option"
+                    [(ngModel)]="selectedOption"
+                    [color]="getOptionColor($index)">
+                    <span class="option-label">{{ String.fromCharCode(65 + $index) }}.</span>
+                    <span class="option-text">{{ option }}</span>
+                  </mat-radio-button>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <div class="action-buttons">
+              <button mat-button (click)="skipQuestion()">
+                <mat-icon>skip_next</mat-icon>
+                Skip
+              </button>
+              <button mat-raised-button 
+                      color="primary" 
+                      (click)="nextQuestion()"
+                      [disabled]="!selectedOption">
+                @if (getQuestionNumber() === getTotalQuestions()) {
+                  <ng-container>
+                    <mat-icon>check</mat-icon>
+                    Submit Quiz
+                  </ng-container>
+                } @else {
+                  <ng-container>
+                    <mat-icon>arrow_forward</mat-icon>
+                    Next Question
+                  </ng-container>
+                }
+              </button>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- Results Step -->
+  @if (currentStep() === 'result' && result()) {
+    <div class="result-step">
+      <mat-card class="result-card">
+        <mat-card-header>
+          <mat-card-title>Quiz Results</mat-card-title>
+          <mat-card-subtitle>Here's how you performed</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="result-summary">
+            <div class="score-circle">
+              <div class="score-value" [style.color]="getGradeColor(result()!.percentage)">
+                {{ result()!.percentage }}%
+              </div>
+              <div class="score-label">Score</div>
+            </div>
+
+            <div class="result-stats">
+              <div class="stat-item correct">
+                <mat-icon>check_circle</mat-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ result()!.correctAnswers }}</span>
+                  <span class="stat-label">Correct</span>
+                </div>
+              </div>
+
+              <div class="stat-item wrong">
+                <mat-icon>cancel</mat-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ result()!.wrongAnswers }}</span>
+                  <span class="stat-label">Wrong</span>
+                </div>
+              </div>
+
+              <div class="stat-item skipped">
+                <mat-icon>remove_circle</mat-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ result()!.skippedAnswers }}</span>
+                  <span class="stat-label">Skipped</span>
+                </div>
+              </div>
+
+              <div class="stat-item time">
+                <mat-icon>timer</mat-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ formatTime(result()!.timeSpent) }}</span>
+                  <span class="stat-label">Time Taken</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-message">
+            <h3 [style.color]="getGradeColor(result()!.percentage)">
+              {{ getGradeMessage(result()!.percentage) }}
+            </h3>
+            <p>You scored {{ result()!.score }} out of {{ result()!.totalQuestions }} questions.</p>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <div class="result-actions">
+            <button mat-button (click)="reviewAnswers()">
+              <mat-icon>rate_review</mat-icon>
+              Review Answers
+            </button>
+            <button mat-raised-button color="primary" (click)="restartQuiz()">
+              <mat-icon>refresh</mat-icon>
+              New Quiz
+            </button>
+            <button mat-raised-button color="accent" (click)="goBack()">
+              <mat-icon>home</mat-icon>
+              Back to Books
+            </button>
+          </div>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading() && currentStep() !== 'config') {
+    <div class="loading-overlay">
+      <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+      <p>Loading quiz...</p>
+    </div>
+  }
+
+  <!-- Keyboard Shortcuts Help -->
+  @if (currentStep() === 'quiz') {
+    <div class="shortcuts-help">
+      <mat-icon>keyboard</mat-icon>
+      <span>Press A-D for options, Enter to submit, S to skip</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,136 @@
+<div class="space-y-6">
+  <header class="space-y-2">
+    <p class="hud-caps text-red-400">NCERT CURRICULUM EXPLORER</p>
+    <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+      Browse by Class & Subject
+    </h1>
+    <p class="text-base text-[#e6bdb8] max-w-2xl">
+      Explore chapters directly from the NCERT curriculum. Select your class and subject to browse available topics.
+    </p>
+  </header>
+
+  <!-- Filters -->
+  <section class="hud-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="hud-accent"></div>
+
+    <!-- Grade Selector -->
+    <div>
+      <label for="grade" class="hud-caps text-[#e6bdb8]/80 mb-3 block">SELECT CLASS</label>
+      <select id="grade" [(ngModel)]="selectedGradeValue"
+              class="hud-input cursor-pointer">
+        @for (grade of grades(); track grade) {
+          <option [ngValue]="grade">Class {{ grade }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Subject Selector -->
+    <div>
+      <label for="subject" class="hud-caps text-[#e6bdb8]/80 mb-3 block">SELECT SUBJECT</label>
+      <select id="subject" [(ngModel)]="selectedSubjectValue"
+              class="hud-input cursor-pointer">
+        @for (subject of subjects(); track subject) {
+          <option [ngValue]="subject">{{ subject }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Go Button -->
+    <div class="flex items-end">
+      <button (click)="onSearch()"
+              [disabled]="!selectedGrade() || !selectedSubject() || loading()"
+              class="w-full hud-button-primary py-3 px-6 rounded-lg font-semibold uppercase tracking-wide
+                     bg-gradient-to-r from-red-500 to-red-600 text-white
+                     hover:from-red-400 hover:to-red-500
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-all duration-200 flex items-center justify-center gap-2">
+        @if (loading()) {
+          <span class="material-symbols-outlined animate-spin">sync</span>
+          Loading...
+        } @else {
+          <span class="material-symbols-outlined">search</span>
+          Go
+        }
+      </button>
+    </div>
+  </section>
+
+  <!-- Chapters List -->
+  <section class="space-y-4">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-red-500">menu_book</span>
+      <h2 class="hud-display text-2xl text-white">{{ selectedSubject() }} Chapters</h2>
+    </div>
+
+    @if (!hasSearched()) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-12">
+        <span class="material-symbols-outlined text-5xl mb-4 text-[#ac8884]">school</span>
+        <p class="text-lg mb-2">Select your class and subject</p>
+        <p class="text-sm opacity-70">Click the <strong>Go</strong> button to browse available chapters</p>
+      </div>
+    } @else if (loading()) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
+        <p class="text-sm mb-3">Loading chapters...</p>
+        <div class="inline-block animate-spin">
+          <span class="material-symbols-outlined">sync</span>
+        </div>
+      </div>
+    } @else if (ncertBooks().length === 0) {
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
+        <span class="material-symbols-outlined text-4xl mb-3 text-[#ac8884]">folder_off</span>
+        <p>No chapters available for Class {{ selectedGrade() }} {{ selectedSubject() }}</p>
+        <p class="text-xs mt-2">Try selecting a different class or subject</p>
+      </div>
+    } @else {
+      <!-- Chapters List -->
+      <ul class="space-y-3">
+        @for (book of ncertBooks(); track book.id) {
+          <li>
+            <button (click)="viewBookContent(book)"
+                    class="w-full hud-card-flat block group hover:border-white/30 transition-all relative text-left">
+              <div class="hud-accent"></div>
+              <div class="flex items-start justify-between gap-4 pl-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 mb-2">
+                    <span class="hud-caps text-[#e6bdb8]/70 text-xs">NCERT</span>
+                  </div>
+                  <h3 class="hud-display text-lg text-white group-hover:text-red-400 transition-colors">
+                    Chapter {{ $index + 1 }}
+                  </h3>
+                </div>
+                <span class="material-symbols-outlined text-[#ac8884] group-hover:text-white transition-colors shrink-0 mt-1">
+                  arrow_forward
+                </span>
+              </div>
+              <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                <span class="inline-block hud-chip text-xs">
+                  <span class="material-symbols-outlined" style="font-size: 14px">picture_as_pdf</span>
+                  View PDF
+                </span>
+                @if (book.totalPages) {
+                  <span class="text-xs text-[#e6bdb8]/60">{{ book.totalPages }} pages</span>
+                }
+              </div>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <!-- Info Section -->
+  <section class="hud-card-flat p-4 border-l-4 border-green-500 bg-green-500/10">
+    <div class="flex items-start gap-3">
+      <span class="material-symbols-outlined text-green-400 shrink-0 mt-1">info</span>
+      <div>
+        <p class="hud-caps text-green-400 mb-2">ENHANCED LEARNING EXPERIENCE</p>
+        <ul class="text-sm text-[#fbdbd7] space-y-1">
+          <li>✓ Interactive 3D models and diagrams</li>
+          <li>✓ Concept maps and visual summaries</li>
+          <li>✓ Practice questions integrated with NCERT</li>
+          <li>✓ Multi-language support (English & Hindi)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>

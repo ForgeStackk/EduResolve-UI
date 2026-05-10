@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { Chapter, LearningApiService, Subject } from '../../../core/api/learning-api.service';
@@ -14,6 +14,7 @@ import { Chapter, LearningApiService, Subject } from '../../../core/api/learning
 export class ChaptersListComponent implements OnInit {
   private api = inject(LearningApiService);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
 
   subject = signal<Subject | null>(null);
   chapters = signal<Chapter[]>([]);
@@ -28,5 +29,9 @@ export class ChaptersListComponent implements OnInit {
       next: rows => { this.chapters.set(rows); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
+  }
+
+  back(): void {
+    this.location.back();
   }
 }

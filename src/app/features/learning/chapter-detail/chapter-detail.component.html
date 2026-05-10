@@ -1,6 +1,5 @@
 <div class="space-y-6">
-  <a routerLink="/learn/subjects"
-     class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
     BACK TO LIBRARY
   </a>
@@ -86,6 +85,26 @@
           </article>
         }
       </section>
+
+      <!-- NCERT Interactive Resources Section -->
+      <section class="space-y-4" *ngIf="ncertResources().length > 0">
+        <app-interactive-content [resources]="ncertResources()"></app-interactive-content>
+      </section>
+
+      <!-- NCERT Info Banner -->
+      @if (!ncertLoading() && ncertResources().length === 0) {
+        <section class="hud-card-flat mt-6 p-4 border-l-4 border-blue-500 bg-blue-500/10">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-blue-400 shrink-0 mt-1">info</span>
+            <div>
+              <p class="hud-caps text-blue-400 mb-1">NCERT CONTENT AVAILABLE</p>
+              <p class="text-sm text-[#fbdbd7]">
+                This chapter is enhanced with NCERT textbook content. Additional diagrams, 3D models, and interactive visualizations will appear here as they're loaded from NCERT resources.
+              </p>
+            </div>
+          </div>
+        </section>
+      }
     } @else if (!loading()) {
       <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
         {{ 'common.noResults' | translate }}

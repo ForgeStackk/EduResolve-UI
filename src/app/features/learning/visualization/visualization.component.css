@@ -1,0 +1,501 @@
+.visualization-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: 'Roboto', sans-serif;
+  min-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styles */
+.viz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title h1 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #1976d2;
+  margin: 0 0 4px 0;
+}
+
+.header-title p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Configuration Panel */
+.config-panel {
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.config-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.controls-section h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-item {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.slider-item mat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.slider-value {
+  font-size: 0.85rem;
+  color: #1976d2;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Visualization Area */
+.visualization-area {
+  flex: 1;
+  margin-bottom: 24px;
+  min-height: 500px;
+}
+
+.viz-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.viz-card mat-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  color: #856404;
+  margin-bottom: 16px;
+}
+
+.viz-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+}
+
+.three-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.loading-overlay mat-progress-spinner {
+  margin-bottom: 16px;
+}
+
+.loading-overlay p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.info-panel {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.info-panel h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #1976d2;
+  margin: 0 0 8px 0;
+}
+
+.info-panel p {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.info-details {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.info-item mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #1976d2;
+}
+
+/* Instructions Panel */
+.instructions-panel {
+  flex-shrink: 0;
+}
+
+.instructions-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+}
+
+.instructions-card h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.instruction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: #1976d2;
+  flex-shrink: 0;
+}
+
+.instruction-content h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.instruction-content p {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .config-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .config-grid button {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .visualization-container {
+    padding: 16px;
+  }
+  
+  .viz-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .config-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .config-grid button {
+    grid-column: span 1;
+  }
+  
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .instructions-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .info-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .header-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    flex-direction: column;
+  }
+  
+  .header-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .slider-item {
+    min-width: 0;
+  }
+  
+  .instruction-item {
+    padding: 12px;
+  }
+}
+
+/* Material Design Overrides */
+.mat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  border-radius: 8px;
+}
+
+.mat-button, .mat-raised-button {
+  border-radius: 8px;
+  font-weight: 500;
+  min-height: 44px;
+}
+
+.mat-slide-toggle {
+  margin-bottom: 0;
+}
+
+.mat-slider {
+  width: 100%;
+}
+
+/* Three.js Container Specific Styles */
+.three-container canvas {
+  display: block;
+  border-radius: 8px;
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.viz-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.config-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.instructions-card {
+  animation: fadeIn 0.7s ease-out;
+}
+
+/* Focus States */
+.three-container:focus-within {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+/* Loading States */
+.config-card:has(.mat-progress-spinner) {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .visualization-container {
+    background: #121212;
+    color: #ffffff;
+  }
+  
+  .config-card,
+  .instructions-card {
+    background: #1e1e1e;
+    color: #ffffff;
+  }
+  
+  .viz-wrapper {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .info-panel {
+    background: linear-gradient(135deg, #1a237e 0%, #2a2a2a 100%);
+  }
+  
+  .instruction-item {
+    background: #2a2a2a;
+    color: #ffffff;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .viz-header,
+  .config-panel,
+  .instructions-panel,
+  .header-actions {
+    display: none !important;
+  }
+  
+  .visualization-container {
+    padding: 0;
+  }
+  
+  .viz-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .three-container {
+    height: 400px !important;
+  }
+}
+
+/* Performance Optimizations */
+.three-container {
+  will-change: transform;
+}
+
+.loading-overlay {
+  backdrop-filter: blur(2px);
+}
+
+/* Accessibility */
+.instruction-item:focus-within {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.mat-button:focus,
+.mat-raised-button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}

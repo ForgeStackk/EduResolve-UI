@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { PreviousYearQuestion, PYQDifficulty, PyqApiService } from '../../../cor
 export class PyqListComponent implements OnInit {
   private api = inject(PyqApiService);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
 
   chapterId = signal<number | null>(null);
   difficulty: PYQDifficulty | null = null;
@@ -38,5 +39,9 @@ export class PyqListComponent implements OnInit {
       next: rows => { this.rows.set(rows); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
+  }
+
+  back(): void {
+    this.location.back();
   }
 }

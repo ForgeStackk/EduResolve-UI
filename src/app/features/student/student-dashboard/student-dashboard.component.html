@@ -198,6 +198,25 @@
         </div>
       </a>
 
+      <!-- NCERT Explorer Card -->
+      <a routerLink="/learn/ncert"
+         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
+        <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+                    flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent"></div>
+          <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                style="font-size:56px; color:#10b981; filter:drop-shadow(0 0 15px rgba(16,185,129,.6))">
+            library_books
+          </span>
+        </div>
+        <div>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">CURRICULUM EXPLORER</span>
+          <h4 class="text-white font-bold leading-tight">NCERT Chapters</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">Browse official textbooks with 3D visualizations</p>
+        </div>
+      </a>
+
       <!-- Weak topic / focus area card -->
       @if (weakTopics().length > 0) {
         @for (w of weakTopics().slice(0,1); track w.id) {

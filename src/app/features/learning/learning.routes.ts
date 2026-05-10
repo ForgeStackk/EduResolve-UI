@@ -6,6 +6,14 @@ export const LEARNING_ROUTES: Routes = [
     loadComponent: () => import('./subjects-list/subjects-list.component').then(m => m.SubjectsListComponent)
   },
   {
+    path: 'ncert',
+    loadComponent: () => import('./ncert-browser/ncert-browser.component').then(m => m.NcertBrowserComponent)
+  },
+  {
+    path: 'pdf-viewer',
+    loadComponent: () => import('./pdf-viewer/pdf-viewer.component').then(m => m.PdfViewerComponent)
+  },
+  {
     path: 'subjects/:subjectId',
     loadComponent: () => import('./chapters-list/chapters-list.component').then(m => m.ChaptersListComponent)
   },

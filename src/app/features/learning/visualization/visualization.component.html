@@ -1,0 +1,210 @@
+<div class="visualization-container">
+  <!-- Header -->
+  <div class="viz-header">
+    <div class="header-left">
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+      <div class="header-title">
+        <h1>3D Concept Visualizer</h1>
+        <p>Interactive 3D visualizations for NCERT concepts</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-button (click)="resetCamera()">
+        <mat-icon>center_focus_strong</mat-icon>
+        Reset View
+      </button>
+      <button mat-button (click)="toggleAnimation()">
+        <mat-icon>{{ config().autoRotate ? 'pause' : 'play_arrow' }}</mat-icon>
+        {{ config().autoRotate ? 'Pause' : 'Play' }}
+      </button>
+      <button mat-button (click)="exportVisualization()">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Configuration Panel -->
+  <div class="config-panel">
+    <mat-card class="config-card">
+      <mat-card-content>
+        <div class="config-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Concept</mat-label>
+            <mat-select [(ngModel)]="config().concept">
+              @for (concept of concepts; track concept) {
+                <mat-option [value]="concept">{{ concept }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Class Level</mat-label>
+            <mat-select [(ngModel)]="config().classLevel">
+              @for (cls of classes; track cls) {
+                <mat-option [value]="cls">Class {{ cls }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Subject</mat-label>
+            <mat-select [(ngModel)]="config().subject">
+              @for (subject of subjects; track subject) {
+                <mat-option [value]="subject">{{ subject }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-raised-button 
+                  color="primary" 
+                  (click)="loadVisualization()"
+                  [disabled]="isLoading()">
+            @if (isLoading()) {
+              <ng-container>
+                <mat-progress-spinner diameter="20"></mat-progress-spinner>
+                Loading...
+              </ng-container>
+            } @else {
+              <ng-container>
+                <mat-icon>3d_rotation</mat-icon>
+                Visualize
+              </ng-container>
+            }
+          </button>
+        </div>
+
+        <div class="controls-section">
+          <h3>Display Settings</h3>
+          <div class="controls-grid">
+            <div class="control-item">
+              <mat-slide-toggle 
+                [(ngModel)]="config().autoRotate"
+                (change)="onConfigChange()">
+                Auto Rotate
+              </mat-slide-toggle>
+            </div>
+
+            <div class="control-item">
+              <mat-slide-toggle 
+                [(ngModel)]="config().showGrid"
+                (change)="onConfigChange()">
+                Show Grid
+              </mat-slide-toggle>
+            </div>
+
+            <div class="control-item">
+              <mat-slide-toggle 
+                [(ngModel)]="config().showAxes"
+                (change)="onConfigChange()">
+                Show Axes
+              </mat-slide-toggle>
+            </div>
+
+            <div class="control-item slider-item">
+              <mat-label>Animation Speed</mat-label>
+              <mat-slider 
+                [(ngModel)]="config().animationSpeed"
+                min="0.1"
+                max="3"
+                step="0.1"
+                value="1"
+                color="primary">
+              </mat-slider>
+              <span class="slider-value">{{ config().animationSpeed.toFixed(1) }}x</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- 3D Visualization Area -->
+  <div class="visualization-area">
+    <mat-card class="viz-card">
+      <mat-card-content>
+        @if (error()) {
+          <div class="error-message">
+            <mat-icon>warning</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        <div class="viz-wrapper">
+          <div id="visualization-container" class="three-container"></div>
+          
+          <!-- Loading Overlay -->
+          @if (isLoading()) {
+            <div class="loading-overlay">
+              <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+              <p>Generating 3D visualization...</p>
+            </div>
+          }
+        </div>
+
+        <!-- Info Panel -->
+        @if (visualizationData()) {
+          <div class="info-panel">
+            <h3>{{ visualizationData()!.concept }}</h3>
+            <p>{{ visualizationData()!.description }}</p>
+            <div class="info-details">
+              <div class="info-item">
+                <mat-icon>school</mat-icon>
+                <span>Class {{ config().classLevel }} • {{ config().subject }}</span>
+              </div>
+              <div class="info-item">
+                <mat-icon>category</mat-icon>
+                <span>Type: {{ visualizationData()!.type }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Instructions Panel -->
+  <div class="instructions-panel">
+    <mat-card class="instructions-card">
+      <mat-card-content>
+        <h3>How to Use 3D Visualizer</h3>
+        <div class="instructions-grid">
+          <div class="instruction-item">
+            <mat-icon class="instruction-icon">mouse</mat-icon>
+            <div class="instruction-content">
+              <h4>Mouse Controls</h4>
+              <p>Left click + drag to rotate<br>Right click + drag to pan<br>Scroll to zoom in/out</p>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <mat-icon class="instruction-icon">touch_app</mat-icon>
+            <div class="instruction-content">
+              <h4>Touch Controls</h4>
+              <p>Single finger drag to rotate<br>Two finger pinch to zoom<br>Two finger drag to pan</p>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <mat-icon class="instruction-icon">settings</mat-icon>
+            <div class="instruction-content">
+              <h4>Customization</h4>
+              <p>Toggle auto-rotation<br>Adjust animation speed<br>Show/hide grid and axes</p>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <mat-icon class="instruction-icon">download</mat-icon>
+            <div class="instruction-content">
+              <h4>Export Options</h4>
+              <p>Save as PNG image<br>High resolution export<br>Share with classmates</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

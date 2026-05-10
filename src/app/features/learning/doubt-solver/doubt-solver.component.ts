@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { DoubtAnswer, DoubtSolverApiService } from '../../../core/api/doubt-solver-api.service';
@@ -19,6 +19,7 @@ import { LanguageService } from '../../../core/i18n/language.service';
 })
 export class DoubtSolverComponent {
   private api = inject(DoubtSolverApiService);
+  private location = inject(Location);
   private lang = inject(LanguageService);
 
   query = '';
@@ -51,5 +52,9 @@ export class DoubtSolverComponent {
     if (a) {
       console.info('[doubt-solver] feedback', { answerId: a.id, verdict });
     }
+  }
+
+  back(): void {
+    this.location.back();
   }
 }
