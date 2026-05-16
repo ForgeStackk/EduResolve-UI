@@ -25,6 +25,12 @@
   --ink:       #0a0a0a;
   --ink-mute:  #525252;
   --ink-soft:  #737373;
+
+  /* ── Gamification palette ── */
+  --gam-bronze:  #CD7F32;
+  --gam-teal:    #2DD4BF;
+  --gam-purple:  #A855F7;
+  --gam-gold:    #fbbf24;
 }
 
 /* --- Base resets ------------------------------------------------------- */

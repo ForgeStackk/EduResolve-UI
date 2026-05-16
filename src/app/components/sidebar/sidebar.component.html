@@ -63,4 +63,13 @@
       }
     }
   </nav>
+
+  @if (currentUser) {
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="logout-button">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">{{ 'nav.logout' | translate }}</span>
+      </button>
+    </div>
+  }
 </aside>

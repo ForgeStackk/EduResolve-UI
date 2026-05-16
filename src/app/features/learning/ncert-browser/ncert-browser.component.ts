@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { NcertApiService, NCERTBook, NCERTChapter } from '../../../core/api/ncert-api.service';
+import { ClassContextService } from '../../../core/class-context.service';
+import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 
 /**
  * NCERT Chapter Browser Component
@@ -19,63 +21,34 @@ import { NcertApiService, NCERTBook, NCERTChapter } from '../../../core/api/ncer
 })
 export class NcertBrowserComponent implements OnInit {
   private ncertApi = inject(NcertApiService);
-  private router = inject(Router);
+  private router   = inject(Router);
+  private classCtx = inject(ClassContextService);
+  readonly catalog  = inject(SubjectCatalogService);
 
-  // NCERT filtering options - loaded from API
-  grades = signal<string[]>([]);
-  subjects = signal<string[]>([]);
+  /** Proxy to catalog so the template can call subjects() */
+  get subjects() { return this.catalog.subjects; }
 
-  selectedGrade = signal<string>('');
+  selectedGrade   = signal<string>('');
   selectedSubject = signal<string>('');
-  ncertBooks = signal<NCERTBook[]>([]);
-  ncertChapters = signal<NCERTChapter[]>([]);
-  loading = signal(false);
-  hasSearched = signal(false);
+  ncertBooks      = signal<NCERTBook[]>([]);
+  ncertChapters   = signal<NCERTChapter[]>([]);
+  loading         = signal(false);
+  hasSearched     = signal(false);
 
   ngOnInit(): void {
-    this.loadClasses();
-  }
-
-  loadClasses(): void {
-    this.ncertApi.getClasses().subscribe({
-      next: (classes: string[]) => {
-        this.grades.set(classes);
-        if (classes.length > 0) {
-          this.selectedGrade.set(classes[0]);
-          this.loadSubjectsForClass(classes[0]);
-        }
-      },
-      error: (err: any) => {
-        console.error('Failed to load classes', err);
-        // Fallback to default classes
-        this.grades.set(['9', '10', '11', '12']);
-        this.selectedGrade.set('9');
-        this.loadSubjectsForClass('9');
+    const grade = this.classCtx.grade();
+    this.selectedGrade.set(grade);
+    
+    // Fetch subjects via catalog (cached, correct endpoint)
+    this.catalog.getSubjects(grade).subscribe(list => {
+      if (list.length > 0 && !this.selectedSubject()) {
+        this.selectedSubject.set(list[0]);
       }
     });
   }
 
-  loadSubjectsForClass(classGrade: string): void {
-    this.ncertApi.getSubjectsByClass(classGrade).subscribe({
-      next: (subjects: string[]) => {
-        this.subjects.set(subjects);
-        if (subjects.length > 0) {
-          this.selectedSubject.set(subjects[0]);
-        } else {
-          this.selectedSubject.set('');
-        }
-        // Reset books and chapters when class/subject changes
-        this.ncertBooks.set([]);
-        this.ncertChapters.set([]);
-        this.hasSearched.set(false);
-      },
-      error: (err: any) => {
-        console.error('Failed to load subjects', err);
-        this.subjects.set([]);
-        this.selectedSubject.set('');
-      }
-    });
-  }
+  /** No-op kept so template references don't break. */
+  loadSubjectsForClass(_grade: string): void { /* delegated to SubjectCatalogService */ }
 
   loadNcertChapters(): void {
     this.loading.set(true);
@@ -107,11 +80,6 @@ export class NcertBrowserComponent implements OnInit {
     });
   }
 
-  onGradeChange(grade: string): void {
-    this.selectedGrade.set(grade);
-    this.loadSubjectsForClass(grade);
-  }
-
   onSubjectChange(subject: string): void {
     this.selectedSubject.set(subject);
     // Reset search state when subject changes
@@ -127,17 +95,6 @@ export class NcertBrowserComponent implements OnInit {
   }
 
   // Getter/setter for ngModel compatibility with signals
-  get selectedGradeValue(): string {
-    return this.selectedGrade();
-  }
-
-  set selectedGradeValue(value: string) {
-    if (value !== this.selectedGrade()) {
-      this.selectedGrade.set(value);
-      this.loadSubjectsForClass(value);
-    }
-  }
-
   get selectedSubjectValue(): string {
     return this.selectedSubject();
   }
@@ -152,11 +109,37 @@ export class NcertBrowserComponent implements OnInit {
     }
   }
 
-  /**
-   * Navigate to chapter detail view with NCERT resources pre-loaded
-   */
+  /** Open the chapter's PDF at its start page. */
   selectChapter(chapter: NCERTChapter): void {
-    this.router.navigate(['/learn/chapters', chapter.id]);
+    this.router.navigate(['/learn/pdf-viewer'], {
+      queryParams: {
+        bookId:    chapter.bookId,
+        startPage: chapter.startPage ?? 1,
+        title:     this.sanitizeChapterId(chapter.title, chapter.chapterNumber)
+      }
+    });
+  }
+
+  /** Construct a local asset path for a chapter and open the PDF viewer. */
+  handleChapterClick(chapterId: string, chapterNumber: number): void {
+    const grade   = this.selectedGrade();
+    const subject = this.selectedSubject();
+    const pdfPath = `/assets/NCERT/${grade}/${subject}/${chapterId}.pdf`;
+    this.router.navigate(['/learn/pdf-viewer'], {
+      queryParams: { pdfPath, title: `Chapter ${chapterNumber}` }
+    });
+  }
+
+  /** Converts raw NCERT file IDs to human-readable labels.
+   *  'iehdd101' → last two digits = 01 → "Chapter 1" */
+  sanitizeChapterId(title: string, chapterNumber: number): string {
+    const trimmed = (title ?? '').trim();
+    if (/^[a-z][a-z0-9]{3,15}$/i.test(trimmed)) {
+      const lastTwo = trimmed.slice(-2);
+      const num = parseInt(lastTwo, 10);
+      return `Chapter ${isNaN(num) ? chapterNumber : num}`;
+    }
+    return title || `Chapter ${chapterNumber}`;
   }
 
   /**
@@ -168,7 +151,7 @@ export class NcertBrowserComponent implements OnInit {
       queryParams: { 
         bookId: book.id,
         pdfPath: book.githubPath,
-        title: book.title 
+        title: book.title
       } 
     });
   }

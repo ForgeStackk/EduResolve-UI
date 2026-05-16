@@ -13,26 +13,36 @@
   <section class="hud-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     <div class="hud-accent"></div>
 
-    <!-- Grade Selector -->
-    <div>
-      <label for="grade" class="hud-caps text-[#e6bdb8]/80 mb-3 block">SELECT CLASS</label>
-      <select id="grade" [(ngModel)]="selectedGradeValue"
-              class="hud-input cursor-pointer">
-        @for (grade of grades(); track grade) {
-          <option [ngValue]="grade">Class {{ grade }}</option>
-        }
-      </select>
+    <!-- Locked class badge (grade is always from user profile, never selectable) -->
+    <div class="flex items-center gap-2 px-4 py-3
+                bg-[#CD7F32]/10 border border-[#CD7F32]/30 rounded-xl">
+      <span class="material-symbols-outlined fill" style="color:#CD7F32;font-size:18px">lock</span>
+      <div>
+        <p class="hud-caps text-[#CD7F32] text-[10px]">YOUR CLASS</p>
+        <p class="text-white font-bold text-sm">Class {{ selectedGrade() }}</p>
+      </div>
     </div>
 
     <!-- Subject Selector -->
     <div>
       <label for="subject" class="hud-caps text-[#e6bdb8]/80 mb-3 block">SELECT SUBJECT</label>
-      <select id="subject" [(ngModel)]="selectedSubjectValue"
-              class="hud-input cursor-pointer">
-        @for (subject of subjects(); track subject) {
-          <option [ngValue]="subject">{{ subject }}</option>
-        }
-      </select>
+      @if (catalog.loading()) {
+        <div class="hud-input flex items-center gap-2 text-[#e6bdb8]/50">
+          <span class="material-symbols-outlined animate-spin" style="font-size:16px">sync</span>
+          Loading subjects…
+        </div>
+      } @else if (catalog.hasError()) {
+        <div class="hud-input text-amber-400/80">
+          Content coming soon for Class {{ selectedGrade() }}
+        </div>
+      } @else {
+        <select id="subject" [(ngModel)]="selectedSubjectValue"
+                class="hud-input cursor-pointer">
+          @for (subject of subjects(); track subject) {
+            <option [ngValue]="subject">{{ subject }}</option>
+          }
+        </select>
+      }
     </div>
 
     <!-- Go Button -->
@@ -76,10 +86,12 @@
         </div>
       </div>
     } @else if (ncertBooks().length === 0) {
-      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
-        <span class="material-symbols-outlined text-4xl mb-3 text-[#ac8884]">folder_off</span>
-        <p>No chapters available for Class {{ selectedGrade() }} {{ selectedSubject() }}</p>
-        <p class="text-xs mt-2">Try selecting a different class or subject</p>
+      <div class="hud-card-flat text-center text-[#e6bdb8] py-12 flex flex-col items-center gap-3">
+        <span class="material-symbols-outlined text-5xl" style="color:#ac8884">cloud_off</span>
+        <p class="text-base font-bold text-white">Content Coming Soon</p>
+        <p class="text-sm opacity-70">
+          NCERT content for Class {{ selectedGrade() }} {{ selectedSubject() }} is being prepared.
+        </p>
       </div>
     } @else {
       <!-- Chapters List -->

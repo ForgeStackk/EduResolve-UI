@@ -5,19 +5,21 @@
        ============================================================= -->
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- Active Module card -->
+    <!-- ── Active Module Card (Glassmorphism) ── -->
     <div class="hud-card lg:col-span-8 overflow-hidden">
       <div class="hud-accent"
            [style.background]="subjectAccent(recommendedSubjectName())"
-           [style.box-shadow]="'0 0 10px ' + subjectAccent(recommendedSubjectName()) + '99'"></div>
+           [style.box-shadow]="'0 0 12px ' + subjectAccent(recommendedSubjectName()) + '99'"></div>
 
       <div class="flex flex-col md:flex-row items-center gap-6 relative">
-        <!-- Mascot / artwork -->
+        <!-- Subject art -->
         <div class="w-40 h-40 md:w-48 md:h-48 rounded-xl border border-white/10
-                    bg-black/40 flex items-center justify-center relative overflow-hidden shrink-0"
+                    bg-black/40 flex items-center justify-center relative overflow-hidden shrink-0 module-art"
              [style.box-shadow]="'inset 0 0 30px ' + subjectAccent(recommendedSubjectName()) + '40'">
+          <div class="art-bg-ring"
+               [style.background]="subjectAccent(recommendedSubjectName()) + '15'"></div>
           <span class="material-symbols-outlined fill"
-                style="font-size:96px"
+                style="font-size:96px;position:relative"
                 [style.color]="subjectAccent(recommendedSubjectName())">
             {{ subjectIconFor(recommendedSubjectName()) }}
           </span>
@@ -26,7 +28,7 @@
         <div class="flex-1 space-y-3 w-full text-center md:text-left">
           <span class="hud-caps"
                 [style.color]="subjectAccent(recommendedSubjectName())">
-            ACTIVE MODULE
+            ● ACTIVE MODULE
           </span>
 
           @if (recommendedChapter(); as c) {
@@ -35,13 +37,14 @@
             </h1>
             <p class="text-[#e6bdb8] text-base leading-relaxed">
               @if (recommendedAccuracy() != null) {
-                You are <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span> through the current module. Final boss quiz unlocks next.
+                You are <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span>
+                through this module. Final boss quiz unlocks next.
               } @else {
-                Press resume to begin the next training module.
+                Press Resume to begin the next training module.
               }
             </p>
 
-            <!-- Progress meter -->
+            <!-- Progress bar -->
             <div class="hud-meter mt-2">
               <div [style.width.%]="recommendedProgressPercent()"
                    [style.background]="subjectAccent(recommendedSubjectName())"
@@ -49,179 +52,328 @@
             </div>
 
             <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
-              <button (click)="continueLearning()" class="hud-btn-primary">
+              <button (click)="continueLearning()" class="hud-btn-primary resume-pulse">
                 <span class="material-symbols-outlined fill">play_arrow</span>
                 RESUME TRAINING
               </button>
-              <a [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
-                 class="hud-btn-ghost">
-                <span class="material-symbols-outlined">quiz</span>
-                QUIZ DRILL
-              </a>
+              <button (click)="openPdf()" class="hud-btn-ghost">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                OPEN PDF
+              </button>
+            </div>
+          } @else if (subjectNames().length === 0) {
+            <!-- Loading shimmer while data is fetching -->
+            <div class="space-y-3 w-full">
+              <div class="h-8 w-56 rounded shimmer-line"></div>
+              <div class="h-4 w-80 rounded shimmer-line"></div>
+              <div class="h-4 w-64 rounded shimmer-line"></div>
             </div>
           } @else {
-            <h1 class="hud-display text-3xl sm:text-4xl text-white">Initializing...</h1>
-            <p class="text-[#e6bdb8]">Loading your active training module.</p>
+            <!-- No progress yet — show Start Your Journey CTA -->
+            <div class="flex flex-col items-center md:items-start gap-4 py-2">
+              <span class="text-5xl">🚀</span>
+              <h1 class="hud-display text-3xl sm:text-4xl text-white">Start Your Journey</h1>
+              <p class="text-[#e6bdb8] text-base leading-relaxed">
+                Your first chapter awaits. Pick a subject and begin your training today.
+              </p>
+              <a [routerLink]="['/learn/subjects']"
+                 class="hud-btn-primary" style="text-decoration:none">
+                <span class="material-symbols-outlined fill">rocket_launch</span>
+                BEGIN TRAINING
+              </a>
+            </div>
           }
         </div>
       </div>
     </div>
 
-    <!-- Daily Directives -->
-    <div class="hud-card lg:col-span-4 flex flex-col">
-      <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
-      <div class="flex items-center gap-2 mb-4">
-        <span class="material-symbols-outlined" style="color:#10b981">checklist</span>
-        <h3 class="hud-display text-xl text-white">Daily Directives</h3>
+    <!-- ── DAILY OPS: Dynamic Missions Card ── -->
+    <div class="hud-card lg:col-span-4 flex flex-col gap-0 overflow-hidden">
+      <div class="hud-accent" style="background:#10b981;box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+
+      <!-- Debrief warning (yesterday's missions incomplete) -->
+      @if (missions.yesterdayIncomplete()) {
+        <div class="ops-debrief-banner">
+          <span class="material-symbols-outlined fill" style="font-size:15px">warning</span>
+          <span>DEBRIEF REQUIRED — yesterday's ops incomplete</span>
+        </div>
+      }
+
+      <!-- Header row -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined fill ops-radar-icon">radar</span>
+          <h3 class="hud-display text-xl text-white">Daily Ops</h3>
+        </div>
+        <div class="ops-timer">
+          <span class="material-symbols-outlined" style="font-size:12px">schedule</span>
+          {{ missions.timeUntilReset() }}
+        </div>
       </div>
 
-      <div class="space-y-3 flex-1">
-        @for (item of dailyPlan(); track item.chapterId; let i = $index) {
-          <div class="flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer"
-               [class.bg-black/40]="!item.done && i !== 0"
-               [class.border-white/5]="!item.done && i !== 0"
-               [class.bg-white/5]="i === 0 && !item.done"
-               [class.border-white/20]="i === 0 && !item.done"
-               [class.bg-emerald-500/10]="item.done"
-               [class.border-emerald-500/40]="item.done"
-               (click)="toggleDirective(item.chapterId)">
-            <div class="w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
-                 [class.border-emerald-400]="item.done"
-                 [class.bg-emerald-500/30]="item.done"
-                 [class.border-white/40]="!item.done">
-              @if (item.done) {
-                <span class="material-symbols-outlined fill text-white" style="font-size:16px">check</span>
-              }
+      <!-- Progress pill -->
+      <div class="ops-progress-row mb-4">
+        <div class="ops-progress-track">
+          <div class="ops-progress-fill"
+               [style.width.%]="(missions.doneCount() / 3) * 100"></div>
+        </div>
+        <span class="hud-caps text-[10px] text-[#e6bdb8]/50 ml-2 whitespace-nowrap">
+          {{ missions.doneCount() }}/3 COMPLETE
+        </span>
+      </div>
+
+      <!-- Mission cards -->
+      <div class="space-y-2.5 flex-1">
+        @if (missions.missions().length === 0) {
+          @for (_ of [1,2,3]; track $index) {
+            <div class="h-16 rounded-xl shimmer-line"></div>
+          }
+        }
+
+        @for (m of missions.missions(); track m.id; let i = $index) {
+          <div class="ops-mission-card"
+               [class.ops-done]="missions.completed()[m.id]"
+               [class.ops-priority]="i === 0 && !missions.completed()[m.id]">
+
+            <!-- Left: rank + type icon -->
+            <div class="ops-rank"
+                 [class.ops-rank-gold]="i === 0"
+                 [class.ops-rank-silver]="i === 1"
+                 [class.ops-rank-bronze]="i === 2">
+              <span class="material-symbols-outlined fill" style="font-size:16px">
+                {{ m.type === 'READ' ? 'menu_book' : m.type === 'QUIZ' ? 'quiz' : 'psychology_alt' }}
+              </span>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-bold truncate"
-                 [class.text-white]="!item.done"
-                 [class.line-through]="item.done"
-                 [class.opacity-70]="item.done">
-                {{ item.title }}
+
+            <!-- Centre: codename + objective -->
+            <div class="flex-1 min-w-0 px-2">
+              <p class="hud-caps text-[9px] mb-0.5"
+                 [class.text-emerald-400]="i === 0 && !missions.completed()[m.id]"
+                 [class.text-[#e6bdb8]/40]="i !== 0 || missions.completed()[m.id]">
+                OP: {{ m.codename }}
               </p>
-              <p class="text-xs text-[#e6bdb8]/80 truncate">{{ item.subject }} · {{ item.minutes }}m</p>
+              <p class="text-xs font-semibold leading-tight truncate"
+                 [class.text-white]="!missions.completed()[m.id]"
+                 [class.text-white/35]="missions.completed()[m.id]"
+                 [class.line-through]="missions.completed()[m.id]">
+                {{ m.objective }}
+              </p>
             </div>
+
+            <!-- Right: done check / in-mission / launch -->
+            @if (missions.completed()[m.id]) {
+              <span class="material-symbols-outlined fill ops-check-icon">check_circle</span>
+            } @else if (missions.pending()[m.id]) {
+              <div class="ops-in-mission-badge">
+                <span class="material-symbols-outlined fill" style="font-size:11px">bolt</span>
+                IN MISSION
+              </div>
+            } @else {
+              <button class="ops-launch-btn"
+                      [class.ops-launch-priority]="i === 0"
+                      (click)="launchMission(m)">
+                <span class="hud-caps" style="font-size:8px">+{{ m.xpReward }}XP</span>
+                <span class="material-symbols-outlined fill" style="font-size:13px">play_arrow</span>
+              </button>
+            }
           </div>
         }
-        @if (dailyPlan().length === 0) {
-          <p class="text-sm text-[#e6bdb8]/70 italic">{{ 'common.loading' | translate }}</p>
-        }
       </div>
 
-      <!-- Streak / XP mini-row -->
-      <div class="mt-5 pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
-        <div class="text-center">
-          <p class="hud-caps text-[#e6bdb8]/70 mb-1">STREAK</p>
-          <p class="hud-display text-2xl text-red-500">🔥 {{ streakDays() }}</p>
-        </div>
-        <div class="text-center">
-          <p class="hud-caps text-[#e6bdb8]/70 mb-1">XP · {{ rankLabel() }}</p>
-          <p class="hud-display text-2xl text-white">{{ experiencePoints() }}</p>
+      <!-- ── Liquid Progress Ring (Streak Engine) ── -->
+      <div class="mt-5 pt-4 border-t border-white/10 flex flex-col items-center gap-3">
+        <app-liquid-progress-ring
+          [progress]="streakProgress()"
+          [color]="streakColor()"
+          [centerValue]="streakPoints()"
+          label="STREAK PTS"
+          [sublabel]="streakRank()"
+          [size]="130"
+          [stroke]="10">
+        </app-liquid-progress-ring>
+
+        <div class="grid grid-cols-2 gap-3 w-full text-center">
+          <div>
+            <p class="hud-caps text-[#e6bdb8]/60 mb-1">STREAK</p>
+            <p class="hud-display text-xl text-red-400">🔥 {{ streakDays() }}</p>
+          </div>
+          <div>
+            <p class="hud-caps text-[#e6bdb8]/60 mb-1">RANK XP</p>
+            <p class="hud-display text-xl" [style.color]="streakColor()">{{ experiencePoints() }}</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- =============================================================
-       STRATEGIC FOCUS chips
+       STRATEGIC FOCUS: Subject Chips
        ============================================================= -->
   <section class="space-y-4">
     <h2 class="hud-display text-2xl sm:text-3xl text-white">Strategic Focus</h2>
     <div class="flex flex-wrap gap-3">
       @for (chip of focusChips(); track chip.id) {
-        <a [routerLink]="['/learn/subjects', chip.id]"
+        <a [routerLink]="['/learn/books']"
+           [queryParams]="{ classGrade: grade() || '9', subject: chip.name }"
            class="hud-chip"
            [class.hud-chip-active]="chip.active">
-          <span class="material-symbols-outlined" style="font-size:18px">{{ chip.icon }}</span>
+          <span class="material-symbols-outlined" style="font-size:16px">{{ chip.icon }}</span>
           {{ chip.name }}
           @if (chip.active) { <span class="opacity-80">· ACTIVE</span> }
         </a>
       }
       @if (focusChips().length === 0) {
-        <span class="hud-chip">Loading subjects...</span>
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="h-8 w-24 rounded-full shimmer-line"></div>
+        }
       }
     </div>
   </section>
 
   <!-- =============================================================
-       TACTICAL INTEL: weak topics + recommended actions
+       LEARNING HEATMAP + SMART SYLLABUS
+       ============================================================= -->
+  <section class="space-y-4">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+      <!-- Learning Heatmap (auto-pilot) spans 2 cols -->
+      <div class="xl:col-span-2">
+        <app-learning-heatmap
+          [weakTopics]="weakTopicsRaw()"
+          [subjects]="subjectNames()"
+          [grade]="grade() || '9'"
+          [activeBookId]="readingProgress()?.bookId ?? null">
+        </app-learning-heatmap>
+      </div>
+
+      <!-- Smart Syllabus Quick-Nav -->
+      <div class="hud-card flex flex-col gap-4">
+        <div class="hud-accent" style="background:#2DD4BF;box-shadow:0 0 10px rgba(45,212,191,0.35)"></div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined fill" style="color:#2DD4BF">library_books</span>
+            <h3 class="hud-display text-lg text-white">Smart Syllabus</h3>
+          </div>
+          <a routerLink="/learn/ncert"
+             class="hud-caps text-[#2DD4BF]/80 hover:text-[#2DD4BF] transition-colors"
+             style="text-decoration:none;font-size:10px">EXPLORE ALL</a>
+        </div>
+
+        <!-- Class badge (hardcoded from profile, non-selectable) -->
+        <div class="class-badge">
+          <span class="material-symbols-outlined fill" style="font-size:14px;color:#CD7F32">school</span>
+          <span class="hud-caps text-[#CD7F32]">Class {{ grade() || '–' }} · NCERT Curriculum</span>
+        </div>
+
+        <!-- Subject links with simulated chapter name pre-read -->
+        <div class="flex flex-col gap-2 flex-1">
+          @for (s of subjectNames().slice(0,5); track s; let i = $index) {
+            <button class="syllabus-row" (click)="navigateToSubject(s)">
+              <div class="syllabus-icon-ring"
+                   [style.background]="subjectAccent(s) + '1a'"
+                   [style.border-color]="subjectAccent(s) + '40'">
+                <span class="material-symbols-outlined" style="font-size:14px"
+                      [style.color]="subjectAccent(s)">{{ subjectIconFor(s) }}</span>
+              </div>
+              <div class="flex-1 text-left">
+                <p class="text-sm font-bold text-white truncate">{{ s }}</p>
+                <p class="text-xs text-[#e6bdb8]/50">
+                  Ch.1: {{ chapterNameHint(s, i) }}
+                </p>
+              </div>
+              <span class="material-symbols-outlined text-white/20" style="font-size:16px">chevron_right</span>
+            </button>
+          }
+          @if (subjectNames().length === 0) {
+            @for (_ of [1,2,3,4]; track $index) {
+              <div class="h-10 rounded-lg shimmer-line"></div>
+            }
+          }
+        </div>
+
+        <a routerLink="/learn/ncert" class="hud-btn-ghost w-full justify-center mt-auto"
+           style="text-decoration:none">
+          <span class="material-symbols-outlined" style="font-size:16px">open_in_full</span>
+          Full Syllabus
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================
+       TACTICAL INTEL: Weak Topics + Quick Actions
        ============================================================= -->
   <section class="space-y-4">
     <div class="flex items-end justify-between">
       <h2 class="hud-display text-2xl sm:text-3xl text-white">Tactical Intel</h2>
       <a routerLink="/learn/subjects"
-         class="text-red-500 hover:text-white font-bold text-xs tracking-widest uppercase transition-colors">
-        VIEW ALL
-      </a>
+         class="text-red-500 hover:text-white font-bold text-xs tracking-widest uppercase transition-colors"
+         style="text-decoration:none">VIEW ALL</a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-      <!-- Quiz drill card -->
-      @if (recommendedChapter(); as c) {
-        <a [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
-           class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
-          <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
-          <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
-                      flex items-center justify-center relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"></div>
-            <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
-                  style="font-size:56px; color:#f59e0b; filter:drop-shadow(0 0 15px rgba(245,158,11,.6))">
-              quiz
-            </span>
-          </div>
-          <div>
-            <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">KNOWLEDGE CHECK</span>
-            <h4 class="text-white font-bold leading-tight">{{ c.name }} Drill</h4>
-            <p class="text-sm text-[#e6bdb8]/80 mt-2">5 Questions · +50 XP</p>
-          </div>
-        </a>
-      }
-
-      <!-- Doubt solver card -->
-      <a routerLink="/learn/doubt"
-         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
-        <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+      <!-- Quiz Drill card (Coming Soon) -->
+      <div class="hud-card-flat flex flex-col gap-3 relative overflow-hidden"
+           style="cursor:not-allowed;opacity:0.55;filter:grayscale(0.6)">
+        <div class="hud-accent" style="background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
         <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
                     flex items-center justify-center relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent"></div>
-          <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
-                style="font-size:56px; color:#3b82f6; filter:drop-shadow(0 0 15px rgba(59,130,246,.6))">
-            psychology_alt
-          </span>
+          <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"></div>
+          <span class="material-symbols-outlined"
+                style="font-size:56px;color:#f59e0b;filter:drop-shadow(0 0 15px rgba(245,158,11,.6))">quiz</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">SUPPORT BRIEFING</span>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">KNOWLEDGE CHECK</span>
+          <h4 class="text-white font-bold leading-tight">Quiz Drill</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">5 Questions · +1 Streak Pt</p>
+        </div>
+        <div class="absolute top-3 right-3 bg-black/70 rounded px-2 py-0.5
+                    hud-caps text-[10px] text-amber-300 border border-amber-300/30">SOON</div>
+      </div>
+
+      <!-- Ask a Doubt card (links to full page) -->
+      <a routerLink="/learn/doubt"
+         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
+         style="text-decoration:none;color:inherit">
+        <div class="hud-accent" style="background:#2DD4BF;box-shadow:0 0 10px rgba(45,212,191,0.5)"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+                    flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-transparent"></div>
+          <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                style="font-size:56px;color:#2DD4BF;filter:drop-shadow(0 0 15px rgba(45,212,191,.6))">psychology_alt</span>
+        </div>
+        <div>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">AI COMMAND CENTER</span>
           <h4 class="text-white font-bold leading-tight">Ask a Doubt</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">Instant AI &amp; textbook answers</p>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">Text · Image · Voice · AI</p>
         </div>
       </a>
 
-      <!-- NCERT Explorer Card -->
+      <!-- NCERT Explorer -->
       <a routerLink="/learn/ncert"
-         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3">
-        <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
+         style="text-decoration:none;color:inherit">
+        <div class="hud-accent" style="background:#10b981;box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
         <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
                     flex items-center justify-center relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent"></div>
           <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
-                style="font-size:56px; color:#10b981; filter:drop-shadow(0 0 15px rgba(16,185,129,.6))">
-            library_books
-          </span>
+                style="font-size:56px;color:#10b981;filter:drop-shadow(0 0 15px rgba(16,185,129,.6))">library_books</span>
         </div>
         <div>
           <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">CURRICULUM EXPLORER</span>
-          <h4 class="text-white font-bold leading-tight">NCERT Chapters</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">Browse official textbooks with 3D visualizations</p>
+          <h4 class="text-white font-bold leading-tight">Smart Syllabus</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">NCERT PDFs with Focus Mode</p>
         </div>
       </a>
 
-      <!-- Weak topic / focus area card -->
+      <!-- Priority Weak Topic -->
       @if (weakTopics().length > 0) {
         @for (w of weakTopics().slice(0,1); track w.id) {
           <button type="button"
-                  (click)="drillWeakTopic(w)"
+                  (click)="drillWeakTopic(w.topicId)"
                   class="hud-card-flat flex flex-col gap-3 text-left w-full cursor-pointer
                          hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(220,38,38,0.25)]
                          transition-all group">
@@ -230,32 +382,29 @@
                         flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-gradient-to-br from-red-600/25 to-transparent"></div>
               <span class="material-symbols-outlined fill group-hover:scale-110 transition-transform"
-                    style="font-size:56px; color:#dc2626; filter:drop-shadow(0 0 15px rgba(220,38,38,.6))">
-                target
-              </span>
+                    style="font-size:56px;color:#dc2626;filter:drop-shadow(0 0 15px rgba(220,38,38,.6))">target</span>
             </div>
             <div>
               <span class="hud-caps text-red-400 mb-1 block">PRIORITY TARGET</span>
-              <h4 class="text-white font-bold leading-tight truncate">
-                {{ w.topicName || ('Topic #' + w.topicId) }}
-              </h4>
+              <h4 class="text-white font-bold leading-tight truncate">{{ w.topicName || 'Topic #' + w.topicId }}</h4>
               <p class="text-sm text-[#e6bdb8]/80 mt-2">
-                Current accuracy <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
+                Accuracy <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
               </p>
               <span class="hud-caps text-red-400 mt-3 inline-flex items-center gap-1 group-hover:text-white transition-colors">
                 LAUNCH DRILL
-                <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
+                <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
               </span>
             </div>
           </button>
         }
       }
     </div>
-
-    @if (dailyPlan().length === 0 && weakTopics().length === 0) {
-      <div class="hud-card-flat text-center text-[#e6bdb8]/80 py-10">
-        {{ 'common.loading' | translate }}
-      </div>
-    }
   </section>
+
 </div>
+
+<!-- ============================================================
+     Floating AI Doubt Center (fixed position, always rendered)
+     ============================================================ -->
+<app-ai-doubt-center [grade]="grade() || '9'"></app-ai-doubt-center>
+    

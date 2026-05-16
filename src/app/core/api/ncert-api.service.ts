@@ -70,7 +70,7 @@ export interface QuizQuestion {
 @Injectable({ providedIn: 'root' })
 export class NcertApiService {
   private http = inject(HttpClient);
-  private base = `${environment.apiBaseUrl}/api/ncert`;
+  private base = `${environment.apiBaseUrl}/ncert`;
 
   /**
    * Get all available classes
@@ -97,7 +97,10 @@ export class NcertApiService {
     return this.http.get<NCERTBook[]>(`${this.base}/books`, {
       params: { classGrade, subject }
     }).pipe(
-      catchError(() => this.getMockBooks(classGrade, subject))
+      catchError(err => {
+        console.error('[NcertApi] Failed to fetch books for', classGrade, subject, err);
+        return of([] as NCERTBook[]);
+      })
     );
   }
 
@@ -106,7 +109,10 @@ export class NcertApiService {
    */
   getChapters(bookId: number): Observable<NCERTChapter[]> {
     return this.http.get<NCERTChapter[]>(`${this.base}/books/${bookId}/chapters`).pipe(
-      catchError(() => this.getMockChapters(bookId))
+      catchError(err => {
+        console.error('[NcertApi] Failed to fetch chapters for book', bookId, err);
+        return of([] as NCERTChapter[]);
+      })
     );
   }
 
@@ -144,6 +150,14 @@ export class NcertApiService {
     return this.http.get<string>(`${this.base}/books/${bookId}/pdf`).pipe(
       catchError(() => of(''))
     );
+  }
+
+  /**
+   * Build the URL for the pdf-content endpoint addressed by class + subject.
+   * Backend: GET /api/ncert/class/{classId}/subject/{subjectId}/pdf-content
+   */
+  getPdfContentUrl(classId: string, subjectId: string): string {
+    return `${this.base}/class/${classId}/subject/${encodeURIComponent(subjectId)}/pdf-content`;
   }
 
   /**

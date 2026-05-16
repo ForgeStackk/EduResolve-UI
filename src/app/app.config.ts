@@ -23,6 +23,9 @@ export const appConfig: ApplicationConfig = {
     // Construct LanguageService eagerly so translations are fetched before the
     // first component renders. Without this, the first paint shows raw keys
     // until something (e.g. TopNav -> LanguageToggle) injects the service.
-    provideAppInitializer(() => { inject(LanguageService); })
+    provideAppInitializer(() => {
+      const langService = inject(LanguageService);
+      return langService.initialize();
+    })
   ]
 };

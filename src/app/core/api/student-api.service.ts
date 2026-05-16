@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 
 export interface StudentProfile {
   id: number;
@@ -21,7 +20,7 @@ export interface StudentProfile {
 @Injectable({ providedIn: 'root' })
 export class StudentApiService {
   private http = inject(HttpClient);
-  private base = `${environment.apiBaseUrl}/students`;
+  private base = 'http://localhost:8080/api/students';
 
   list(className?: string): Observable<StudentProfile[]> {
     const params: Record<string, string> = {};
@@ -31,5 +30,13 @@ export class StudentApiService {
 
   getById(id: number): Observable<StudentProfile> {
     return this.http.get<StudentProfile>(`${this.base}/${id}`);
+  }
+
+  getByUserId(userId: number): Observable<StudentProfile> {
+    return this.http.get<StudentProfile>(`${this.base}/by-user/${userId}`);
+  }
+
+  getByUserIdString(userId: string): Observable<StudentProfile> {
+    return this.http.get<StudentProfile>(`${this.base}/by-user/${userId}`);
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { StudentApiService, StudentProfile } from '../../../core/api/student-api.service';
 
 /** Status -> HUD accent color for the roster indicator dot. */
@@ -14,7 +15,7 @@ const STATUS_COLORS: Record<string, string> = {
 @Component({
   selector: 'app-teacher-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './teacher-dashboard.component.html',
   styleUrl: './teacher-dashboard.component.css'
 })

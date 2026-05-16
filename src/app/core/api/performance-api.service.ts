@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 
 export interface WeakTopic {
   id: number;
@@ -17,7 +16,7 @@ export interface WeakTopic {
 @Injectable({ providedIn: 'root' })
 export class PerformanceApiService {
   private http = inject(HttpClient);
-  private base = `${environment.apiBaseUrl}/performance`;
+  private base = 'http://localhost:8080/api/performance';
 
   list(studentId: number): Observable<WeakTopic[]> {
     return this.http.get<WeakTopic[]>(`${this.base}/${studentId}`);

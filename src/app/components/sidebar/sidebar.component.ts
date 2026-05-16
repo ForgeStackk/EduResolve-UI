@@ -17,4 +17,8 @@ export class SidebarComponent {
   get currentUser(): User | null {
     return this.authService.currentUser() as User | null;
   }
+
+  logout() {
+    this.authService.logout();
+  }
 }

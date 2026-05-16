@@ -1,0 +1,264 @@
+/* ================================================================
+ * Skill Galaxy — Skill Intelligence Widget
+ * ================================================================ */
+
+.heatmap-shell { display: flex; flex-direction: column; gap: 16px; }
+
+/* Color legend */
+.galaxy-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(230,189,184,0.5);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-label { color: rgba(230,189,184,0.5); }
+
+.hm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hm-header-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: rgba(168,85,247,0.12);
+  border: 1px solid rgba(168,85,247,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hm-live-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  color: #2DD4BF;
+  animation: live-blink 2s ease-in-out infinite;
+}
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* Two-column layout */
+.hm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .hm-grid { grid-template-columns: 1fr 300px; }
+}
+
+/* ---- Subject Grid ---- */
+.day-header-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+.subject-col-spacer { flex: 0 0 100px; }
+.day-label {
+  flex: 1;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(230,189,184,0.4);
+  text-align: center;
+}
+.acc-label-head {
+  flex: 0 0 58px;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(230,189,184,0.4);
+  text-align: right;
+}
+
+.subject-rows { display: flex; flex-direction: column; gap: 6px; }
+
+.subject-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.subject-row:hover { background: rgba(255,255,255,0.04); }
+
+.subject-name-col {
+  flex: 0 0 100px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+}
+.subject-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(230,189,184,0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heat-cell {
+  flex: 1;
+  height: 22px;
+  border-radius: 4px;
+  transition: background 0.3s ease, transform 0.15s;
+  cursor: pointer;
+}
+.heat-cell:hover { transform: scaleY(1.3); }
+
+.acc-readout {
+  font-size: 11px;
+  font-weight: 800;
+  text-align: right;
+  letter-spacing: 0.02em;
+  transition: color 0.3s;
+}
+
+/* Accuracy + predicted-pts column */
+.acc-col {
+  flex: 0 0 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.predicted-pts-badge {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #f97316;
+  background: rgba(249,115,22,0.12);
+  border: 1px solid rgba(249,115,22,0.3);
+  border-radius: 4px;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+
+/* Shimmer rows */
+.shimmer-row {
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(34,197,94,0.04) 0%,
+    rgba(249,115,22,0.10) 50%,
+    rgba(185,28,28,0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+  margin-bottom: 6px;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ---- Autopilot / Galaxy Focus Card ---- */
+.autopilot-card { display: flex; flex-direction: column; gap: 14px; }
+
+/* Predicted Points highlight card */
+.predicted-pts-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(249,115,22,0.08);
+  border: 1px solid rgba(249,115,22,0.25);
+}
+.predicted-pts-headline {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(230,189,184,0.9);
+  line-height: 1.4;
+  margin: 0 0 2px;
+}
+.predicted-pts-sub {
+  font-size: 10px;
+  color: rgba(230,189,184,0.5);
+  margin: 0;
+}
+
+.ap-eyebrow { display: flex; align-items: center; gap: 6px; }
+
+.ap-subject-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+.ap-icon-ring {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ap-subject-name {
+  font-family: 'Lexend','Inter',sans-serif;
+  font-size: 15px; font-weight: 700; color: #fff;
+  letter-spacing: -0.01em;
+}
+.ap-subject-sub { font-size: 11px; color: rgba(230,189,184,0.6); font-weight: 600; }
+
+/* ROI card */
+.roi-card {
+  background: rgba(205,127,50,0.08);
+  border: 1px solid rgba(205,127,50,0.2);
+  border-radius: 10px;
+  padding: 12px;
+}
+.roi-title { font-size: 12px; font-weight: 700; color: rgba(230,189,184,0.8); margin-bottom: 8px; }
+.roi-pts { color: #CD7F32; font-size: 15px; font-weight: 900; }
+.roi-steps { display: flex; flex-direction: column; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.roi-steps li {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: rgba(230,189,184,0.8); font-weight: 600;
+}
+.roi-steps strong { color: #A855F7; }
+
+/* Accuracy meter */
+.ap-meter-wrap { display: flex; flex-direction: column; gap: 4px; }
+.ap-meter-track {
+  height: 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+}
+.ap-meter-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 8px currentColor;
+}
+.ap-meter-label {
+  font-size: 10px; color: rgba(230,189,184,0.5); font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Launch CTA */
+.ap-launch-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #CD7F32; color: #1a0800;
+  font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: auto;
+}
+.ap-launch-btn:hover {
+  background: #d9943d;
+  box-shadow: 0 0 20px rgba(205,127,50,0.4);
+}

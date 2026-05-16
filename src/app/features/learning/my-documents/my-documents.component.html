@@ -1,0 +1,128 @@
+<div class="space-y-8">
+
+  <!-- ── Page Header ── -->
+  <header class="space-y-1">
+    <p class="hud-caps text-red-400">{{ 'myDocs.section' | translate }}</p>
+    <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
+      {{ 'myDocs.title' | translate }}
+    </h1>
+    <p class="text-[#e6bdb8]/60 text-sm">{{ 'myDocs.subtitle' | translate }}</p>
+  </header>
+
+  <!-- ── Upload Zone ── -->
+  <section class="hud-card"
+           [class.ring-2]="dragOver()"
+           [class.ring-red-400]="dragOver()"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave()"
+           (drop)="onDrop($event)">
+    <div class="hud-accent"></div>
+
+    <label class="flex flex-col items-center gap-4 py-10 cursor-pointer select-none"
+           for="doc-upload-input">
+
+      @if (uploading()) {
+        <span class="material-symbols-outlined text-5xl text-red-400 animate-spin">sync</span>
+        <p class="hud-caps text-red-400">{{ 'myDocs.uploading' | translate }}</p>
+      } @else {
+        <span class="material-symbols-outlined text-5xl"
+              [style.color]="dragOver() ? '#dc2626' : 'rgba(230,189,184,0.4)'">
+          upload_file
+        </span>
+        <div class="text-center">
+          <p class="text-white font-semibold">{{ 'myDocs.dropHere' | translate }}</p>
+          <p class="text-[#e6bdb8]/50 text-sm mt-1">{{ 'myDocs.orBrowse' | translate }}</p>
+          <p class="text-[#e6bdb8]/40 text-xs mt-1">{{ 'myDocs.pdfMax' | translate }}</p>
+        </div>
+      }
+    </label>
+
+    <input id="doc-upload-input"
+           type="file"
+           accept=".pdf"
+           class="hidden"
+           (change)="onFileInput($event)"
+           [disabled]="uploading()">
+
+    @if (uploadError()) {
+      <p class="text-red-400 text-sm text-center pb-4">{{ uploadError() | translate }}</p>
+    }
+  </section>
+
+  <!-- ── Error banner ── -->
+  @if (error()) {
+    <div class="hud-card-flat flex items-center gap-3 px-5 py-3 border-red-500/40">
+      <span class="material-symbols-outlined text-red-400" style="font-size:18px">error</span>
+      <p class="text-red-400 text-sm">{{ error() | translate }}</p>
+    </div>
+  }
+
+  <!-- ── Loading skeleton ── -->
+  @if (loading()) {
+    <div class="space-y-3">
+      @for (_ of [1,2,3]; track $index) {
+        <div class="hud-card-flat h-16 relative overflow-hidden">
+          <div class="skeleton-sweep"></div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Document list ── -->
+  @if (!loading() && docs().length > 0) {
+    <section class="space-y-3">
+      <p class="hud-caps text-[#e6bdb8]/50 text-[10px]">
+        {{ docs().length }} {{ 'myDocs.files' | translate }}
+      </p>
+
+      @for (doc of docs(); track doc.id) {
+        <button type="button"
+                class="doc-row w-full"
+                (click)="openDoc(doc)">
+
+          <!-- PDF icon -->
+          <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-500/10
+                      flex items-center justify-center">
+            <span class="material-symbols-outlined fill text-red-400"
+                  style="font-size:20px">picture_as_pdf</span>
+          </div>
+
+          <!-- Name + meta -->
+          <div class="flex-1 text-left min-w-0 px-3">
+            <p class="text-white font-semibold text-sm truncate">{{ doc.originalName }}</p>
+            <p class="text-[#e6bdb8]/50 text-xs mt-0.5">
+              {{ formatSize(doc.fileSize) }} &nbsp;·&nbsp; {{ formatDate(doc.uploadedAt) }}
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="pdf-pill">
+              <span class="material-symbols-outlined fill" style="font-size:13px">open_in_new</span>
+              {{ 'myDocs.open' | translate }}
+            </span>
+            <button type="button"
+                    class="p-1.5 rounded-lg text-[#e6bdb8]/30 hover:text-red-400
+                           hover:bg-red-500/10 transition-colors"
+                    (click)="deleteDoc(doc, $event)"
+                    [title]="'myDocs.delete' | translate">
+              <span class="material-symbols-outlined" style="font-size:16px">delete</span>
+            </button>
+          </div>
+        </button>
+      }
+    </section>
+  }
+
+  <!-- ── Empty state ── -->
+  @if (!loading() && docs().length === 0 && !error()) {
+    <div class="hud-card-flat flex flex-col items-center gap-4 py-16 text-center">
+      <span class="material-symbols-outlined text-5xl" style="color:#ac8884">folder_open</span>
+      <h3 class="hud-display text-xl text-white">{{ 'myDocs.emptyTitle' | translate }}</h3>
+      <p class="text-[#e6bdb8]/60 text-sm max-w-xs">
+        {{ 'myDocs.emptyHint' | translate }}
+      </p>
+    </div>
+  }
+
+</div>

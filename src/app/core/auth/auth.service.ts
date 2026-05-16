@@ -1,14 +1,22 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 export type Role = 'student' | 'teacher' | 'admin' | 'parent';
 
 export interface User {
   id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   name: string;
   email: string;
   role: Role;
+  className?: string;
+  phoneNumber?: string;
+  schoolName?: string;
   /** Backend student-profile id (matches `students.id`). */
   studentId?: number;
+  grade?: string;
 }
 
 /**
@@ -35,22 +43,36 @@ export const MOCK_STUDENT_PROFILE = {
   providedIn: 'root'
 })
 export class AuthService {
-  // Mock-login as the seeded student "Marcus Thomas" (student id = 1, 10A).
-  // Switch to a different student by changing studentId here.
-  currentUser = signal<User | null>({
-    id: 'marcus.s@eduresolve.test',
-    name: MOCK_STUDENT_PROFILE.name,
-    email: 'marcus.s@eduresolve.test',
-    role: 'student',
-    studentId: MOCK_STUDENT_PROFILE.id
-  });
+  private router = inject(Router);
+
+  currentUser = signal<User | null>(null);
+
+  constructor() {
+    this.loadUserFromStorage();
+  }
+
+  private loadUserFromStorage() {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.currentUser.set(user);
+      } catch (e) {
+        console.error('Failed to parse stored user:', e);
+        localStorage.removeItem('user');
+      }
+    }
+  }
 
   login(user: User): void {
     this.currentUser.set(user);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   logout(): void {
     this.currentUser.set(null);
+    localStorage.removeItem('user');
+    this.router.navigate(['/login']);
   }
 
   hasRole(allowedRoles: Role[]): boolean {
@@ -61,5 +83,10 @@ export class AuthService {
   /** Convenience accessor for the currently logged-in student id (or null). */
   currentStudentId(): number | null {
     return this.currentUser()?.studentId ?? null;
+  }
+
+  /** Check if user is authenticated */
+  isAuthenticated(): boolean {
+    return this.currentUser() !== null;
   }
 }

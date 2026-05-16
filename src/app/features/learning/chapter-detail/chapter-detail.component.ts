@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { Chapter, ChunkType, ContentChunk, LearningApiService, Topic } from '../../../core/api/learning-api.service';
 import { PerformanceApiService, WeakTopic } from '../../../core/api/performance-api.service';
-import { AuthService, MOCK_STUDENT_PROFILE } from '../../../core/auth/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { NcertApiService, NCERTResource } from '../../../core/api/ncert-api.service';
 import { InteractiveContentComponent } from '../interactive-content/interactive-content.component';
@@ -27,10 +27,11 @@ export class ChapterDetailComponent implements OnInit {
   protected lang = inject(LanguageService);
 
   protected tabs: { type: ChunkType; labelKey: string }[] = [
-    { type: 'SUMMARY',      labelKey: 'chapters.summary' },
-    { type: 'EXPLANATION',  labelKey: 'chapters.explanation' },
-    { type: 'EXAMPLE',      labelKey: 'chapters.examples' },
-    { type: 'IMPORTANT_QA', labelKey: 'chapters.importantQa' },
+    { type: 'SUMMARY',      labelKey: 'Summary' },
+    { type: 'EXPLANATION',  labelKey: 'Explanation' },
+    { type: 'EXAMPLE',      labelKey: 'Examples' },
+    { type: 'IMPORTANT_QA', labelKey: 'ImportantQa' },
+    { type: 'DIAGRAM',      labelKey: 'Diagrams' },
   ];
 
   chapter = signal<Chapter | null>(null);
@@ -73,16 +74,25 @@ export class ChapterDetailComponent implements OnInit {
     this.api.listTopics(id).subscribe(rows => {
       this.topics.set(rows);
       const initial: Record<number, ChunkType> = {};
-      rows.forEach(r => { initial[r.id] = 'SUMMARY'; this.loadChunks(r.id, 'SUMMARY'); });
+      rows.forEach(r => {
+        initial[r.id] = 'SUMMARY';
+        this.loadChunks(r.id, 'SUMMARY');
+        // Pre-load explanation and examples to ensure content is available
+        this.loadChunks(r.id, 'EXPLANATION');
+        this.loadChunks(r.id, 'EXAMPLE');
+      });
       this.active.set(initial);
       this.loading.set(false);
     });
 
     // Pull the student's performance snapshot to drive the real progress meter.
-    const studentId = this.auth.currentStudentId() ?? MOCK_STUDENT_PROFILE.id;
-    this.performanceApi.weakTopics(studentId, 50).pipe(
-      catchError(() => of([] as WeakTopic[]))
-    ).subscribe(rows => this.weakTopics.set(rows));
+    const studentId = this.auth.currentStudentId();
+    if (studentId) {
+      this.performanceApi.weakTopics(studentId, 50).subscribe({
+        next: (rows) => this.weakTopics.set(rows),
+        error: (error) => console.error('Error loading weak topics:', error)
+      });
+    }
   }
 
   /**
@@ -113,8 +123,15 @@ export class ChapterDetailComponent implements OnInit {
   }
 
   private loadChunks(topicId: number, type: ChunkType) {
-    this.api.listContent(topicId, this.lang.current(), type).subscribe(rows => {
-      this.chunksByTopic.update(prev => ({ ...prev, [topicId]: rows }));
+    this.api.listContent(topicId, this.lang.current(), type).subscribe({
+      next: (rows) => {
+        this.chunksByTopic.update(prev => ({ ...prev, [topicId]: rows }));
+      },
+      error: (error) => {
+        console.error(`Error loading chunks for topic ${topicId}, type ${type}:`, error);
+        // Set empty array on error to prevent undefined issues
+        this.chunksByTopic.update(prev => ({ ...prev, [topicId]: [] }));
+      }
     });
   }
 

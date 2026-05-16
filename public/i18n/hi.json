@@ -5,6 +5,7 @@
   },
   "nav": {
     "dashboard": "डैशबोर्ड",
+    "home": "होम",
     "subjects": "विषय",
     "chapters": "अध्याय",
     "quiz": "प्रश्नोत्तरी",
@@ -12,7 +13,46 @@
     "revision": "पुनरावलोकन",
     "bookmarks": "सहेजे गए",
     "doubt": "शंका पूछें",
-    "logout": "लॉग आउट"
+    "logout": "लॉग आउट",
+    "overview": "अवलोकन",
+    "classes": "कक्षाएं",
+    "assignments": "असाइनमेंट",
+    "users": "उपयोगकर्ता",
+    "myDocuments": "मेरे दस्तावेज़"
+  },
+  "auth": {
+    "welcomeBack": "वापसी पर स्वागत है",
+    "loginToContinue": "EduResolve में लॉग इन करें",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "loggingIn": "लॉग इन हो रहा है...",
+    "login": "लॉग इन",
+    "dontHaveAccount": "खाता नहीं है?",
+    "signUp": "साइन अप",
+    "createAccount": "खाता बनाएं",
+    "joinEduResolve": "EduResolve से जुड़ें और सीखना शुरू करें",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "contactNumber": "संपर्क नंबर",
+    "class": "कक्षा",
+    "schoolName": "स्कूल का नाम",
+    "enterSchoolName": "अपने स्कूल का नाम दर्ज करें",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "creatingAccount": "खाता बनाया जा रहा है...",
+    "alreadyHaveAccount": "पहले से खाता है?",
+    "pleaseFillAllFields": "कृपया सभी फ़ील्ड भरें",
+    "passwordsDoNotMatch": "पासवर्ड मेल नहीं खा रहे",
+    "passwordTooShort": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+    "selectClass": "कक्षा चुनें",
+    "selectSchool": "स्कूल चुनें",
+    "enterFirstName": "पहला नाम दर्ज करें",
+    "enterLastName": "अंतिम नाम दर्ज करें",
+    "enterEmail": "अपना ईमेल दर्ज करें",
+    "enterContactNumber": "संपर्क नंबर दर्ज करें",
+    "createPassword": "पासवर्ड बनाएं",
+    "enterPassword": "अपना पासवर्ड दर्ज करें",
+    "registrationFailed": "पंजीकरण विफल। कृपया पुनः प्रयास करें।",
+    "loginFailed": "लॉग इन विफल। कृपया पुनः प्रयास करें।"
   },
   "common": {
     "loading": "लोड हो रहा है...",
@@ -90,9 +130,9 @@
     "empty": "अभी कुछ सहेजा नहीं गया है।"
   },
   "doubt": {
-    "title": "शंका पूछें",
-    "placeholder": "अपना प्रश्न लिखें...",
-    "ask": "पूछें",
+    "title": "Doubt Forum",
+    "placeholder": "फंसे हो? उलझन में हो? बस पूछ दो! हम पहले तुम्हारी किताब में खोजेंगे, फिर AI को बुलाएंगे 🚀",
+    "ask": "उत्तर पाएँ →",
     "answer": "उत्तर",
     "source": {
       "cache": "सहेजे गए उत्तरों से",
@@ -105,5 +145,24 @@
     "title": "खोज",
     "placeholder": "विषय, अध्याय, उदाहरण खोजें...",
     "results": "परिणाम"
+  },
+  "myDocs": {
+    "section": "मेरी लाइब्रेरी",
+    "title": "मेरे दस्तावेज़",
+    "subtitle": "अपने नोट्स, वर्कशीट या कोई भी PDF यहाँ अपलोड करें और कभी भी खोलें।",
+    "dropHere": "PDF यहाँ खींचकर छोड़ें",
+    "orBrowse": "या फाइल चुनने के लिए दबाएँ",
+    "pdfMax": "केवल PDF · अधिकतम 20 MB",
+    "uploading": "अपलोड हो रहा है…",
+    "open": "खोलें",
+    "delete": "हटाएँ",
+    "files": "दस्तावेज़",
+    "emptyTitle": "अभी कोई दस्तावेज़ नहीं",
+    "emptyHint": "अपना पहला PDF अपलोड करें — नोट्स, वर्कशीट या कोई भी पाठ्य सामग्री।",
+    "pdfOnly": "केवल PDF फाइलें स्वीकार हैं।",
+    "fileTooLarge": "फाइल बहुत बड़ी है। अधिकतम आकार 20 MB है।",
+    "uploadFailed": "अपलोड विफल। कृपया पुनः प्रयास करें।",
+    "loadError": "दस्तावेज़ लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
+    "deleteFailed": "दस्तावेज़ हटाया नहीं जा सका। कृपया पुनः प्रयास करें।"
   }
 }

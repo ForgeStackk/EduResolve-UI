@@ -1,7 +1,19 @@
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
-  <div class="font-bold text-xl text-brand-accent">EduResolve</div>
+  <div class="flex items-center gap-4">
+    <div class="font-bold text-xl text-brand-accent">EduResolve</div>
+    @if (schoolName()) {
+      <div class="school-badge">
+        <img src="/images/school emblem.jpg" alt="School emblem" class="school-emblem-img">
+        <span class="school-text">{{ schoolName() }}</span>
+      </div>
+    }
+  </div>
   <div class="flex items-center gap-4">
     <app-language-toggle></app-language-toggle>
     <span class="text-sm text-gray-600 font-medium">Profile Settings</span>
+    <button (click)="logout()" class="logout-btn">
+      <span class="logout-icon">🚪</span>
+      <span class="logout-text">Logout</span>
+    </button>
   </div>
 </header>

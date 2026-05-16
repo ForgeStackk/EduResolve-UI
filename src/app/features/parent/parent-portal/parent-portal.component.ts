@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { EventApiService } from '../../../core/api/event-api.service';
 import { ComplaintApiService } from '../../../core/api/complaint-api.service';
 
@@ -25,7 +26,7 @@ interface Ticket {
 @Component({
   selector: 'app-parent-portal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './parent-portal.component.html',
   styleUrl: './parent-portal.component.css'
 })

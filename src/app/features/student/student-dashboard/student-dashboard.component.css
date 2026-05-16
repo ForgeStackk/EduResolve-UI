@@ -1,1 +1,306 @@
-/* Component-specific styles. Tailwind utilities live in the template. */
+/* ================================================================
+ * Student Dashboard — Component Styles
+ * Dark HUD system + Gamification accents
+ * ================================================================ */
+
+/* ---- Active Module Art ---- */
+.module-art {
+  animation: art-breathe 4s ease-in-out infinite;
+}
+@keyframes art-breathe {
+  0%, 100% { box-shadow: inset 0 0 30px rgba(0,0,0,0.4); }
+  50%       { box-shadow: inset 0 0 45px rgba(0,0,0,0.6), 0 0 20px rgba(255,255,255,0.04); }
+}
+.art-bg-ring {
+  position: absolute; inset: 0; border-radius: inherit;
+  animation: ring-rotate 12s linear infinite;
+}
+@keyframes ring-rotate {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* ---- Resume pulse button ---- */
+.resume-pulse {
+  animation: resume-glow 2.4s ease-in-out infinite;
+}
+@keyframes resume-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(220,38,38,0.3); }
+  50%       { box-shadow: 0 0 38px rgba(220,38,38,0.65), 0 0 60px rgba(220,38,38,0.2); }
+}
+
+/* ---- Mission rows ---- */
+.mission-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mission-active {
+  background: rgba(16,185,129,0.08);
+  border-color: rgba(16,185,129,0.25);
+  box-shadow: 0 0 12px rgba(16,185,129,0.1);
+}
+.mission-done {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.05);
+  opacity: 0.7;
+}
+.mission-idle {
+  background: rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.05);
+}
+.mission-row:hover { filter: brightness(1.12); }
+
+.mission-rank-badge {
+  font-size: 14px; line-height: 1;
+  flex-shrink: 0;
+}
+.badge-gold   { color: #fbbf24; }
+.badge-silver { color: rgba(230,189,184,0.55); }
+.badge-bronze { color: #CD7F32; }
+
+.mission-check {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.check-done {
+  border-color: #10b981;
+  background: rgba(16,185,129,0.2);
+}
+
+/* ---- Shimmer loading lines ---- */
+.shimmer-line {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.6s infinite;
+}
+@keyframes shimmer-sweep {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ---- Smart Syllabus panel ---- */
+.class-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: rgba(205,127,50,0.1);
+  border: 1px solid rgba(205,127,50,0.25);
+  align-self: flex-start;
+}
+
+.syllabus-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.025);
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+.syllabus-row:hover {
+  background: rgba(45,212,191,0.06);
+  border-color: rgba(45,212,191,0.2);
+}
+.syllabus-icon-ring {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ================================================================
+ * Daily Ops — Mission Card System
+ * ================================================================ */
+
+/* Debrief warning banner (yesterday incomplete) */
+.ops-debrief-banner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.30);
+  color: #fbbf24;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: debrief-pulse 2.5s ease-in-out infinite;
+}
+@keyframes debrief-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(245,158,11,0); }
+  50%       { box-shadow: 0 0 14px rgba(245,158,11,0.22); }
+}
+
+/* Radar icon spin */
+.ops-radar-icon {
+  color: #10b981;
+  font-size: 20px;
+  animation: radar-spin 3s linear infinite;
+}
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Countdown timer */
+.ops-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.20);
+  color: #34d399;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Progress track */
+.ops-progress-row {
+  display: flex;
+  align-items: center;
+}
+.ops-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.ops-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 8px rgba(16,185,129,0.5);
+}
+
+/* Mission card */
+.ops-mission-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.25);
+  transition: all 0.2s;
+  cursor: default;
+}
+.ops-priority {
+  background: rgba(16,185,129,0.07);
+  border-color: rgba(16,185,129,0.22);
+  box-shadow: 0 0 10px rgba(16,185,129,0.08);
+  animation: ops-priority-glow 2.8s ease-in-out infinite;
+}
+@keyframes ops-priority-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.08); }
+  50%       { box-shadow: 0 0 18px rgba(16,185,129,0.20); }
+}
+.ops-done {
+  opacity: 0.50;
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.04);
+}
+
+/* Rank icon bubble */
+.ops-rank {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ops-rank-gold   { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.28); }
+.ops-rank-silver { background: rgba(148,163,184,0.10); color: #94a3b8; border: 1px solid rgba(148,163,184,0.20); }
+.ops-rank-bronze { background: rgba(205,127,50,0.10); color: #CD7F32; border: 1px solid rgba(205,127,50,0.22); }
+
+/* Launch button */
+.ops-launch-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: rgba(230,189,184,0.7);
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  min-width: 42px;
+}
+.ops-launch-btn:hover {
+  background: rgba(220,38,38,0.15);
+  border-color: rgba(220,38,38,0.40);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(220,38,38,0.20);
+}
+.ops-launch-priority {
+  background: rgba(16,185,129,0.12);
+  border-color: rgba(16,185,129,0.35);
+  color: #34d399;
+}
+.ops-launch-priority:hover {
+  background: rgba(16,185,129,0.25);
+  box-shadow: 0 0 12px rgba(16,185,129,0.30);
+  color: #fff;
+}
+
+/* In-mission indicator (launched but not yet credited) */
+.ops-in-mission-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.35);
+  color: #fbbf24;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  animation: in-mission-pulse 1.8s ease-in-out infinite;
+}
+@keyframes in-mission-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(245,158,11,0); }
+  50%       { box-shadow: 0 0 10px rgba(245,158,11,0.35); }
+}
+
+/* Completion check icon */
+.ops-check-icon {
+  font-size: 22px;
+  color: #10b981;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(16,185,129,0.5));
+}

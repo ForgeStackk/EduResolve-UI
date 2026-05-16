@@ -1,0 +1,215 @@
+<div class="signup-container">
+  <div class="signup-card">
+    <div class="signup-header">
+      <h1>Create Account</h1>
+      <p>Join EduResolve to start learning</p>
+    </div>
+
+    <form (ngSubmit)="signup()" class="signup-form">
+      <div class="form-group">
+        <label for="role">I am a</label>
+        <select
+          id="role"
+          [(ngModel)]="role"
+          (change)="onRoleChange($event)"
+          name="role"
+          required
+          class="form-input"
+        >
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="admin">Admin</option>
+          <option value="parent">Parent</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            [(ngModel)]="firstName"
+            (ngModelChange)="onFirstNameChange()"
+            name="firstName"
+            required
+            placeholder="Enter first name"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            [(ngModel)]="lastName"
+            (ngModelChange)="onLastNameChange()"
+            name="lastName"
+            required
+            placeholder="Enter last name"
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          required
+          placeholder="Choose a unique username"
+          class="form-input"
+        />
+        @if (usernameSuggestions().length > 0) {
+          <div class="username-suggestions">
+            <span class="suggestions-label">Suggestions:</span>
+            @for (suggestion of usernameSuggestions(); track suggestion) {
+              <button type="button" (click)="selectSuggestion(suggestion)" class="suggestion-chip">
+                {{ suggestion }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder="Enter your email"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Contact Number</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          [(ngModel)]="phoneNumber"
+          name="phoneNumber"
+          required
+          placeholder="Enter contact number"
+          class="form-input"
+        />
+      </div>
+
+      @if (showClassName()) {
+        <div class="form-group">
+          <label for="className">Class</label>
+          <select
+            id="className"
+            [(ngModel)]="className"
+            name="className"
+            required
+            class="form-input"
+          >
+            <option value="">Select Class</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+          </select>
+        </div>
+      }
+
+      @if (showSchoolName()) {
+        <div class="form-group">
+          <label for="schoolName">School Name</label>
+          <select
+            id="schoolName"
+            [ngModel]="showCustomSchoolInput() ? 'other' : schoolName"
+            (change)="onSchoolChange($event)"
+            name="schoolName"
+            required
+            class="form-input"
+          >
+            <option value="">Select School</option>
+            @for (school of schools(); track school) {
+              <option [value]="school">{{ school }}</option>
+            }
+            <option value="other">Other (Enter school name)</option>
+          </select>
+        </div>
+
+        @if (showCustomSchoolInput()) {
+          <div class="form-group">
+            <label for="customSchoolName">Enter your school name</label>
+            <input
+              type="text"
+              id="customSchoolName"
+              [(ngModel)]="customSchoolName"
+              name="customSchoolName"
+              required
+              placeholder="Enter your school name"
+              class="form-input"
+            />
+          </div>
+        }
+      }
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Create password"
+          autocomplete="new-password"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          required
+          placeholder="Confirm password"
+          autocomplete="new-password"
+          class="form-input"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="signup-button"
+      >
+        @if (loading()) {
+          <span class="loading-spinner"></span>
+          Creating account...
+        } @else {
+          Sign Up
+        }
+      </button>
+    </form>
+
+    <div class="signup-footer">
+      <p>Already have an account?</p>
+      <button (click)="goToLogin()" class="login-link">
+        Login
+      </button>
+    </div>
+  </div>
+</div>

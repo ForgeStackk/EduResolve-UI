@@ -1,0 +1,198 @@
+<!-- ============================================================
+     Floating Trigger Button
+     ============================================================ -->
+<button
+  class="doubt-fab"
+  (click)="togglePanel()"
+  [class.fab-open]="isOpen()"
+  aria-label="Open AI Doubt Command Center"
+  title="Ask a Doubt">
+  <span class="material-symbols-outlined fill" style="font-size:26px">
+    {{ isOpen() ? 'close' : 'psychology_alt' }}
+  </span>
+  @if (!isOpen()) {
+    <span class="fab-badge">AI</span>
+  }
+</button>
+
+<!-- ============================================================
+     Panel
+     ============================================================ -->
+@if (isOpen()) {
+  <!-- Backdrop -->
+  <div class="doubt-backdrop" (click)="togglePanel()" aria-hidden="true"></div>
+
+  <!-- Panel -->
+  <div class="doubt-panel" role="dialog" aria-modal="true" aria-label="AI Doubt Command Center">
+
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="flex items-center gap-2.5">
+        <div class="header-icon">
+          <span class="material-symbols-outlined fill" style="color:#2DD4BF;font-size:18px">psychology_alt</span>
+        </div>
+        <div>
+          <h3 class="panel-title">Doubt Command</h3>
+          <p class="panel-subtitle">Class {{ grade }} · AI Tutor</p>
+        </div>
+      </div>
+      <button class="panel-close" (click)="togglePanel()" aria-label="Close">
+        <span class="material-symbols-outlined" style="font-size:18px">close</span>
+      </button>
+    </div>
+
+    <!-- Mode Chips -->
+    <div class="mode-bar">
+      <button class="mode-chip" [class.mode-active]="mode() === 'text'"
+              (click)="selectMode('text')">
+        <span class="material-symbols-outlined" style="font-size:13px">keyboard</span>
+        Text
+      </button>
+      <button class="mode-chip" [class.mode-active]="mode() === 'image'"
+              (click)="selectMode('image')">
+        <span class="material-symbols-outlined" style="font-size:13px">image_search</span>
+        Image
+      </button>
+      <button class="mode-chip" [class.mode-active]="mode() === 'voice'"
+              (click)="selectMode('voice')">
+        <span class="material-symbols-outlined" style="font-size:13px">mic</span>
+        Voice
+      </button>
+    </div>
+
+    <!-- Subject context row -->
+    @if (subjectsLoading()) {
+      <p class="subject-loading">Loading subjects…</p>
+    } @else if (subjects().length > 0) {
+      <div class="subject-row">
+        <span class="subject-row-label">Subject</span>
+        <select class="subject-select" [(ngModel)]="selectedSubject">
+          <option value="">— Any —</option>
+          @for (s of subjects(); track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <!-- Input Area -->
+    <div class="input-area">
+
+      <!-- Image preview -->
+      @if (mode() === 'image' && imagePreview()) {
+        <div class="img-preview-wrap">
+          <img [src]="imagePreview()!" alt="Uploaded" class="img-preview" />
+          <button class="img-clear-btn" (click)="clearImage()" aria-label="Remove image">
+            <span class="material-symbols-outlined" style="font-size:15px">close</span>
+          </button>
+        </div>
+      }
+
+      <!-- Textarea -->
+      <div class="textarea-wrap">
+        <textarea
+          class="doubt-textarea"
+          [(ngModel)]="queryText"
+          [placeholder]="mode() === 'voice' ? 'Listening… speak your question' :
+                         mode() === 'image' ? 'Describe what you see or ask about the image…' :
+                         'Ask anything — e.g., Why does photosynthesis need sunlight?'"
+          rows="3"
+          [readonly]="voiceActive()"
+          (keydown.control.enter)="sendQuery()">
+        </textarea>
+
+        @if (voiceActive()) {
+          <div class="voice-wave">
+            <span class="wave-bar" style="animation-delay:0s"></span>
+            <span class="wave-bar" style="animation-delay:0.1s"></span>
+            <span class="wave-bar" style="animation-delay:0.2s"></span>
+            <span class="wave-bar" style="animation-delay:0.3s"></span>
+            <span class="wave-bar" style="animation-delay:0.4s"></span>
+          </div>
+        }
+      </div>
+
+      <!-- Image Upload trigger -->
+      @if (mode() === 'image' && !imagePreview()) {
+        <label class="upload-zone">
+          <span class="material-symbols-outlined" style="font-size:22px">upload_file</span>
+          <span>Upload Image (OCR)</span>
+          <input type="file" accept="image/*" class="sr-only" (change)="onImageUpload($event)" />
+        </label>
+      }
+
+      <!-- Voice re-trigger -->
+      @if (mode() === 'voice' && !voiceActive()) {
+        <button class="voice-trigger" (click)="startVoice()">
+          <span class="material-symbols-outlined fill" style="font-size:18px">mic</span>
+          Tap to Speak
+        </button>
+      }
+
+      <!-- Error -->
+      @if (errorMsg()) {
+        <p class="error-text">
+          <span class="material-symbols-outlined fill" style="font-size:14px">warning</span>
+          {{ errorMsg() }}
+        </p>
+      }
+
+      <!-- Send -->
+      <button class="send-btn" (click)="sendQuery()"
+              [disabled]="!queryText.trim() || isLoading()">
+        @if (isLoading()) {
+          <span class="btn-spinner"></span>
+          Analyzing…
+        } @else {
+          <span class="material-symbols-outlined fill" style="font-size:15px">send</span>
+          Send to AI
+        }
+      </button>
+    </div>
+
+    <!-- Shimmer while loading -->
+    @if (isLoading()) {
+      <div class="shimmer-container">
+        <div class="shimmer-bar" style="width:70%"></div>
+        <div class="shimmer-bar" style="width:100%"></div>
+        <div class="shimmer-bar" style="width:85%"></div>
+        <div class="shimmer-bar" style="width:60%"></div>
+      </div>
+    }
+
+    <!-- Response -->
+    @if (response(); as ans) {
+      <div class="response-wrap">
+        <div class="response-meta">
+          <span class="hud-caps" style="color:#2DD4BF">AI Response</span>
+          <span class="source-pill"
+                [class.pill-ai]="ans.source === 'AI'"
+                [class.pill-db]="ans.source === 'DB'"
+                [class.pill-teacher]="ans.source === 'TEACHER'">
+            {{ ans.source }}
+          </span>
+        </div>
+
+        <div class="response-body">
+          <p class="response-text">{{ ans.answer }}</p>
+        </div>
+
+        <!-- Rich Media Row (3D/Diagram/Chart placeholders) -->
+        <div class="media-row">
+          <div class="media-card" title="3D model coming soon">
+            <span class="material-symbols-outlined" style="font-size:26px;color:#A855F7">view_in_ar</span>
+            <span>3D Model</span>
+          </div>
+          <div class="media-card" title="Diagram coming soon">
+            <span class="material-symbols-outlined" style="font-size:26px;color:#2DD4BF">schema</span>
+            <span>Diagram</span>
+          </div>
+          <div class="media-card" title="Real-world example coming soon">
+            <span class="material-symbols-outlined" style="font-size:26px;color:#CD7F32">explore</span>
+            <span>Example</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

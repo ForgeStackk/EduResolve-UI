@@ -6,8 +6,16 @@ export const LEARNING_ROUTES: Routes = [
     loadComponent: () => import('./subjects-list/subjects-list.component').then(m => m.SubjectsListComponent)
   },
   {
+    path: 'books',
+    loadComponent: () => import('./book-browser/book-browser.component').then(m => m.BookBrowserComponent)
+  },
+  {
     path: 'ncert',
     loadComponent: () => import('./ncert-browser/ncert-browser.component').then(m => m.NcertBrowserComponent)
+  },
+  {
+    path: 'pdf',
+    loadComponent: () => import('./pdf-viewer/pdf-viewer.component').then(m => m.PdfViewerComponent)
   },
   {
     path: 'pdf-viewer',
@@ -36,6 +44,10 @@ export const LEARNING_ROUTES: Routes = [
   {
     path: 'bookmarks',
     loadComponent: () => import('./bookmarks/bookmarks.component').then(m => m.BookmarksComponent)
+  },
+  {
+    path: 'my-documents',
+    loadComponent: () => import('./my-documents/my-documents.component').then(m => m.MyDocumentsComponent)
   },
   { path: '', redirectTo: 'subjects', pathMatch: 'full' }
 ];

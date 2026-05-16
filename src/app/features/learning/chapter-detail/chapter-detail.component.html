@@ -28,7 +28,7 @@
     </section>
 
     <!-- Action row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <button [routerLink]="['/learn/quiz']" [queryParams]="{ chapterId: c.id }"
               class="hud-btn-primary w-full">
         <span class="material-symbols-outlined fill">rocket_launch</span>
@@ -38,6 +38,11 @@
               class="hud-btn-ghost w-full">
         <span class="material-symbols-outlined">history_edu</span>
         {{ 'chapters.viewPyqs' | translate }}
+      </button>
+      <button [routerLink]="['/learn/pdf-viewer']" [queryParams]="{ chapterId: c.id }"
+              class="hud-btn-ghost w-full">
+        <span class="material-symbols-outlined">picture_as_pdf</span>
+        Open PDF
       </button>
     </div>
 
@@ -68,19 +73,34 @@
             </div>
 
             <!-- Content -->
-            @if (chunksByTopic()[t.id]?.length) {
+            @if (chunksByTopic()[t.id] && chunksByTopic()[t.id].length > 0) {
               <div class="space-y-4">
                 @for (chunk of chunksByTopic()[t.id]; track chunk.id) {
                   <div class="space-y-2">
                     @if (chunk.title) {
                       <h4 class="hud-display text-base text-white">{{ chunk.title }}</h4>
                     }
-                    <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ chunk.body }}</p>
+                    @if (chunk.body) {
+                      <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ chunk.body }}</p>
+                    }
+                    @if (chunk.imageUrl) {
+                      <div class="mt-3 rounded-lg overflow-hidden border border-white/10">
+                        <img [src]="chunk.imageUrl" [alt]="chunk.title || 'Diagram'" class="w-full h-auto" />
+                      </div>
+                    }
+                    @if (!chunk.body && !chunk.imageUrl) {
+                      <p class="text-sm text-[#e6bdb8]/70 italic">Loading detailed content...</p>
+                    }
                   </div>
                 }
               </div>
             } @else {
-              <p class="text-sm text-[#e6bdb8]/70 text-center py-6">{{ 'common.noResults' | translate }}</p>
+              <p class="text-sm text-[#e6bdb8]/70 text-center py-6">
+                No content available for this section yet. 
+                @if (active()[t.id] === 'SUMMARY') {
+                  Try switching to Explanation tab for more details.
+                }
+              </p>
             }
           </article>
         }

@@ -18,14 +18,32 @@
   <!-- Input -->
   <section class="hud-card space-y-4">
     <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+
+    <!-- Subject context bar -->
+    @if (catalog.loading()) {
+      <p class="text-xs text-[#e6bdb8]/50">Loading subjects…</p>
+    } @else if (catalog.hasError()) {
+      <p class="text-xs text-amber-400/70">Content for this class is coming soon.</p>
+    } @else if (catalog.subjects().length > 0) {
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="hud-caps text-[#e6bdb8]/50 text-[10px]">SUBJECT:</span>
+        @for (s of catalog.subjects(); track s) {
+          <button type="button"
+                  (click)="selectedSubject.set(selectedSubject() === s ? '' : s)"
+                  class="hud-chip text-xs"
+                  [class.hud-chip-active]="selectedSubject() === s">{{ s }}</button>
+        }
+      </div>
+    }
+
     <textarea [(ngModel)]="query"
               rows="4"
-              [placeholder]="'doubt.placeholder' | translate"
+              [placeholder]="(selectedSubject() ? selectedSubject() + ' — ' : '') + ('Any confusion? We got you covered.' | translate)"
               class="hud-input resize-none"></textarea>
     <button (click)="ask()" [disabled]="!query.trim() || loading()"
             class="hud-btn-primary w-full">
       <span class="material-symbols-outlined fill">send</span>
-      {{ loading() ? ('common.loading' | translate) : ('doubt.ask' | translate) }}
+      {{ loading() ? ('common.loading' | translate) : ('Go for it!' | translate) }}
     </button>
   </section>
 
@@ -53,6 +71,26 @@
       </div>
 
       <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ a.answer }}</p>
+
+      <!-- Images Gallery -->
+      @if (a.images && a.images.length > 0) {
+        <div class="pt-4 border-t border-white/10">
+          <p class="hud-caps text-red-400 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:16px">image_search</span>
+            Related Visuals
+          </p>
+          <div class="grid grid-cols-2 gap-3">
+            @for (image of a.images; track $index) {
+              <div class="overflow-hidden rounded-lg border border-white/10 hover:border-blue-400 transition-colors">
+                <img [src]="image"
+                     alt="Educational visual for: {{ a.answer | slice:0:50 }}"
+                     class="w-full h-40 object-cover hover:scale-105 transition-transform"
+                     onerror="this.style.display='none'">
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <div class="pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
         <button type="button"

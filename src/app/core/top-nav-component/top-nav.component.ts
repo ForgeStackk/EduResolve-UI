@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { LanguageToggleComponent } from '../i18n/language-toggle/language-toggle.component';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-top-nav',
@@ -8,4 +9,11 @@ import { LanguageToggleComponent } from '../i18n/language-toggle/language-toggle
   templateUrl: './top-nav.component.html',
   styleUrl: './top-nav.component.css'
 })
-export class TopNavComponent {}
+export class TopNavComponent {
+  private authService = inject(AuthService);
+  schoolName = computed(() => this.authService.currentUser()?.schoolName ?? '');
+
+  logout(): void {
+    this.authService.logout();
+  }
+}

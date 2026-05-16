@@ -5,6 +5,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "home": "Home",
     "subjects": "Subjects",
     "chapters": "Chapters",
     "quiz": "Quiz",
@@ -12,7 +13,46 @@
     "revision": "Revision",
     "bookmarks": "Bookmarks",
     "doubt": "Ask a Doubt",
-    "logout": "Log out"
+    "logout": "Log out",
+    "overview": "Overview",
+    "classes": "Classes",
+    "assignments": "Assignments",
+    "users": "Users",
+    "myDocuments": "My Documents"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "loginToContinue": "Login to continue to EduResolve",
+    "email": "Email",
+    "password": "Password",
+    "loggingIn": "Logging in...",
+    "login": "Login",
+    "dontHaveAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "joinEduResolve": "Join EduResolve to start learning",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "contactNumber": "Contact Number",
+    "class": "Class",
+    "schoolName": "School Name",
+    "enterSchoolName": "Enter your school name",
+    "confirmPassword": "Confirm Password",
+    "creatingAccount": "Creating account...",
+    "alreadyHaveAccount": "Already have an account?",
+    "pleaseFillAllFields": "Please fill in all fields",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "selectClass": "Select Class",
+    "selectSchool": "Select School",
+    "enterFirstName": "Enter first name",
+    "enterLastName": "Enter last name",
+    "enterEmail": "Enter your email",
+    "enterContactNumber": "Enter contact number",
+    "createPassword": "Create password",
+    "enterPassword": "Enter your password",
+    "registrationFailed": "Registration failed. Please try again.",
+    "loginFailed": "Login failed. Please try again."
   },
   "common": {
     "loading": "Loading...",
@@ -90,9 +130,9 @@
     "empty": "Nothing bookmarked yet. Tap the bookmark icon on any chapter, question, or doubt to save it here."
   },
   "doubt": {
-    "title": "Ask a Doubt",
-    "placeholder": "Type your question...",
-    "ask": "Ask",
+    "title": "Doubt Forum",
+    "placeholder": "Stuck? Confused? Ask away! We'll search your textbook first, then call in the AI reinforcements...",
+    "ask": "Get Answer →",
     "answer": "Answer",
     "source": {
       "cache": "from saved answers",
@@ -105,5 +145,24 @@
     "title": "Search",
     "placeholder": "Search topics, chapters, examples...",
     "results": "Results"
+  },
+  "myDocs": {
+    "section": "MY LIBRARY",
+    "title": "My Documents",
+    "subtitle": "Upload your notes, worksheets, or any PDF and open them anytime.",
+    "dropHere": "Drag & drop a PDF here",
+    "orBrowse": "or tap to browse files",
+    "pdfMax": "PDF files only · Max 20 MB",
+    "uploading": "Uploading…",
+    "open": "Open",
+    "delete": "Delete",
+    "files": "documents",
+    "emptyTitle": "No Documents Yet",
+    "emptyHint": "Upload your first PDF — notes, worksheets, or any study material.",
+    "pdfOnly": "Only PDF files are allowed.",
+    "fileTooLarge": "File is too large. Maximum size is 20 MB.",
+    "uploadFailed": "Upload failed. Please try again.",
+    "loadError": "Could not load your documents. Please try again.",
+    "deleteFailed": "Could not delete the document. Please try again."
   }
 }

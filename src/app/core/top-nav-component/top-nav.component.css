@@ -1,1 +1,57 @@
 /* Top Nav Styles */
+
+.school-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 18px 6px 8px;
+  background: linear-gradient(135deg, #dc2626 0%, #9f1239 100%);
+  border-radius: 40px;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4), 0 0 0 2px rgba(252, 165, 165, 0.2);
+}
+
+.school-emblem-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.school-text {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.logout-icon {
+  font-size: 14px;
+}
+
+.logout-text {
+  white-space: nowrap;
+}

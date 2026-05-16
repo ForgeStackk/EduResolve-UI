@@ -3,7 +3,7 @@
   <!-- Back link -->
   <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
-    BACK TO SYSTEMS
+    Back to Subjects
   </a>
 
   <!-- Subject header -->
@@ -22,34 +22,66 @@
     </div>
 
     @if (loading()) {
-      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
+      <div class="space-y-3">
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="hud-card-flat relative overflow-hidden">
+            <div class="h-3 w-20 rounded mb-3"
+                 style="background:rgba(255,255,255,0.08);animation:shimmer 1.4s ease-in-out infinite"></div>
+            <div class="h-5 w-64 rounded mb-2"
+                 style="background:rgba(255,255,255,0.08);animation:shimmer 1.4s ease-in-out infinite 0.1s"></div>
+            <div class="h-3 w-48 rounded"
+                 style="background:rgba(255,255,255,0.08);animation:shimmer 1.4s ease-in-out infinite 0.2s"></div>
+          </div>
+        }
+      </div>
     } @else if (chapters().length === 0) {
-      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.noResults' | translate }}</div>
+      <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
+        <span class="material-symbols-outlined text-5xl" style="color:#ac8884">folder_off</span>
+        <h3 class="hud-display text-xl text-white">No Chapters Found</h3>
+        <p class="text-[#e6bdb8]/70 text-sm max-w-xs">
+          No chapters are available for this module yet. Check back soon or explore another subject.
+        </p>
+        <a routerLink="/learn/subjects"
+           class="hud-btn-ghost mt-2" style="text-decoration:none">
+          <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>
+          Browse Subjects
+        </a>
+      </div>
     } @else {
       <ul class="space-y-3">
         @for (c of chapters(); track c.id; let idx = $index) {
-          <li>
-            <a [routerLink]="['/learn/chapters', c.id]"
-               class="hud-card-flat block group hover:border-white/30 transition-all relative">
-              <div class="hud-accent"></div>
-              <div class="flex items-start justify-between gap-4 pl-2">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-3 mb-1">
-                    <span class="hud-caps text-red-400">CH {{ idx + 1 | number:'2.0' }}</span>
-                    @if (c.estimatedMinutes) {
-                      <span class="hud-caps text-[#e6bdb8]/70">{{ c.estimatedMinutes }} MIN</span>
-                    }
-                  </div>
-                  <h3 class="hud-display text-lg text-white group-hover:text-red-400 transition-colors">{{ c.name }}</h3>
-                  @if (c.summary) {
-                    <p class="text-sm text-[#e6bdb8]/80 mt-2 line-clamp-2 leading-relaxed">{{ c.summary }}</p>
+          <li class="hud-card-flat group hover:border-white/30 transition-all relative overflow-visible">
+            <div class="hud-accent"></div>
+            <div class="flex items-start gap-4 pl-2">
+
+              <!-- Main info — click opens chapter PDF directly -->
+              <div (click)="openChapterPdf(c, idx)" class="flex-1 min-w-0 block cursor-pointer">
+                <div class="flex items-center gap-3 mb-1">
+                  <span class="hud-caps text-red-400">CH {{ idx + 1 | number:'2.0' }}</span>
+                  @if (c.estimatedMinutes) {
+                    <span class="hud-caps text-[#e6bdb8]/70">{{ c.estimatedMinutes }} MIN</span>
                   }
                 </div>
-                <span class="material-symbols-outlined text-[#ac8884] group-hover:text-white transition-colors shrink-0 mt-1">
-                  chevron_right
-                </span>
+                <h3 class="hud-display text-lg text-white group-hover:text-red-400 transition-colors">
+                  {{ sanitizeChapterName(c.name, idx) }}
+                </h3>
+                @if (c.summary) {
+                  <p class="text-sm text-[#e6bdb8]/80 mt-2 line-clamp-2 leading-relaxed">{{ c.summary }}</p>
+                }
               </div>
-            </a>
+
+              <!-- PDF pill button — navigates to book browser filtered by this subject -->
+              <button (click)="handleChapterPdf($event, c, idx)"
+                      class="shrink-0 mt-1 flex items-center gap-1 px-3 py-1.5 rounded-lg
+                             bg-red-500/10 border border-red-500/25 text-red-400
+                             hover:bg-red-500/20 hover:text-white hover:border-red-500/50
+                             transition-all hud-caps text-[10px] cursor-pointer"
+                      title="Open chapter PDF">
+                <span class="material-symbols-outlined fill" style="font-size:13px">picture_as_pdf</span>
+                PDF
+              </button>
+
+            </div>
           </li>
         }
       </ul>

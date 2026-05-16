@@ -8,6 +8,8 @@ export interface DoubtAnswer {
   answer: string;
   hitType: 'cache' | 'db' | 'ai';
   source: 'DB' | 'AI' | 'FALLBACK' | 'TEACHER';
+  images?: string[];  // URLs to educational images
+  timestamp?: string;
 }
 
 @Injectable({ providedIn: 'root' })

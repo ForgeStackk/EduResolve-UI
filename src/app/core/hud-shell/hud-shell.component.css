@@ -1,29 +1,67 @@
-:host {
-  display: block;
-}
+:host { display: block; }
 
-/* Bottom-nav link styling. Active = solid red pill with glow. */
+/* ---- Back Button ---- */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  color: #fff;
+  background: rgba(220,38,38,0.2);
+  border-color: rgba(220,38,38,0.35);
+  box-shadow: 0 0 10px rgba(220,38,38,0.2);
+}
+.back-btn:active { transform: scale(0.92); }
+
+/* ---- Bottom Nav ---- */
 .hud-nav-link {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 14px;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255,255,255,0.4);
   transition: all 150ms ease;
+  position: relative;
 }
 .hud-nav-link:hover { color: #fff; }
 .hud-nav-link:active { transform: scale(0.92); }
-
-.hud-nav-link .material-symbols-outlined {
-  font-size: 26px;
-}
+.hud-nav-link .material-symbols-outlined { font-size: 26px; }
 
 .hud-nav-active {
   color: #fff !important;
   background: #dc2626;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.55);
+  box-shadow: 0 0 20px rgba(220,38,38,0.55);
 }
 .hud-nav-active .material-symbols-outlined {
   font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Coming Soon nav item */
+.hud-nav-coming-soon {
+  cursor: not-allowed;
+  opacity: 0.38;
+  filter: grayscale(0.8);
+}
+.coming-soon-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5);
+  padding: 1px 3px;
+  border-radius: 3px;
 }

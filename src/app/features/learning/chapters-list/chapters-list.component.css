@@ -1,1 +1,6 @@
 /* Component-specific styles. Tailwind utilities live in the template. */
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.9; }
+}

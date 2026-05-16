@@ -4,44 +4,79 @@
   <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 h-16
                  bg-black/40 backdrop-blur-xl border-b border-white/10
                  shadow-[0_0_15px_rgba(220,38,38,0.2)]">
-    <a [routerLink]="theme().homeLink" class="flex items-center gap-3 group">
-      <div class="w-9 h-9 rounded-full overflow-hidden border border-[#dc2626]/60
-                  bg-[#382523] flex items-center justify-center
-                  shadow-[0_0_10px_rgba(220,38,38,0.3)]">
-        @if (role() === 'student') {
-          <span class="font-bold text-sm tracking-wide text-[#fbdbd7]">{{ initials() || '?' }}</span>
-        } @else {
-          <span class="material-symbols-outlined text-[#ffb4ab]" style="font-size:20px">
-            @switch (role()) {
-              @case ('teacher') { school }
-              @case ('admin')   { shield_person }
-              @case ('parent')  { diversity_3 }
-            }
-          </span>
-        }
-      </div>
-      <span class="hud-display text-lg sm:text-xl text-white italic tracking-widest
-                   group-hover:text-[#ffb4ab] transition-colors">{{ theme().brand }}</span>
-    </a>
 
+    <!-- Left: Back (contextual) + Brand -->
+    <div class="flex items-center gap-2">
+      @if (showBackBtn()) {
+        <button (click)="goBack()"
+                class="back-btn"
+                aria-label="Go back"
+                title="Back">
+          <span class="material-symbols-outlined" style="font-size:20px">arrow_back</span>
+        </button>
+      }
+
+      <a [routerLink]="theme().homeLink" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-full overflow-hidden border border-[#dc2626]/60
+                    bg-[#382523] flex items-center justify-center
+                    shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+          @if (role() === 'student') {
+            <span class="font-bold text-sm tracking-wide text-[#fbdbd7]">{{ initials() || '?' }}</span>
+          } @else {
+            <span class="material-symbols-outlined text-[#ffb4ab]" style="font-size:20px">
+              @switch (role()) {
+                @case ('teacher') { school }
+                @case ('admin')   { shield_person }
+                @case ('parent')  { diversity_3 }
+              }
+            </span>
+          }
+        </div>
+        @if (!showBackBtn()) {
+          <span class="hud-display text-lg sm:text-xl text-white italic tracking-widest
+                       group-hover:text-[#ffb4ab] transition-colors">{{ theme().brand }}</span>
+        }
+      </a>
+    </div>
+
+    <!-- Center: School badge -->
+    @if (schoolName()) {
+      <div class="hidden sm:flex items-center gap-2.5 pl-1.5 pr-4 py-1.5
+                  bg-gradient-to-r from-amber-500/20 to-yellow-400/10
+                  rounded-full border border-amber-400/40
+                  shadow-[0_0_16px_rgba(251,191,36,0.25)]">
+        <img src="/images/school emblem.jpg" alt="School emblem"
+             class="w-8 h-8 rounded-full object-cover border-2 border-amber-300/60 bg-white shrink-0">
+        <span class="text-amber-200 font-bold text-sm tracking-wide">{{ schoolName() }}</span>
+      </div>
+    }
+
+    <!-- Right: Language + role indicator + logout -->
     <div class="flex items-center gap-2 sm:gap-3">
       <app-language-toggle></app-language-toggle>
 
       @if (role() === 'student') {
-        <!-- Student: fire streak chip -->
         <div class="flex items-center gap-1 text-red-500 font-bold tracking-tight px-3 py-1.5
                     bg-white/5 rounded-full border border-white/10">
           <span class="text-base leading-none">🔥</span>
           <span class="text-sm tabular-nums">{{ streak() }}</span>
         </div>
       } @else {
-        <!-- Non-student: role-name chip -->
         <div class="hidden sm:flex items-center gap-1 hud-caps text-red-400 px-3 py-1.5
                     bg-white/5 rounded-full border border-white/10">
           <span class="material-symbols-outlined" style="font-size:14px">verified</span>
           <span>{{ role() | uppercase }}</span>
         </div>
       }
+
+      <button (click)="logout()"
+              class="flex items-center gap-1 text-white/60 hover:text-white
+                     bg-white/5 hover:bg-red-900/40 px-3 py-1.5
+                     rounded-full border border-white/10 transition-colors"
+              title="Logout">
+        <span class="material-symbols-outlined" style="font-size:18px">logout</span>
+        <span class="hidden sm:inline text-xs tracking-widest uppercase">{{ 'nav.logout' | translate }}</span>
+      </button>
     </div>
   </header>
 
@@ -56,14 +91,25 @@
               rounded-t-2xl border-t border-white/15
               shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
     @for (item of theme().nav; track item.link) {
-      <a [routerLink]="item.link"
-         routerLinkActive="hud-nav-active"
-         [routerLinkActiveOptions]="{ exact: !!item.exact }"
-         class="hud-nav-link flex flex-col items-center gap-0.5"
-         [attr.aria-label]="item.label">
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-        <span class="text-[10px] tracking-widest uppercase opacity-80">{{ item.label }}</span>
-      </a>
+      @if (item.comingSoon) {
+        <!-- Coming Soon nav item: greyed out, unclickable -->
+        <div class="hud-nav-link hud-nav-coming-soon flex flex-col items-center gap-0.5"
+             [attr.aria-label]="(item.labelKey | translate) + ' — Coming Soon'"
+             title="Coming Soon">
+          <span class="material-symbols-outlined">{{ item.icon }}</span>
+          <span class="text-[10px] tracking-widest uppercase opacity-60">{{ item.labelKey | translate }}</span>
+          <span class="coming-soon-dot">SOON</span>
+        </div>
+      } @else {
+        <a [routerLink]="item.link"
+           routerLinkActive="hud-nav-active"
+           [routerLinkActiveOptions]="{ exact: !!item.exact }"
+           class="hud-nav-link flex flex-col items-center gap-0.5"
+           [attr.aria-label]="item.labelKey | translate">
+          <span class="material-symbols-outlined">{{ item.icon }}</span>
+          <span class="text-[10px] tracking-widest uppercase opacity-80">{{ item.labelKey | translate }}</span>
+        </a>
+      }
     }
   </nav>
 </div>

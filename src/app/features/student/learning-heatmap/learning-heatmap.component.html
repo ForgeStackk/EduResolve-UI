@@ -1,0 +1,165 @@
+<div class="heatmap-shell">
+
+  <!-- Section header -->
+  <div class="hm-header">
+    <div class="flex items-center gap-2">
+      <div class="hm-header-icon">
+        <span class="material-symbols-outlined fill" style="font-size:18px;color:#A855F7">auto_awesome</span>
+      </div>
+      <div>
+        <h2 class="hud-display text-xl text-white">Skill Galaxy</h2>
+        <p class="hud-caps" style="color:rgba(168,85,247,0.7)">Skill Intelligence</p>
+      </div>
+    </div>
+    <span class="hm-live-badge">● LIVE</span>
+  </div>
+
+  <!-- Color-scale legend -->
+  <div class="galaxy-legend">
+    <span class="legend-dot" style="background:#b91c1c"></span>
+    <span class="legend-label">Urgent</span>
+    <span class="legend-dot" style="background:#f97316;margin-left:10px"></span>
+    <span class="legend-label">In Progress</span>
+    <span class="legend-dot" style="background:#22c55e;margin-left:10px"></span>
+    <span class="legend-label">Mastered</span>
+  </div>
+
+  <div class="hm-grid">
+
+    <!-- Left: Subject Performance Grid -->
+    <div class="hud-card overflow-hidden">
+      <div class="hud-accent" style="background:#A855F7;box-shadow:0 0 10px rgba(168,85,247,0.4)"></div>
+
+      <!-- Day column headers -->
+      <div class="day-header-row">
+        <span class="subject-col-spacer"></span>
+        @for (day of dayLabels; track day) {
+          <span class="day-label">{{ day }}</span>
+        }
+        <span class="acc-label-head">Score</span>
+      </div>
+
+      <!-- Subject rows -->
+      <div class="subject-rows">
+        @for (stat of subjectStats(); track stat.name) {
+          <div class="subject-row"
+               (click)="navigateUrgent(stat)"
+               role="button"
+               [title]="stat.accuracy < 45 ? 'Urgent — click to open PDFs for ' + stat.name : stat.name">
+
+            <!-- Subject name + icon -->
+            <div class="subject-name-col">
+              <span class="material-symbols-outlined" style="font-size:14px"
+                    [style.color]="stat.color">{{ stat.icon }}</span>
+              <span class="subject-label">{{ stat.name }}</span>
+            </div>
+
+            <!-- 7-day heatmap cells -->
+            @for (day of dayLabels; track $index) {
+              <div class="heat-cell"
+                   [style.background]="cellColor(stat, $index)"
+                   [title]="stat.name + ' — ' + day"></div>
+            }
+
+            <!-- Accuracy + predicted-points badge -->
+            <div class="acc-col">
+              <span class="acc-readout" [style.color]="heatColorFor(stat.accuracy)">
+                {{ stat.accuracy }}%
+              </span>
+              @if (predictedPoints(stat) > 0) {
+                <span class="predicted-pts-badge">+{{ predictedPoints(stat) }}pts</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (subjectStats().length === 0) {
+          @for (_ of [1,2,3,4]; track $index) {
+            <div class="shimmer-row"></div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Right: Auto-Pilot Recommendation -->
+    @if (prioritySubject(); as ps) {
+      <div class="hud-card autopilot-card">
+        <div class="hud-accent" style="background:#CD7F32;box-shadow:0 0 10px rgba(205,127,50,0.45)"></div>
+
+        <!-- Autopilot label -->
+        <div class="ap-eyebrow">
+          <span class="material-symbols-outlined fill" style="font-size:16px;color:#CD7F32">rocket_launch</span>
+          <span class="hud-caps" style="color:#CD7F32">Galaxy Focus · Highest ROI</span>
+        </div>
+
+        <!-- Priority subject -->
+        <div class="ap-subject-badge" [style.border-color]="ps.color + '55'">
+          <div class="ap-icon-ring" [style.background]="ps.color + '1a'">
+            <span class="material-symbols-outlined fill" style="font-size:28px"
+                  [style.color]="ps.color">{{ ps.icon }}</span>
+          </div>
+          <div>
+            <p class="ap-subject-name">{{ ps.name }}</p>
+            <p class="ap-subject-sub">Current accuracy · <span [style.color]="heatColorFor(ps.accuracy)">{{ ps.accuracy }}%</span></p>
+          </div>
+        </div>
+
+        <!-- Predicted Points badge -->
+        <div class="predicted-pts-card">
+          <span class="material-symbols-outlined fill" style="font-size:18px;color:#f97316">stars</span>
+          <div>
+            <p class="predicted-pts-headline">
+              Complete a chapter now to gain
+              <strong style="color:#f97316">+{{ predictedPoints(ps) }} Streak Points!</strong>
+            </p>
+            <p class="predicted-pts-sub">Score 19/20 on the quiz to unlock the full bonus</p>
+          </div>
+        </div>
+
+        <!-- ROI steps -->
+        <div class="roi-card">
+          <p class="roi-title">Earn <span class="roi-pts">+{{ roiPoints }} pts</span> by</p>
+          <ul class="roi-steps">
+            <li>
+              <span class="material-symbols-outlined fill" style="font-size:13px;color:#22c55e">check_circle</span>
+              Study 1 chapter from {{ ps.name }}
+            </li>
+            <li>
+              <span class="material-symbols-outlined fill" style="font-size:13px;color:#22c55e">check_circle</span>
+              Take the 20-Q quiz
+            </li>
+            <li>
+              <span class="material-symbols-outlined fill" style="font-size:13px;color:#A855F7">stars</span>
+              Score 19-20 → <strong>{{ predictedPoints(ps) }} streak points</strong>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Accuracy meter -->
+        <div class="ap-meter-wrap">
+          <div class="ap-meter-track">
+            <div class="ap-meter-fill"
+                 [style.width.%]="ps.accuracy"
+                 [style.background]="heatColorFor(ps.accuracy)"></div>
+          </div>
+          <span class="ap-meter-label">{{ ps.accuracy }}% → Target 75%</span>
+        </div>
+
+        <!-- CTA: opens active PDF directly when bookId is available -->
+        <button class="ap-launch-btn" (click)="navigateToDrill(ps.name)">
+          <span class="material-symbols-outlined fill" style="font-size:16px">play_arrow</span>
+          Launch Mission
+          @if (activeBookId) {
+            <span style="font-size:10px;opacity:0.7;margin-left:4px">→ PDF</span>
+          }
+        </button>
+      </div>
+    } @else {
+      <!-- Skeleton -->
+      <div class="hud-card">
+        <div class="hud-accent" style="background:#CD7F32"></div>
+        <div class="shimmer-row" style="height:120px;border-radius:10px"></div>
+      </div>
+    }
+  </div>
+</div>

@@ -35,6 +35,12 @@ export class LanguageService {
     this.set(initial);
   }
 
+  /** Wait for initial language to be loaded (for app initializer) */
+  async initialize(): Promise<void> {
+    const lang = this.current();
+    await this.translate.use(lang).toPromise();
+  }
+
   set(lang: AppLanguage): void {
     this.current.set(lang);
     // `use(lang)` is also a cold Observable in ngx-translate v17 - the JSON

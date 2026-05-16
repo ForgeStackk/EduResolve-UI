@@ -83,16 +83,24 @@ export class PdfViewerComponent implements OnInit {
     } else {
       // Read from query params
       this.route.queryParams.subscribe(params => {
-        const bookId = params['bookId'];
-        
-        if (bookId) {
-          // Construct PDF URL from backend endpoint
-          this.pdfSrc.set(`${environment.apiBaseUrl}/api/ncert/books/${bookId}/pdf-content`);
-        }
-        
+        const bookId    = params['bookId'];
+        const pdfPath   = params['pdfPath'];
+        const startPage = params['startPage'];
         const titleParam = params['title'];
+
+        if (bookId) {
+          this.pdfSrc.set(`${environment.apiBaseUrl}/ncert/books/${bookId}/pdf-content`);
+        } else if (pdfPath) {
+          this.pdfSrc.set(pdfPath);
+        }
+
         if (titleParam) {
           this.title.set(titleParam);
+        }
+
+        if (startPage) {
+          const pageNum = parseInt(startPage, 10);
+          if (!isNaN(pageNum) && pageNum > 0) this.page = pageNum;
         }
       });
     }
