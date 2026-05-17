@@ -31,6 +31,7 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
   response        = signal<DoubtAnswer | null>(null);
   voiceActive     = signal(false);
   imagePreview    = signal<string | null>(null);
+  imageFile       = signal<File | null>(null);
   errorMsg        = signal('');
   earnedPoints    = signal<number | null>(null);
 
@@ -73,7 +74,10 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
     this.recognition.interimResults = false;
     this.recognition.continuous   = false;
     this.recognition.onstart  = () => this.voiceActive.set(true);
-    this.recognition.onend    = () => this.voiceActive.set(false);
+    this.recognition.onend    = () => {
+      this.voiceActive.set(false);
+      if (this.queryText.trim()) setTimeout(() => this.sendQuery(), 800);
+    };
     this.recognition.onerror  = () => {
       this.voiceActive.set(false);
       this.errorMsg.set('Voice capture failed. Please try again.');
@@ -87,17 +91,22 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
   onImageUpload(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    this.imageFile.set(file);
     const reader = new FileReader();
-    reader.onload = (e) => {
-      this.imagePreview.set(e.target?.result as string);
-      this.queryText = `[OCR Image: ${file.name}] Please explain the concept or problem shown in this image.`;
-    };
+    reader.onload = (e) => this.imagePreview.set(e.target?.result as string);
     reader.readAsDataURL(file);
   }
 
   sendQuery(): void {
+    if (this.isLoading()) return;
+
+    if (this.mode() === 'image' && this.imageFile()) {
+      this.sendImageQuery();
+      return;
+    }
+
     const q = this.queryText.trim();
-    if (!q || this.isLoading()) return;
+    if (!q) return;
 
     this.isLoading.set(true);
     this.response.set(null);
@@ -108,11 +117,8 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
     const classAwareQuery = `I am a Class ${this.grade} student${subjectCtx}. Please use vocabulary and examples suitable for a ${this.grade}th-grade student. Question: ${q}`;
     const studentId = this.auth.currentUser()?.studentId;
 
-    this.doubtApi.ask(classAwareQuery, 'en', undefined, studentId).subscribe({
-      next: (ans) => {
-        this.response.set(ans);
-        this.isLoading.set(false);
-      },
+    this.doubtApi.ask(classAwareQuery, 'en', this.selectedSubject || undefined, studentId).subscribe({
+      next: (ans) => { this.response.set(ans); this.isLoading.set(false); },
       error: () => {
         this.errorMsg.set('Could not reach the AI engine. Check your connection and try again.');
         this.isLoading.set(false);
@@ -120,8 +126,28 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
     });
   }
 
+  private sendImageQuery(): void {
+    this.isLoading.set(true);
+    this.response.set(null);
+    this.errorMsg.set('');
+    this.earnedPoints.set(null);
+
+    const studentId = this.auth.currentUser()?.studentId;
+    const subjectCtx = this.selectedSubject ? ` studying ${this.selectedSubject}` : '';
+    const q = this.queryText.trim() || `I am a Class ${this.grade} student${subjectCtx}. Please explain this image.`;
+
+    this.doubtApi.askWithImage(this.imageFile()!, q, 'en', this.selectedSubject || undefined, studentId).subscribe({
+      next: (ans) => { this.response.set(ans); this.isLoading.set(false); },
+      error: () => {
+        this.errorMsg.set('Could not analyze the image. Please try again.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
   clearImage(): void {
     this.imagePreview.set(null);
+    this.imageFile.set(null);
     this.queryText = '';
   }
 
@@ -130,6 +156,7 @@ export class AiDoubtCenterComponent implements OnInit, OnDestroy {
     this.selectedSubject = '';
     this.response.set(null);
     this.imagePreview.set(null);
+    this.imageFile.set(null);
     this.errorMsg.set('');
     this.isLoading.set(false);
     this.earnedPoints.set(null);

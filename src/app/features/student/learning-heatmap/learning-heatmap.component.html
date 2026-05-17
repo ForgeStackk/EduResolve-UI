@@ -16,7 +16,9 @@
 
   <!-- Color-scale legend -->
   <div class="galaxy-legend">
-    <span class="legend-dot" style="background:#b91c1c"></span>
+    <span class="legend-dot" style="background:#4b5563"></span>
+    <span class="legend-label">Not Started</span>
+    <span class="legend-dot" style="background:#b91c1c;margin-left:10px"></span>
     <span class="legend-label">Urgent</span>
     <span class="legend-dot" style="background:#f97316;margin-left:10px"></span>
     <span class="legend-label">In Progress</span>
@@ -100,7 +102,13 @@
           </div>
           <div>
             <p class="ap-subject-name">{{ ps.name }}</p>
-            <p class="ap-subject-sub">Current accuracy · <span [style.color]="heatColorFor(ps.accuracy)">{{ ps.accuracy }}%</span></p>
+            <p class="ap-subject-sub">
+              @if (ps.accuracy === 0) {
+                <span style="color:#4b5563">Not started yet</span>
+              } @else {
+                Current accuracy · <span [style.color]="heatColorFor(ps.accuracy)">{{ ps.accuracy }}%</span>
+              }
+            </p>
           </div>
         </div>
 
@@ -142,7 +150,7 @@
                  [style.width.%]="ps.accuracy"
                  [style.background]="heatColorFor(ps.accuracy)"></div>
           </div>
-          <span class="ap-meter-label">{{ ps.accuracy }}% → Target 75%</span>
+          <span class="ap-meter-label">{{ ps.accuracy === 0 ? 'Start studying → Target 75%' : ps.accuracy + '% → Target 75%' }}</span>
         </div>
 
         <!-- CTA: opens active PDF directly when bookId is available -->

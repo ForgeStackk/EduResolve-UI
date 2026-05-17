@@ -203,6 +203,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -298,7 +299,16 @@
           Full Syllabus
         </a>
       </div>
+
     </div>
+  </section>
+
+  <!-- =============================================================
+       COMMUNITY: Streak Garden + Class Leaderboard
+       ============================================================= -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <app-streak-garden [studentId]="studentId()!"></app-streak-garden>
+    <app-leaderboard [classGrade]="grade() || '9'"></app-leaderboard>
   </section>
 
   <!-- =============================================================

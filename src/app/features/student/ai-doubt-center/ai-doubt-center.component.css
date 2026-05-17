@@ -358,6 +358,17 @@
   white-space: pre-wrap; word-break: break-word;
 }
 
+/* AI response images */
+.response-images {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 10px;
+}
+.response-img {
+  max-width: 100%; border-radius: 10px;
+  border: 1px solid rgba(45,212,191,0.2);
+  background: rgba(0,0,0,0.3);
+}
+
 /* Rich-media placeholders */
 .media-row { display: flex; gap: 8px; }
 .media-card {

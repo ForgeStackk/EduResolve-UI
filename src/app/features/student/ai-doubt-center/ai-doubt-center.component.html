@@ -139,7 +139,7 @@
 
       <!-- Send -->
       <button class="send-btn" (click)="sendQuery()"
-              [disabled]="!queryText.trim() || isLoading()">
+              [disabled]="(!queryText.trim() && !imageFile()) || isLoading()">
         @if (isLoading()) {
           <span class="btn-spinner"></span>
           Analyzing…
@@ -177,21 +177,15 @@
           <p class="response-text">{{ ans.answer }}</p>
         </div>
 
-        <!-- Rich Media Row (3D/Diagram/Chart placeholders) -->
-        <div class="media-row">
-          <div class="media-card" title="3D model coming soon">
-            <span class="material-symbols-outlined" style="font-size:26px;color:#A855F7">view_in_ar</span>
-            <span>3D Model</span>
+        <!-- AI-returned educational images -->
+        @if (ans.images && ans.images.length > 0) {
+          <div class="response-images">
+            @for (img of ans.images; track img) {
+              <img [src]="img" alt="Educational diagram" class="response-img"
+                   loading="lazy" (error)="$any($event.target).style.display='none'" />
+            }
           </div>
-          <div class="media-card" title="Diagram coming soon">
-            <span class="material-symbols-outlined" style="font-size:26px;color:#2DD4BF">schema</span>
-            <span>Diagram</span>
-          </div>
-          <div class="media-card" title="Real-world example coming soon">
-            <span class="material-symbols-outlined" style="font-size:26px;color:#CD7F32">explore</span>
-            <span>Example</span>
-          </div>
-        </div>
+        }
       </div>
     }
   </div>

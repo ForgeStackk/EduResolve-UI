@@ -16,6 +16,8 @@ import { LiquidProgressRingComponent } from '../liquid-progress-ring/liquid-prog
 import { AiDoubtCenterComponent } from '../ai-doubt-center/ai-doubt-center.component';
 import { LearningHeatmapComponent } from '../learning-heatmap/learning-heatmap.component';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
+import { StreakGardenComponent } from '../streak-garden/streak-garden.component';
+import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
 
 interface ReadingProgress {
   id: number; studentId: number;
@@ -62,7 +64,9 @@ const RANK_TIERS = [
     LiquidProgressRingComponent,
     AiDoubtCenterComponent,
     LearningHeatmapComponent,
-  ],
+    LeaderboardComponent,
+    StreakGardenComponent,
+],
   templateUrl: './student-dashboard.component.html',
   styleUrl:    './student-dashboard.component.css'
 })

@@ -11,11 +11,12 @@ export interface SubjectStat {
   icon: string;
 }
 
-/** Skill Galaxy color scale: Dark Red → Orange → Radiant Green */
+/** Skill Galaxy color scale: Grey → Dark Red → Orange → Radiant Green */
 function heatColor(acc: number): string {
-  if (acc >= 75) return '#22c55e';   // Radiant Green  — Mastered
-  if (acc >= 45) return '#f97316';   // Orange         — In Progress
-  return '#b91c1c';                  // Dark Red       — Urgent / Not Started
+  if (acc === 0)  return '#4b5563';   // Grey           — Not Started
+  if (acc >= 75)  return '#22c55e';   // Radiant Green  — Mastered
+  if (acc >= 45)  return '#f97316';   // Orange         — In Progress
+  return '#b91c1c';                   // Dark Red       — Urgent
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -70,12 +71,12 @@ export class LearningHeatmapComponent implements OnChanges {
     const relevant = this.weakTopics.filter(w => (w as any).subject?.toLowerCase() === lower);
     const accuracy = relevant.length
       ? Math.round(relevant.reduce((s, w) => s + w.accuracy, 0) / relevant.length)
-      : this.deterministicAccuracy(name);
+      : 0;
 
     return {
       name,
       accuracy,
-      sessions: this.deterministicSessions(name),
+      sessions: relevant.length ? this.deterministicSessions(name) : 0,
       color: COLOR_MAP[lower] ?? '#667eea',
       icon: ICON_MAP[lower] ?? 'menu_book',
     };
