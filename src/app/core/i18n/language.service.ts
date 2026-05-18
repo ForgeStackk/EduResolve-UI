@@ -1,4 +1,5 @@
 import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -37,8 +38,7 @@ export class LanguageService {
 
   /** Wait for initial language to be loaded (for app initializer) */
   async initialize(): Promise<void> {
-    const lang = this.current();
-    await this.translate.use(lang).toPromise();
+    await firstValueFrom(this.translate.use(this.current()));
   }
 
   set(lang: AppLanguage): void {

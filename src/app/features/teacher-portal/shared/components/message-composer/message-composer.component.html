@@ -1,0 +1,214 @@
+<div class="space-y-5">
+
+  <!-- ── Recipient badge ──────────────────────────────────────────────────── -->
+  @if (showRecipientBadge) {
+    <div class="flex items-center gap-2">
+      <span class="text-xs hud-caps text-gray-500">To:</span>
+      <span class="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs text-white font-medium">
+        {{ recipientLabel }}
+      </span>
+    </div>
+  }
+
+  <!-- ── Due date ──────────────────────────────────────────────────────────── -->
+  @if (showDueDatePicker) {
+    <div>
+      <label class="block text-xs hud-caps text-gray-500 mb-2">
+        Due Date <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="date"
+        [min]="today"
+        [value]="dueDate()"
+        (change)="dueDate.set($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-red-500 transition-colors
+               [&::-webkit-calendar-picker-indicator]:invert" />
+    </div>
+  }
+
+  <!-- ── Text body ─────────────────────────────────────────────────────────── -->
+  <div>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">Instructions / Message</label>
+    <textarea
+      [value]="textBody()"
+      (input)="textBody.set($any($event.target).value)"
+      [placeholder]="placeholder"
+      rows="4"
+      class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3
+             text-sm resize-none focus:outline-none focus:border-red-500 transition-colors
+             placeholder:text-gray-600">
+    </textarea>
+  </div>
+
+  <!-- ── Voice note ────────────────────────────────────────────────────────── -->
+  <div>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">Voice Note</label>
+    <app-voice-recorder (voiceRecorded)="onVoiceRecorded($event)" />
+  </div>
+
+  <!-- ── Photos ────────────────────────────────────────────────────────────── -->
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-xs hud-caps text-gray-500">
+        Photos
+        <span class="text-gray-700 normal-case">(max 5 MB each)</span>
+      </label>
+      <div class="flex items-center gap-3">
+        @if (showCameraCapture) {
+          <label class="cursor-pointer text-xs text-gray-400 hover:text-white transition-colors">
+            📷 Camera
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              class="hidden"
+              (change)="addImages($event)" />
+          </label>
+        }
+        <label class="cursor-pointer text-xs text-red-400 hover:text-red-300 transition-colors">
+          + Gallery
+          <input type="file" accept="image/*" multiple class="hidden" (change)="addImages($event)" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Drag-and-drop zone -->
+    <div
+      class="rounded-xl border-2 border-dashed transition-colors p-3"
+      [class]="isDragging()
+        ? 'border-red-500 bg-red-900/10'
+        : (imagePreviews().length === 0 ? 'border-gray-800 bg-gray-900/40' : 'border-gray-800')"
+      (dragover)="$event.preventDefault(); isDragging.set(true)"
+      (dragleave)="isDragging.set(false)"
+      (drop)="onImageDrop($event)">
+
+      @if (imagePreviews().length === 0) {
+        <p class="text-center text-xs text-gray-600 py-3 select-none">
+          Drag &amp; drop photos here, or use the buttons above
+        </p>
+      } @else {
+        <!-- Thumbnail grid -->
+        <div class="flex flex-wrap gap-2">
+          @for (img of imagePreviews(); track img.url; let i = $index) {
+            <div class="relative group w-20 h-20 flex-shrink-0">
+              <img
+                [src]="img.url"
+                [alt]="img.name"
+                class="w-full h-full object-cover rounded-lg border border-gray-700" />
+
+              <!-- Hover overlay with actions -->
+              <div class="absolute inset-0 rounded-lg bg-black/50 opacity-0 group-hover:opacity-100
+                          transition-opacity flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  (click)="openLightbox(img.url)"
+                  title="Preview"
+                  class="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 text-white
+                         text-xs leading-none flex items-center justify-center transition-colors">
+                  👁
+                </button>
+                <button
+                  type="button"
+                  (click)="removeImage(i)"
+                  title="Remove"
+                  class="w-6 h-6 rounded-full bg-red-600/80 hover:bg-red-600 text-white
+                         text-xs leading-none flex items-center justify-center transition-colors font-bold">
+                  ×
+                </button>
+              </div>
+
+              <!-- Size badge -->
+              <span class="absolute bottom-0.5 left-0.5 right-0.5 text-center text-[9px]
+                           text-gray-300 truncate bg-black/60 rounded-b px-1">
+                {{ formatBytes(img.size) }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ── File attachments ──────────────────────────────────────────────────── -->
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-xs hud-caps text-gray-500">
+        Files
+        <span class="text-gray-700 normal-case">(max 25 MB · up to {{ maxFiles }})</span>
+      </label>
+      @if (!filesAtLimit()) {
+        <label class="cursor-pointer text-xs text-red-400 hover:text-red-300 transition-colors">
+          + Add Files
+          <input
+            type="file"
+            multiple
+            [accept]="fileAccept"
+            class="hidden"
+            (change)="addFiles($event)" />
+        </label>
+      } @else {
+        <span class="text-xs text-gray-600">Limit reached</span>
+      }
+    </div>
+
+    @if (files().length > 0) {
+      <ul class="space-y-1.5">
+        @for (f of files(); track f.name; let i = $index) {
+          <li class="flex items-center gap-2 bg-gray-800 border border-gray-700/50
+                     rounded-lg px-3 py-2 text-xs">
+            <span class="text-gray-500 flex-shrink-0">📎</span>
+            <span class="text-white truncate flex-1 min-w-0">{{ f.name }}</span>
+            <span class="text-gray-600 flex-shrink-0 tabular-nums">{{ formatBytes(f.size) }}</span>
+            <button
+              type="button"
+              (click)="removeFile(i)"
+              class="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors
+                     leading-none font-bold ml-1">
+              ×
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <!-- ── Error / success ───────────────────────────────────────────────────── -->
+  @if (error()) {
+    <p class="text-sm text-red-400">{{ error() }}</p>
+  }
+  @if (sent() !== null) {
+    <p class="text-sm text-green-400">✓ Delivered to {{ sent() }} recipient(s)</p>
+  }
+
+  <!-- ── Submit ────────────────────────────────────────────────────────────── -->
+  <button
+    type="button"
+    (click)="send()"
+    [disabled]="!hasContent() || sending()"
+    class="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-bold
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+    @if (sending()) { Sending… } @else { {{ submitLabel }} }
+  </button>
+
+</div>
+
+<!-- ── Lightbox ──────────────────────────────────────────────────────────── -->
+@if (lightboxUrl()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+    (click)="closeLightbox()">
+    <img
+      [src]="lightboxUrl()!"
+      alt="Preview"
+      class="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-2xl"
+      (click)="$event.stopPropagation()" />
+    <button
+      type="button"
+      (click)="closeLightbox()"
+      class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20
+             text-white text-lg flex items-center justify-center transition-colors">
+      ×
+    </button>
+  </div>
+}

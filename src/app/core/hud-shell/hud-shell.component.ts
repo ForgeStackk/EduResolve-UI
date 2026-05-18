@@ -31,7 +31,7 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
     nav: [
       { icon: 'home',          labelKey: 'nav.home',      link: '/student/dashboard', exact: true },
       { icon: 'local_library', labelKey: 'nav.subjects',  link: '/learn/subjects' },
-      { icon: 'quiz',          labelKey: 'nav.quiz',      link: '/learn/quiz',        comingSoon: true },
+      { icon: 'quiz',          labelKey: 'nav.quiz',      link: '/learn/quiz' },
       { icon: 'forum',         labelKey: 'nav.doubt',     link: '/learn/doubt' },
       { icon: 'bookmark',      labelKey: 'nav.bookmarks', link: '/learn/bookmarks' }
     ]
@@ -66,6 +66,7 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
 const ROOT_PATHS = new Set([
   '/student/dashboard',
   '/learn/subjects',
+  '/learn/quiz',
   '/learn/doubt',
   '/learn/bookmarks',
   '/teacher/dashboard',

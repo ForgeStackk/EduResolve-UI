@@ -3,6 +3,15 @@
     "name": "EduResolve",
     "tagline": "सारी पढ़ाई, एक ही जगह।"
   },
+  "teacher": {
+    "nav": {
+      "myClass":  "मेरी कक्षा",
+      "messages": "संदेश",
+      "homework": "गृहकार्य",
+      "reports":  "रिपोर्ट",
+      "archive":  "रिपोर्ट संग्रह"
+    }
+  },
   "nav": {
     "dashboard": "डैशबोर्ड",
     "home": "होम",
@@ -77,7 +86,44 @@
     "weakTopics": "जिन विषयों पर ध्यान देना है",
     "streak": "दिन की लय",
     "xp": "अंक",
-    "topPercent": "आज के शीर्ष {{value}}% में"
+    "topPercent": "आज के शीर्ष {{value}}% में",
+    "activeModule": "सक्रिय मॉड्यूल",
+    "youAre": "आप",
+    "throughModule": "इस मॉड्यूल तक पहुँच चुके हैं। अगली चुनौती जल्द आएगी।",
+    "resumeHint": "अगला अभ्यास शुरू करने के लिए जारी रखें दबाएँ।",
+    "resumeTraining": "जारी रखें",
+    "openPdf": "PDF खोलें",
+    "startJourney": "यात्रा शुरू करें",
+    "startJourneyHint": "आपका पहला अध्याय इंतज़ार कर रहा है। एक विषय चुनें और आज से पढ़ाई शुरू करें।",
+    "beginTraining": "पढ़ाई शुरू करें",
+    "debriefRequired": "कल की पढ़ाई अधूरी रह गई थी",
+    "dailyOps": "दैनिक अभ्यास",
+    "ofComplete": "/3 पूर्ण",
+    "inMission": "चालू है",
+    "strategicFocus": "मुख्य विषय",
+    "activeLabel": "· सक्रिय",
+    "smartSyllabus": "स्मार्ट पाठ्यक्रम",
+    "exploreAll": "सभी देखें",
+    "classGrade": "कक्षा {{grade}} · NCERT पाठ्यक्रम",
+    "chHint": "अ.1:",
+    "fullSyllabus": "पूरा पाठ्यक्रम",
+    "tacticalIntel": "कमज़ोर क्षेत्र",
+    "viewAll": "सभी देखें",
+    "knowledgeCheck": "ज्ञान जाँच",
+    "quizDrill": "प्रश्नोत्तरी अभ्यास",
+    "quizDrillDesc": "5 प्रश्न · +1 अंक",
+    "soon": "जल्द",
+    "aiCenter": "AI सहायता केंद्र",
+    "askDoubt": "शंका पूछें",
+    "aiDesc": "टेक्स्ट · चित्र · आवाज़ · AI",
+    "curriculumExplorer": "पाठ्यक्रम खोज",
+    "ncertDesc": "NCERT PDF फोकस मोड के साथ",
+    "priorityTarget": "प्राथमिकता लक्ष्य",
+    "accuracy": "सटीकता",
+    "launchDrill": "अभ्यास शुरू करें",
+    "streakLabel": "लय",
+    "rankXpLabel": "रैंक XP",
+    "streakPtsLabel": "लय अंक"
   },
   "chapters": {
     "title": "अध्याय",
@@ -91,7 +137,12 @@
     "startQuiz": "प्रश्नोत्तरी शुरू करें",
     "viewPyqs": "पिछले प्रश्न देखें",
     "addBookmark": "सहेजें",
-    "removeBookmark": "सहेजा गया"
+    "removeBookmark": "सहेजा गया",
+    "backToSubjects": "विषयों पर वापस",
+    "gradeModule": "कक्षा {{grade}} · मॉड्यूल",
+    "notFound": "कोई अध्याय नहीं मिला",
+    "notFoundHint": "इस मॉड्यूल में अभी कोई अध्याय नहीं है। जल्द वापस आएँ या किसी और विषय को देखें।",
+    "browseSubjects": "विषय देखें"
   },
   "quiz": {
     "title": "प्रश्नोत्तरी",
@@ -127,10 +178,11 @@
   },
   "bookmarks": {
     "title": "बाद के लिए सहेजे गए",
-    "empty": "अभी कुछ सहेजा नहीं गया है।"
+    "empty": "अभी कुछ सहेजा नहीं गया है।",
+    "emptyHint": "किसी भी पुस्तक पर बुकमार्क आइकन दबाएँ।"
   },
   "doubt": {
-    "title": "Doubt Forum",
+    "title": "शंका मंच",
     "placeholder": "फंसे हो? उलझन में हो? बस पूछ दो! हम पहले तुम्हारी किताब में खोजेंगे, फिर AI को बुलाएंगे 🚀",
     "ask": "उत्तर पाएँ →",
     "answer": "उत्तर",
@@ -139,7 +191,24 @@
       "db": "आपकी पाठ्यपुस्तक से",
       "ai": "AI द्वारा निर्मित",
       "fallback": "अभी पर्याप्त सामग्री नहीं"
-    }
+    },
+    "backToHud": "वापस जाएँ",
+    "supportBriefing": "सहायता केंद्र",
+    "subtitle": "कोई सवाल पूछें। हम पहले आपकी पाठ्यपुस्तक में खोजेंगे; ज़रूरत पड़ने पर AI मदद करेगा।",
+    "inputPlaceholder": "कुछ समझ नहीं आया? बस पूछो!",
+    "submit": "जमा करें →",
+    "relatedVisuals": "संबंधित चित्र",
+    "helpful": "उपयोगी",
+    "markedHelpful": "उपयोगी चिह्नित",
+    "notHelpful": "उपयोगी नहीं",
+    "feedbackLogged": "प्रतिक्रिया नोट की",
+    "tipsTitle": "उपयोगी सुझाव",
+    "tip1Title": "स्पष्ट रहें",
+    "tip1Body": "सटीक और विस्तृत प्रश्न पूछें ताकि बेहतर उत्तर मिले।",
+    "tip2Title": "संदर्भ दें",
+    "tip2Body": "अध्याय या विषय का नाम बताएं ताकि जल्दी उत्तर मिले।",
+    "comingSoon": "इस कक्षा की सामग्री जल्द उपलब्ध होगी।",
+    "loadingSubjects": "विषय लोड हो रहे हैं…"
   },
   "search": {
     "title": "खोज",
@@ -164,5 +233,24 @@
     "uploadFailed": "अपलोड विफल। कृपया पुनः प्रयास करें।",
     "loadError": "दस्तावेज़ लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
     "deleteFailed": "दस्तावेज़ हटाया नहीं जा सका। कृपया पुनः प्रयास करें।"
+  },
+  "aiBot": {
+    "openTitle": "शंका पूछें",
+    "panelTitle": "शंका कमांड",
+    "panelSubtitle": "कक्षा {{grade}} · AI शिक्षक",
+    "modeText": "टेक्स्ट",
+    "modeImage": "चित्र",
+    "modeVoice": "आवाज़",
+    "loadingSubjects": "विषय लोड हो रहे हैं…",
+    "subject": "विषय",
+    "anySubject": "— कोई भी —",
+    "placeholderVoice": "सुन रहा हूँ… अपना सवाल बोलें",
+    "placeholderImage": "चित्र के बारे में बताएं या सवाल पूछें…",
+    "placeholderText": "कुछ भी पूछें — जैसे, प्रकाश संश्लेषण के लिए सूरज की रोशनी क्यों चाहिए?",
+    "uploadImage": "चित्र अपलोड करें (OCR)",
+    "tapToSpeak": "बोलने के लिए दबाएँ",
+    "analyzing": "विश्लेषण हो रहा है…",
+    "sendToAi": "AI को भेजें",
+    "aiResponse": "AI का उत्तर"
   }
 }

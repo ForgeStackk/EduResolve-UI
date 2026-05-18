@@ -12,18 +12,87 @@
     <div class="w-10"></div>
   </header>
 
-  <!-- 1. Configuration Phase ------------------------------------------------ -->
+  <!-- ── 1. Config ─────────────────────────────────────────────── -->
   @if (phase() === 'config') {
-    <section class="hud-card space-y-6">
+    <section class="hud-card space-y-5">
       <div class="hud-accent"></div>
       <div>
         <span class="hud-caps text-red-400">SIMULATION SETUP</span>
         <h2 class="hud-display text-2xl text-white mt-1">{{ 'quiz.configure' | translate }}</h2>
       </div>
 
+      <!-- Chapter: pre-selected from book browser -->
+      @if (chapterId()) {
+        <div class="flex items-center gap-3 bg-red-600/10 border border-red-500/30 rounded-xl px-4 py-3">
+          <span class="material-symbols-outlined fill text-red-400 shrink-0">menu_book</span>
+          <div class="flex-1 min-w-0">
+            <p class="hud-caps text-red-400 text-[10px]">SELECTED CHAPTER</p>
+            <p class="text-white text-sm font-semibold truncate">
+              {{ selectedChapterTitle() || ('Chapter #' + chapterId()) }}
+            </p>
+          </div>
+          <button type="button" (click)="clearChapter()"
+                  class="text-[#e6bdb8]/50 hover:text-white transition-colors shrink-0">
+            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+          </button>
+        </div>
+
+      } @else {
+        <!-- Subject selector -->
+        <div>
+          <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-2 block">SELECT SUBJECT</label>
+          @if (catalog.loading()) {
+            <div class="quiz-select flex items-center gap-2 text-[#e6bdb8]/50">
+              <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
+              Loading subjects…
+            </div>
+          } @else {
+            <select class="quiz-select"
+                    [ngModel]="selectedSubject()"
+                    (ngModelChange)="onSubjectChange($event)">
+              <option value="">— Choose a subject —</option>
+              @for (s of catalog.subjects(); track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+          }
+        </div>
+
+        <!-- Book selector -->
+        @if (selectedSubject()) {
+          <div>
+            <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-2 block">SELECT BOOK</label>
+            @if (booksLoading()) {
+              <div class="quiz-select flex items-center gap-2 text-[#e6bdb8]/50">
+                <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
+                Loading books…
+              </div>
+            } @else if (books().length === 0) {
+              <p class="text-sm text-[#e6bdb8]/50">No books found for this subject.</p>
+            } @else {
+              <select class="quiz-select"
+                      (change)="onBookChange(+$any($event.target).value)">
+                <option value="">— Choose a book —</option>
+                @for (b of books(); track b.id) {
+                  <option [value]="b.id">{{ b.title }}</option>
+                }
+              </select>
+            }
+          </div>
+        }
+
+        <!-- Resolving chapters silently -->
+        @if (chaptersLoading()) {
+          <div class="flex items-center gap-2 text-[#e6bdb8]/50 text-sm px-1">
+            <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
+            Resolving book…
+          </div>
+        }
+      }
+
       <!-- Difficulty -->
       <div>
-        <label class="hud-caps text-[#e6bdb8]/80 mb-3 block">{{ 'quiz.difficulty' | translate }}</label>
+        <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-3 block">{{ 'quiz.difficulty' | translate }}</label>
         <div class="grid grid-cols-3 gap-2">
           @for (d of difficulties; track d) {
             <button (click)="difficulty.set(d)"
@@ -35,40 +104,48 @@
         </div>
       </div>
 
-      <!-- Count (auto-calculated based on difficulty) -->
-      <div class="bg-black/40 border border-white/10 rounded-lg p-4">
+      <!-- Question count -->
+      <div class="bg-black/40 border border-white/10 rounded-xl p-4">
         <p class="hud-caps text-[#e6bdb8]/80 mb-2">{{ 'quiz.count' | translate }}</p>
         <div class="flex items-center justify-between">
           <span class="text-2xl font-bold text-red-400">{{ count() }}</span>
           <span class="text-sm text-[#e6bdb8]/70">
             @switch (difficulty()) {
-              @case ('EASY') {
-                Build confidence with more questions
-              }
-              @case ('HARD') {
-                Focused challenge with fewer questions
-              }
-              @default {
-                Balanced difficulty mix
-              }
+              @case ('EASY')   { Build confidence with more questions }
+              @case ('HARD')   { Focused challenge with fewer questions }
+              @default         { Balanced difficulty mix }
             }
           </span>
         </div>
       </div>
 
-      <button (click)="generate()" [disabled]="!chapterId()" class="hud-btn-primary w-full">
-        <span class="material-symbols-outlined fill">rocket_launch</span>
-        {{ 'quiz.generate' | translate }}
+      <!-- Error -->
+      @if (errorMsg()) {
+        <p class="text-sm text-red-400 text-center">{{ errorMsg() | translate }}</p>
+      }
+
+      <!-- Generate button -->
+      <button (click)="generate()"
+              [disabled]="!chapterId() || generating()"
+              class="hud-btn-primary w-full disabled:opacity-40">
+        @if (generating()) {
+          <span class="material-symbols-outlined animate-spin">sync</span>
+          Generating…
+        } @else {
+          <span class="material-symbols-outlined fill">rocket_launch</span>
+          {{ 'quiz.generate' | translate }}
+        }
       </button>
+
       @if (!chapterId()) {
-        <p class="text-sm text-[#e6bdb8]/80 text-center">
-          Select a chapter from the library to launch a drill.
+        <p class="text-xs text-[#e6bdb8]/50 text-center">
+          Select a subject and chapter above to begin.
         </p>
       }
     </section>
   }
 
-  <!-- 2. Taking ------------------------------------------------------------- -->
+  <!-- ── 2. Taking ──────────────────────────────────────────────── -->
   @if (phase() === 'taking' && quiz(); as q) {
     <section class="hud-card">
       <div class="hud-accent"></div>
@@ -91,20 +168,17 @@
 
         <div class="space-y-3 mb-6">
           @for (opt of currentOptions(); track opt.id; let i = $index) {
-            <label class="flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all"
+            <label class="flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all"
                    [class.border-red-500]="answers()[cq.id] === opt.id"
                    [class.bg-red-600/15]="answers()[cq.id] === opt.id"
                    [class.shadow-[0_0_15px_rgba(220,38,38,0.25)]]="answers()[cq.id] === opt.id"
                    [class.border-white/10]="answers()[cq.id] !== opt.id"
-                   [class.bg-black/30]="answers()[cq.id] !== opt.id"
-                   [class.hover:border-white/30]="answers()[cq.id] !== opt.id">
+                   [class.bg-black/30]="answers()[cq.id] !== opt.id">
               <input type="radio" [name]="'q' + cq.id" [value]="opt.id"
                      [checked]="answers()[cq.id] === opt.id"
                      (change)="selectAnswer(cq.id, opt.id)"
                      class="mt-1 hud-radio"/>
-              <span class="hud-caps text-red-400 mt-0.5 shrink-0">
-                {{ ['A','B','C','D','E'][i] }}
-              </span>
+              <span class="hud-caps text-red-400 mt-0.5 shrink-0">{{ ['A','B','C','D'][i] }}</span>
               <span class="text-[15px] text-[#fbdbd7]">{{ opt.text }}</span>
             </label>
           }
@@ -132,7 +206,7 @@
     </section>
   }
 
-  <!-- 3. Results ------------------------------------------------------------ -->
+  <!-- ── 3. Results ─────────────────────────────────────────────── -->
   @if (phase() === 'results' && quiz(); as q) {
     <section class="hud-card text-center">
       <div class="hud-accent"></div>
@@ -150,10 +224,9 @@
         <div [style.width.%]="(score() / q.questions.length) * 100"></div>
       </div>
 
-      <!-- breakdown -->
       <div class="space-y-3 mt-7 text-left">
         @for (item of breakdown(); track item.question.id) {
-          <div class="rounded-lg border p-4"
+          <div class="rounded-xl border p-4"
                [class.border-emerald-500/50]="item.correct"
                [class.bg-emerald-500/10]="item.correct"
                [class.border-red-500/60]="!item.correct"
@@ -189,4 +262,5 @@
       </button>
     </section>
   }
+
 </div>

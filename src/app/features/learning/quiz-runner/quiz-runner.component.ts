@@ -3,9 +3,11 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { Difficulty, GeneratedQuiz, QuizGeneratorApiService } from '../../../core/api/quiz-generator-api.service';
+import { Difficulty, GeneratedQuiz } from '../../../core/api/quiz-generator-api.service';
 import { LanguageService } from '../../../core/i18n/language.service';
-import { NcertApiService, QuizQuestion } from '../../../core/api/ncert-api.service';
+import { NcertApiService, NCERTBook, NCERTChapter } from '../../../core/api/ncert-api.service';
+import { ClassContextService } from '../../../core/class-context.service';
+import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 
 interface Option { id: string; text: string; }
 
@@ -17,35 +19,40 @@ interface Option { id: string; text: string; }
   styleUrl: './quiz-runner.component.css'
 })
 export class QuizRunnerComponent implements OnInit, OnDestroy {
-  private ncertApi = inject(NcertApiService);
-  private api = inject(QuizGeneratorApiService);
-  private route = inject(ActivatedRoute);
-  private location = inject(Location);
-  protected lang = inject(LanguageService);
+  private ncertApi  = inject(NcertApiService);
+  private route     = inject(ActivatedRoute);
+  private location  = inject(Location);
+  private classCtx  = inject(ClassContextService);
+  readonly catalog  = inject(SubjectCatalogService);
+  protected lang    = inject(LanguageService);
 
   difficulties: Difficulty[] = ['EASY', 'MEDIUM', 'HARD'];
 
-  useNcertApi = signal<boolean>(false);
-  chapterId = signal<number | null>(null);
+  // ── Chapter selection ────────────────────────────────────────
+  selectedSubject      = signal<string>('');
+  books                = signal<NCERTBook[]>([]);
+  chapters             = signal<NCERTChapter[]>([]);
+  booksLoading         = signal(false);
+  chaptersLoading      = signal(false);
+  generating           = signal(false);
+  errorMsg             = signal<string>('');
+
+  chapterId            = signal<number | null>(null);
+  selectedChapterTitle = signal<string>('');
+
+  // ── Quiz config ──────────────────────────────────────────────
   difficulty = signal<Difficulty>('MEDIUM');
-  
-  /** Auto-computed question count based on difficulty level:
-   *  - EASY: 10 questions (more for confidence building)
-   *  - MEDIUM: 7 questions (balanced)
-   *  - HARD: 5 questions (fewer but more challenging)
-   */
+
   count = computed(() => {
     const d = this.difficulty();
     return d === 'EASY' ? 10 : d === 'HARD' ? 5 : 7;
   });
 
-  phase = signal<'config' | 'taking' | 'results'>('config');
-  quiz = signal<GeneratedQuiz | null>(null);
-  currentIndex = signal(0);
-  /** questionId -> selected optionId */
-  answers = signal<Record<number, string>>({});
-
-  /** Timer */
+  // ── Quiz state ───────────────────────────────────────────────
+  phase            = signal<'config' | 'taking' | 'results'>('config');
+  quiz             = signal<GeneratedQuiz | null>(null);
+  currentIndex     = signal(0);
+  answers          = signal<Record<number, string>>({});
   remainingSeconds = signal(0);
   private timerHandle: any;
 
@@ -59,99 +66,148 @@ export class QuizRunnerComponent implements OnInit, OnDestroy {
     try { return JSON.parse(q.optionsJson) as Option[]; } catch { return []; }
   });
 
-  score = computed(() => this.breakdown().filter(b => b.correct).length);
-
+  score     = computed(() => this.breakdown().filter(b => b.correct).length);
   breakdown = computed(() => {
     const q = this.quiz(); if (!q) return [];
     return q.questions.map(qq => ({
       question: qq,
-      correct: this.answers()[qq.id] != null && this.answers()[qq.id] === qq.correctOptionId
+      correct: this.answers()[qq.id] != null && this.answers()[qq.id] === qq.correctOptionId,
     }));
   });
 
   ngOnInit() {
-    const cid = this.route.snapshot.queryParamMap.get('chapterId');
-    if (cid) this.chapterId.set(Number(cid));
+    this.catalog.load();
+    const cid   = this.route.snapshot.queryParamMap.get('chapterId');
+    const title = this.route.snapshot.queryParamMap.get('chapterTitle');
+    if (cid) {
+      this.chapterId.set(Number(cid));
+      if (title) this.selectedChapterTitle.set(title);
+    }
   }
 
   ngOnDestroy() { this.clearTimer(); }
 
+  // ── Selection handlers ───────────────────────────────────────
+
+  onSubjectChange(subject: string) {
+    this.selectedSubject.set(subject);
+    this.chapterId.set(null);
+    this.books.set([]);
+    this.chapters.set([]);
+    this.errorMsg.set('');
+    if (!subject) return;
+    this.booksLoading.set(true);
+    this.ncertApi.getBooks(this.classCtx.grade(), subject).subscribe({
+      next: books => {
+        this.books.set(books);
+        this.booksLoading.set(false);
+        if (books.length === 1) this.onBookChange(books[0].id);
+      },
+      error: () => this.booksLoading.set(false),
+    });
+  }
+
+  onBookChange(bookId: number) {
+    this.chapterId.set(null);
+    this.selectedChapterTitle.set('');
+    this.chapters.set([]);
+    if (!bookId) return;
+    const book = this.books().find(b => b.id === bookId);
+    this.chaptersLoading.set(true);
+    this.ncertApi.getChapters(bookId).subscribe({
+      next: chapters => {
+        this.chaptersLoading.set(false);
+        if (chapters.length > 0) {
+          const last = chapters[chapters.length - 1];
+          this.chapterId.set(last.id);
+        } else {
+          this.chapterId.set(bookId);
+        }
+        this.selectedChapterTitle.set(book?.title ?? `Book ${bookId}`);
+      },
+      error: () => {
+        this.chaptersLoading.set(false);
+        this.chapterId.set(bookId);
+        this.selectedChapterTitle.set(book?.title ?? `Book ${bookId}`);
+      },
+    });
+  }
+
+  onChapterSelect(chapter: NCERTChapter) {
+    this.chapterId.set(chapter.id);
+    this.selectedChapterTitle.set(chapter.title || `Chapter ${chapter.chapterNumber}`);
+  }
+
+  clearChapter() {
+    this.chapterId.set(null);
+    this.selectedChapterTitle.set('');
+  }
+
+  // ── Quiz generation ──────────────────────────────────────────
+
   generate() {
     if (!this.chapterId()) return;
-    
-    if (this.useNcertApi()) {
-      // Use NCERT API for quiz generation
-      this.ncertApi.generateQuiz(
-        this.difficulty().toLowerCase(),
-        this.count(),
-        this.chapterId()!
-      ).subscribe((ncertQuestions) => {
-        if (!ncertQuestions.length) return;
-        
-        // Convert NCERT questions to GeneratedQuiz format
-        const generatedQuiz: GeneratedQuiz = {
+    this.generating.set(true);
+    this.errorMsg.set('');
+
+    this.ncertApi.generateQuiz(
+      this.difficulty().toLowerCase(),
+      this.count(),
+      this.chapterId()!,
+    ).subscribe({
+      next: (ncertQuestions) => {
+        this.generating.set(false);
+        if (!ncertQuestions?.length) {
+          this.errorMsg.set('quiz.noQuestions');
+          return;
+        }
+        const quiz: GeneratedQuiz = {
           chapterId: this.chapterId()!,
           language: this.lang.current(),
-          requested: ncertQuestions.length,
+          requested: this.count(),
           returned: ncertQuestions.length,
-          recommendedDurationSeconds: ncertQuestions.length * 60,
-          questions: ncertQuestions.map((q) => ({
-            id: q.id,
+          recommendedDurationSeconds: ncertQuestions.length * 90,
+          questions: ncertQuestions.map((q, idx) => ({
+            id: q.id ?? (idx + 1),
             text: q.questionText,
             optionsJson: JSON.stringify([
               { id: 'A', text: q.optionA },
               { id: 'B', text: q.optionB },
               { id: 'C', text: q.optionC },
-              { id: 'D', text: q.optionD }
+              { id: 'D', text: q.optionD },
             ]),
             correctOptionId: q.correctOption,
-            explanation: q.explanation
-          }))
+            explanation: q.explanation,
+          })),
         };
-        
-        this.quiz.set(generatedQuiz);
+        this.quiz.set(quiz);
         this.currentIndex.set(0);
         this.answers.set({});
-        this.remainingSeconds.set(generatedQuiz.recommendedDurationSeconds);
+        this.remainingSeconds.set(quiz.recommendedDurationSeconds);
         this.phase.set('taking');
         this.startTimer();
-      });
-    } else {
-      // Use existing quiz generator API
-      this.api.generate({
-        chapterId: this.chapterId()!,
-        difficulty: this.difficulty(),
-        language: this.lang.current(),
-        count: this.count()
-      }).subscribe(res => {
-        if (!res.questions.length) return;
-        this.quiz.set(res);
-        this.currentIndex.set(0);
-        this.answers.set({});
-        this.remainingSeconds.set(res.recommendedDurationSeconds);
-        this.phase.set('taking');
-        this.startTimer();
-      });
-    }
+      },
+      error: () => {
+        this.generating.set(false);
+        this.errorMsg.set('quiz.noQuestions');
+      },
+    });
   }
 
   selectAnswer(qid: number, optionId: string) {
     this.answers.update(prev => ({ ...prev, [qid]: optionId }));
   }
 
-  next() { this.currentIndex.update(i => i + 1); }
-  prev() { this.currentIndex.update(i => Math.max(0, i - 1)); }
-
-  submit() {
-    this.clearTimer();
-    this.phase.set('results');
-  }
+  next()   { this.currentIndex.update(i => i + 1); }
+  prev()   { this.currentIndex.update(i => Math.max(0, i - 1)); }
+  submit() { this.clearTimer(); this.phase.set('results'); }
 
   reset() {
     this.clearTimer();
     this.quiz.set(null);
     this.answers.set({});
     this.currentIndex.set(0);
+    this.errorMsg.set('');
     this.phase.set('config');
   }
 
@@ -159,6 +215,8 @@ export class QuizRunnerComponent implements OnInit, OnDestroy {
     const mm = Math.floor(s / 60); const ss = s % 60;
     return `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
   }
+
+  back(): void { this.location.back(); }
 
   private startTimer() {
     this.clearTimer();
@@ -169,8 +227,7 @@ export class QuizRunnerComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  back(): void {
-    this.location.back();
+  private clearTimer() {
+    if (this.timerHandle) { clearInterval(this.timerHandle); this.timerHandle = null; }
   }
-  private clearTimer() { if (this.timerHandle) { clearInterval(this.timerHandle); this.timerHandle = null; } }
 }

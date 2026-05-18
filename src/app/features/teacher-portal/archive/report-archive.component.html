@@ -1,0 +1,167 @@
+<div class="p-6 space-y-6">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <div>
+    <h2 class="text-xl font-bold text-white hud-caps tracking-widest">Report Archive</h2>
+    <p class="text-xs text-gray-500 mt-0.5">
+      Read-only access to historical attendance reports across all your classes.
+      Reports are generated automatically at month end.
+    </p>
+  </div>
+
+  <!-- ── Selectors ────────────────────────────────────────────────────────── -->
+  <div class="flex flex-wrap items-end gap-3">
+    <!-- Class -->
+    <div>
+      <label class="block text-xs hud-caps text-gray-500 mb-1">Class</label>
+      <select
+        [value]="selectedClass()?.classId ?? ''"
+        (change)="onClassChange($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-red-500 transition-colors min-w-36">
+        @for (cls of classes(); track cls.classId) {
+          <option [value]="cls.classId">{{ cls.className }}-{{ cls.section }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Month -->
+    <div>
+      <label class="block text-xs hud-caps text-gray-500 mb-1">Month</label>
+      <select
+        [value]="selectedMonth()"
+        (change)="onMonthChange($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-red-500 transition-colors min-w-32">
+        @for (m of months; track m.value) {
+          <option [value]="m.value">{{ m.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Year -->
+    <div>
+      <label class="block text-xs hud-caps text-gray-500 mb-1">Year</label>
+      <select
+        [value]="selectedYear()"
+        (change)="onYearChange($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
+               focus:outline-none focus:border-red-500 transition-colors">
+        @for (y of years; track y) {
+          <option [value]="y">{{ y }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- ── Error ─────────────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="bg-red-900/40 border border-red-700 rounded-lg px-4 py-3 text-sm text-red-300">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Loading ───────────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="hud-card rounded-xl p-10 flex items-center justify-center">
+      <p class="text-gray-500 text-sm animate-pulse">Loading archive…</p>
+    </div>
+
+  <!-- ── Not found ─────────────────────────────────────────────────────────── -->
+  } @else if (notFound()) {
+    <div class="hud-card rounded-xl p-10 flex flex-col items-center justify-center gap-2">
+      <span class="text-3xl">🗄</span>
+      <p class="text-gray-400 text-sm">
+        No report found for {{ selectedMonthLabel() }} {{ selectedYear() }}.
+      </p>
+      <p class="text-gray-600 text-xs">Reports are generated automatically on the last day of each month.</p>
+    </div>
+
+  <!-- ── No classes ────────────────────────────────────────────────────────── -->
+  } @else if (classes().length === 0) {
+    <div class="hud-card rounded-xl p-10 flex flex-col items-center justify-center gap-2">
+      <span class="text-3xl">📋</span>
+      <p class="text-gray-400 text-sm">No classes are assigned to your account.</p>
+    </div>
+
+  <!-- ── Report ────────────────────────────────────────────────────────────── -->
+  } @else if (report()) {
+
+    <!-- Read-only notice -->
+    <div class="flex items-center gap-2 text-xs text-gray-600 bg-gray-800/40 border border-gray-800
+                rounded-lg px-4 py-2">
+      <span>🔒</span>
+      <span>Archive view — report data cannot be modified or re-sent.</span>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="flex flex-wrap items-center gap-6 px-4 py-3 bg-gray-800/60 rounded-xl border border-gray-800">
+      <div>
+        <p class="text-xs hud-caps text-gray-500">Working Days</p>
+        <p class="text-2xl font-bold text-white tabular-nums">{{ report()!.summary.totalWorkingDays }}</p>
+      </div>
+      <div class="h-8 w-px bg-gray-700 hidden sm:block"></div>
+      <div>
+        <p class="text-xs hud-caps text-gray-500">Month</p>
+        <p class="text-sm font-semibold text-white">{{ selectedMonthLabel() }} {{ selectedYear() }}</p>
+      </div>
+      <div class="h-8 w-px bg-gray-700 hidden sm:block"></div>
+      <div>
+        <p class="text-xs hud-caps text-gray-500">Students</p>
+        <p class="text-sm font-semibold text-white">{{ report()!.summary.studentWiseSummary.length }}</p>
+      </div>
+    </div>
+
+    <!-- Summary table -->
+    <div class="hud-card rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-800 text-left">
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500 w-14">Roll</th>
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500">Name</th>
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500 text-center w-12">P</th>
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500 text-center w-12">A</th>
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500 text-center w-12">L</th>
+              <th class="px-4 py-3 text-xs hud-caps text-gray-500 text-center w-20">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of report()!.summary.studentWiseSummary; track row.studentId; let i = $index) {
+              <tr class="border-b border-gray-800/50 hover:bg-gray-800/20 transition-colors">
+                <td class="px-4 py-3 text-gray-500 font-mono text-xs">
+                  {{ row.rollNumber ?? (i + 1).toString().padStart(2, '0') }}
+                </td>
+                <td class="px-4 py-3 text-white">{{ row.fullName }}</td>
+                <td class="px-4 py-3 text-center text-green-400 font-semibold tabular-nums">{{ row.present }}</td>
+                <td class="px-4 py-3 text-center text-red-400 font-semibold tabular-nums">{{ row.absent }}</td>
+                <td class="px-4 py-3 text-center text-yellow-400 font-semibold tabular-nums">{{ row.late }}</td>
+                <td class="px-4 py-3 text-center tabular-nums font-semibold"
+                    [class]="pctClass(attendancePct(row))">
+                  @if (attendancePct(row) !== null) {
+                    {{ attendancePct(row)! | number:'1.1-1' }}%
+                  } @else { — }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Download only — no send in archive -->
+    <button
+      (click)="downloadPdf()"
+      [disabled]="!report()!.reportFileUrl"
+      class="flex items-center gap-2 px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white
+             text-sm font-medium rounded-lg transition-colors
+             disabled:opacity-40 disabled:cursor-not-allowed">
+      ⬇ Download PDF
+      @if (!report()!.reportFileUrl) {
+        <span class="text-xs text-gray-500">(not available)</span>
+      }
+    </button>
+
+  }
+
+</div>

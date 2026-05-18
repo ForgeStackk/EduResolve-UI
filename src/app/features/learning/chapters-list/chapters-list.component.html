@@ -3,13 +3,13 @@
   <!-- Back link -->
   <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
-    Back to Subjects
+    {{ 'chapters.backToSubjects' | translate }}
   </a>
 
   <!-- Subject header -->
   @if (subject(); as s) {
     <header class="space-y-2">
-      <p class="hud-caps text-red-400">GRADE {{ s.grade }} · MODULE</p>
+      <p class="hud-caps text-red-400">{{ 'chapters.gradeModule' | translate:{ grade: s.grade } }}</p>
       <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight">{{ s.name }}</h1>
     </header>
   }
@@ -37,14 +37,12 @@
     } @else if (chapters().length === 0) {
       <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
         <span class="material-symbols-outlined text-5xl" style="color:#ac8884">folder_off</span>
-        <h3 class="hud-display text-xl text-white">No Chapters Found</h3>
-        <p class="text-[#e6bdb8]/70 text-sm max-w-xs">
-          No chapters are available for this module yet. Check back soon or explore another subject.
-        </p>
+        <h3 class="hud-display text-xl text-white">{{ 'chapters.notFound' | translate }}</h3>
+        <p class="text-[#e6bdb8]/70 text-sm max-w-xs">{{ 'chapters.notFoundHint' | translate }}</p>
         <a routerLink="/learn/subjects"
            class="hud-btn-ghost mt-2" style="text-decoration:none">
           <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>
-          Browse Subjects
+          {{ 'chapters.browseSubjects' | translate }}
         </a>
       </div>
     } @else {

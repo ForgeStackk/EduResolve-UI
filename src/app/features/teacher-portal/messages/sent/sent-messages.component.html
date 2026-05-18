@@ -1,0 +1,48 @@
+<div class="p-6 space-y-4">
+
+  <div class="flex items-center justify-between">
+    <h2 class="text-xl font-bold text-white hud-caps tracking-wider">Sent Messages</h2>
+    <a routerLink="../compose" class="text-sm text-red-400 hover:text-red-300">+ Compose</a>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gray-500 text-sm animate-pulse">Loading…</p>
+  } @else if (messages().length === 0) {
+    <p class="text-gray-500 text-sm text-center py-12">No messages sent yet.</p>
+  } @else {
+    <div class="space-y-2">
+      @for (msg of messages(); track msg.messageId) {
+        <div class="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-500 uppercase tracking-wider">{{ msg.recipientType }}</span>
+            <span class="text-xs text-gray-600">{{ msg.sentAt | date:'short' }}</span>
+          </div>
+          @if (msg.textBody) {
+            <p class="text-sm text-white line-clamp-2">{{ msg.textBody }}</p>
+          }
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <span>📎 {{ msg.attachmentCount }}</span>
+            <span>✓ {{ msg.readCount }} read</span>
+            @if (msg.isHomework) {
+              <span class="text-yellow-400">📝 Homework</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between pt-2">
+      <button (click)="prev()" [disabled]="page() === 0"
+        class="px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 disabled:opacity-40 text-white rounded-lg">
+        ← Prev
+      </button>
+      <span class="text-xs text-gray-500">{{ total() }} total</span>
+      <button (click)="next()" [disabled]="messages().length < 20"
+        class="px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 disabled:opacity-40 text-white rounded-lg">
+        Next →
+      </button>
+    </div>
+  }
+
+</div>

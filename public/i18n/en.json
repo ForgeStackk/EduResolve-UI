@@ -3,6 +3,15 @@
     "name": "EduResolve",
     "tagline": "All your learning. One place."
   },
+  "teacher": {
+    "nav": {
+      "myClass":  "My Class",
+      "messages": "Messages",
+      "homework": "Homework",
+      "reports":  "Reports",
+      "archive":  "Report Archive"
+    }
+  },
   "nav": {
     "dashboard": "Dashboard",
     "home": "Home",
@@ -77,7 +86,44 @@
     "weakTopics": "Topics that need attention",
     "streak": "Day streak",
     "xp": "XP",
-    "topPercent": "Top {{value}}% today"
+    "topPercent": "Top {{value}}% today",
+    "activeModule": "ACTIVE MODULE",
+    "youAre": "You are",
+    "throughModule": "through this module. Final boss quiz unlocks next.",
+    "resumeHint": "Press Resume to begin the next training module.",
+    "resumeTraining": "RESUME TRAINING",
+    "openPdf": "OPEN PDF",
+    "startJourney": "Start Your Journey",
+    "startJourneyHint": "Your first chapter awaits. Pick a subject and begin your training today.",
+    "beginTraining": "BEGIN TRAINING",
+    "debriefRequired": "DEBRIEF REQUIRED — yesterday's ops incomplete",
+    "dailyOps": "Daily Ops",
+    "ofComplete": "/3 COMPLETE",
+    "inMission": "IN MISSION",
+    "strategicFocus": "Strategic Focus",
+    "activeLabel": "· ACTIVE",
+    "smartSyllabus": "Smart Syllabus",
+    "exploreAll": "EXPLORE ALL",
+    "classGrade": "Class {{grade}} · NCERT Curriculum",
+    "chHint": "Ch.1:",
+    "fullSyllabus": "Full Syllabus",
+    "tacticalIntel": "Tactical Intel",
+    "viewAll": "VIEW ALL",
+    "knowledgeCheck": "KNOWLEDGE CHECK",
+    "quizDrill": "Quiz Drill",
+    "quizDrillDesc": "5 Questions · +1 Streak Pt",
+    "soon": "SOON",
+    "aiCenter": "AI COMMAND CENTER",
+    "askDoubt": "Ask a Doubt",
+    "aiDesc": "Text · Image · Voice · AI",
+    "curriculumExplorer": "CURRICULUM EXPLORER",
+    "ncertDesc": "NCERT PDFs with Focus Mode",
+    "priorityTarget": "PRIORITY TARGET",
+    "accuracy": "Accuracy",
+    "launchDrill": "LAUNCH DRILL",
+    "streakLabel": "STREAK",
+    "rankXpLabel": "RANK XP",
+    "streakPtsLabel": "STREAK PTS"
   },
   "chapters": {
     "title": "Chapters",
@@ -91,7 +137,12 @@
     "startQuiz": "Start a quiz",
     "viewPyqs": "View past papers",
     "addBookmark": "Bookmark",
-    "removeBookmark": "Bookmarked"
+    "removeBookmark": "Bookmarked",
+    "backToSubjects": "Back to Subjects",
+    "gradeModule": "GRADE {{grade}} · MODULE",
+    "notFound": "No Chapters Found",
+    "notFoundHint": "No chapters are available for this module yet. Check back soon or explore another subject.",
+    "browseSubjects": "Browse Subjects"
   },
   "quiz": {
     "title": "Quiz",
@@ -127,7 +178,8 @@
   },
   "bookmarks": {
     "title": "Saved for later",
-    "empty": "Nothing bookmarked yet. Tap the bookmark icon on any chapter, question, or doubt to save it here."
+    "empty": "Nothing bookmarked yet.",
+    "emptyHint": "Tap the bookmark icon on any book to save it here."
   },
   "doubt": {
     "title": "Doubt Forum",
@@ -139,7 +191,24 @@
       "db": "from your textbook content",
       "ai": "AI-generated",
       "fallback": "Not enough content yet"
-    }
+    },
+    "backToHud": "BACK TO HUD",
+    "supportBriefing": "SUPPORT BRIEFING",
+    "subtitle": "Transmit a question. The HUD checks your textbook archive first; AI fallback engages only when needed.",
+    "inputPlaceholder": "Any confusion? We got you covered.",
+    "submit": "Go for it!",
+    "relatedVisuals": "Related Visuals",
+    "helpful": "Helpful",
+    "markedHelpful": "Marked helpful",
+    "notHelpful": "Not helpful",
+    "feedbackLogged": "Feedback logged",
+    "tipsTitle": "INTEL TIPS",
+    "tip1Title": "BE SPECIFIC",
+    "tip1Body": "Ask clear, detailed questions to get sharper answers.",
+    "tip2Title": "ADD CONTEXT",
+    "tip2Body": "Mention the chapter or topic for faster resolution.",
+    "comingSoon": "Content for this class is coming soon.",
+    "loadingSubjects": "Loading subjects…"
   },
   "search": {
     "title": "Search",
@@ -164,5 +233,24 @@
     "uploadFailed": "Upload failed. Please try again.",
     "loadError": "Could not load your documents. Please try again.",
     "deleteFailed": "Could not delete the document. Please try again."
+  },
+  "aiBot": {
+    "openTitle": "Ask a Doubt",
+    "panelTitle": "Doubt Command",
+    "panelSubtitle": "Class {{grade}} · AI Tutor",
+    "modeText": "Text",
+    "modeImage": "Image",
+    "modeVoice": "Voice",
+    "loadingSubjects": "Loading subjects…",
+    "subject": "Subject",
+    "anySubject": "— Any —",
+    "placeholderVoice": "Listening… speak your question",
+    "placeholderImage": "Describe what you see or ask about the image…",
+    "placeholderText": "Ask anything — e.g., Why does photosynthesis need sunlight?",
+    "uploadImage": "Upload Image (OCR)",
+    "tapToSpeak": "Tap to Speak",
+    "analyzing": "Analyzing…",
+    "sendToAi": "Send to AI",
+    "aiResponse": "AI Response"
   }
 }

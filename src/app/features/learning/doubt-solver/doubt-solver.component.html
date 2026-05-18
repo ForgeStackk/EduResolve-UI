@@ -2,17 +2,15 @@
 
   <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
-    BACK TO HUD
+    {{ 'doubt.backToHud' | translate }}
   </a>
 
   <header class="space-y-2">
-    <p class="hud-caps text-red-400">SUPPORT BRIEFING</p>
+    <p class="hud-caps text-red-400">{{ 'doubt.supportBriefing' | translate }}</p>
     <h1 class="hud-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
       {{ 'doubt.title' | translate }}
     </h1>
-    <p class="text-base text-[#e6bdb8] max-w-2xl">
-      Transmit a question. The HUD checks your textbook archive first; AI fallback engages only when needed.
-    </p>
+    <p class="text-base text-[#e6bdb8] max-w-2xl">{{ 'doubt.subtitle' | translate }}</p>
   </header>
 
   <!-- Input -->
@@ -21,9 +19,9 @@
 
     <!-- Subject context bar -->
     @if (catalog.loading()) {
-      <p class="text-xs text-[#e6bdb8]/50">Loading subjects…</p>
+      <p class="text-xs text-[#e6bdb8]/50">{{ 'doubt.loadingSubjects' | translate }}</p>
     } @else if (catalog.hasError()) {
-      <p class="text-xs text-amber-400/70">Content for this class is coming soon.</p>
+      <p class="text-xs text-amber-400/70">{{ 'doubt.comingSoon' | translate }}</p>
     } @else if (catalog.subjects().length > 0) {
       <div class="flex flex-wrap items-center gap-2">
         <span class="hud-caps text-[#e6bdb8]/50 text-[10px]">SUBJECT:</span>
@@ -38,12 +36,12 @@
 
     <textarea [(ngModel)]="query"
               rows="4"
-              [placeholder]="(selectedSubject() ? selectedSubject() + ' — ' : '') + ('Any confusion? We got you covered.' | translate)"
+              [placeholder]="(selectedSubject() ? selectedSubject() + ' — ' : '') + ('doubt.inputPlaceholder' | translate)"
               class="hud-input resize-none"></textarea>
     <button (click)="ask()" [disabled]="!query.trim() || loading()"
             class="hud-btn-primary w-full">
       <span class="material-symbols-outlined fill">send</span>
-      {{ loading() ? ('common.loading' | translate) : ('Go for it!' | translate) }}
+      {{ loading() ? ('common.loading' | translate) : ('doubt.submit' | translate) }}
     </button>
   </section>
 
@@ -77,7 +75,7 @@
         <div class="pt-4 border-t border-white/10">
           <p class="hud-caps text-red-400 mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined" style="font-size:16px">image_search</span>
-            Related Visuals
+            {{ 'doubt.relatedVisuals' | translate }}
           </p>
           <div class="grid grid-cols-2 gap-3">
             @for (image of a.images; track $index) {
@@ -101,7 +99,7 @@
                 [class.!text-emerald-400]="feedback() === 'up'">
           <span class="material-symbols-outlined"
                 [class.fill]="feedback() === 'up'">thumb_up</span>
-          {{ feedback() === 'up' ? 'Marked helpful' : 'Helpful' }}
+          {{ feedback() === 'up' ? ('doubt.markedHelpful' | translate) : ('doubt.helpful' | translate) }}
         </button>
         <button type="button"
                 (click)="rate('down')"
@@ -111,7 +109,7 @@
                 [class.!text-red-400]="feedback() === 'down'">
           <span class="material-symbols-outlined"
                 [class.fill]="feedback() === 'down'">thumb_down</span>
-          {{ feedback() === 'down' ? 'Feedback logged' : 'Not helpful' }}
+          {{ feedback() === 'down' ? ('doubt.feedbackLogged' | translate) : ('doubt.notHelpful' | translate) }}
         </button>
       </div>
     </section>
@@ -121,16 +119,16 @@
   <section class="space-y-3">
     <h2 class="hud-display text-xl text-white flex items-center gap-2">
       <span class="material-symbols-outlined text-amber-400">tips_and_updates</span>
-      INTEL TIPS
+      {{ 'doubt.tipsTitle' | translate }}
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="hud-card-flat">
-        <p class="hud-caps text-red-400 mb-2">BE SPECIFIC</p>
-        <p class="text-sm text-[#fbdbd7]">Ask clear, detailed questions to get sharper answers.</p>
+        <p class="hud-caps text-red-400 mb-2">{{ 'doubt.tip1Title' | translate }}</p>
+        <p class="text-sm text-[#fbdbd7]">{{ 'doubt.tip1Body' | translate }}</p>
       </div>
       <div class="hud-card-flat">
-        <p class="hud-caps text-red-400 mb-2">ADD CONTEXT</p>
-        <p class="text-sm text-[#fbdbd7]">Mention the chapter or topic for faster resolution.</p>
+        <p class="hud-caps text-red-400 mb-2">{{ 'doubt.tip2Title' | translate }}</p>
+        <p class="text-sm text-[#fbdbd7]">{{ 'doubt.tip2Body' | translate }}</p>
       </div>
     </div>
   </section>

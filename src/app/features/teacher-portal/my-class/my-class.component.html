@@ -1,0 +1,22 @@
+<div class="flex flex-col h-full">
+
+  <!-- Sub-tab bar -->
+  <div class="border-b border-gray-800 bg-gray-900 px-6">
+    <nav class="flex gap-6" role="tablist">
+      @for (tab of tabs; track tab.path) {
+        <a
+          [routerLink]="tab.path"
+          routerLinkActive="border-b-2 border-red-500 text-white"
+          class="py-4 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+          {{ tab.label }}
+        </a>
+      }
+    </nav>
+  </div>
+
+  <!-- Routed child -->
+  <div class="flex-1 overflow-y-auto">
+    <router-outlet />
+  </div>
+
+</div>

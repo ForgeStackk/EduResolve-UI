@@ -1,0 +1,36 @@
+<div class="flex flex-wrap gap-3">
+
+  <!-- Class selector -->
+  <div>
+    <label class="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Class</label>
+    <select
+      [value]="selectedClassId()"
+      (change)="onClassChange($any($event.target).value)"
+      class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm min-w-36 focus:outline-none focus:border-red-500">
+      <option value="">— Select class —</option>
+      @for (cls of classes(); track cls.classId) {
+        <option [value]="cls.classId">
+          {{ cls.className }}-{{ cls.section }}
+          @if (cls.isClassTeacher) { (CT) }
+        </option>
+      }
+    </select>
+  </div>
+
+  <!-- Subject selector (visible once class is chosen) -->
+  @if (subjects().length) {
+    <div>
+      <label class="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Subject</label>
+      <select
+        [value]="selectedSubjectId() ?? ''"
+        (change)="onSubjectChange($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm min-w-36 focus:outline-none focus:border-red-500">
+        <option value="">— All subjects —</option>
+        @for (sub of subjects(); track sub.subjectId) {
+          <option [value]="sub.subjectId">{{ sub.subjectName }}</option>
+        }
+      </select>
+    </div>
+  }
+
+</div>

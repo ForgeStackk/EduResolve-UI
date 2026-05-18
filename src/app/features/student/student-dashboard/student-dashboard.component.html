@@ -28,7 +28,7 @@
         <div class="flex-1 space-y-3 w-full text-center md:text-left">
           <span class="hud-caps"
                 [style.color]="subjectAccent(recommendedSubjectName())">
-            ● ACTIVE MODULE
+            ● {{ 'dashboard.activeModule' | translate }}
           </span>
 
           @if (recommendedChapter(); as c) {
@@ -37,10 +37,10 @@
             </h1>
             <p class="text-[#e6bdb8] text-base leading-relaxed">
               @if (recommendedAccuracy() != null) {
-                You are <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span>
-                through this module. Final boss quiz unlocks next.
+                {{ 'dashboard.youAre' | translate }} <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span>
+                {{ 'dashboard.throughModule' | translate }}
               } @else {
-                Press Resume to begin the next training module.
+                {{ 'dashboard.resumeHint' | translate }}
               }
             </p>
 
@@ -54,11 +54,11 @@
             <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
               <button (click)="continueLearning()" class="hud-btn-primary resume-pulse">
                 <span class="material-symbols-outlined fill">play_arrow</span>
-                RESUME TRAINING
+                {{ 'dashboard.resumeTraining' | translate }}
               </button>
               <button (click)="openPdf()" class="hud-btn-ghost">
                 <span class="material-symbols-outlined">picture_as_pdf</span>
-                OPEN PDF
+                {{ 'dashboard.openPdf' | translate }}
               </button>
             </div>
           } @else if (subjectNames().length === 0) {
@@ -72,14 +72,12 @@
             <!-- No progress yet — show Start Your Journey CTA -->
             <div class="flex flex-col items-center md:items-start gap-4 py-2">
               <span class="text-5xl">🚀</span>
-              <h1 class="hud-display text-3xl sm:text-4xl text-white">Start Your Journey</h1>
-              <p class="text-[#e6bdb8] text-base leading-relaxed">
-                Your first chapter awaits. Pick a subject and begin your training today.
-              </p>
+              <h1 class="hud-display text-3xl sm:text-4xl text-white">{{ 'dashboard.startJourney' | translate }}</h1>
+              <p class="text-[#e6bdb8] text-base leading-relaxed">{{ 'dashboard.startJourneyHint' | translate }}</p>
               <a [routerLink]="['/learn/subjects']"
                  class="hud-btn-primary" style="text-decoration:none">
                 <span class="material-symbols-outlined fill">rocket_launch</span>
-                BEGIN TRAINING
+                {{ 'dashboard.beginTraining' | translate }}
               </a>
             </div>
           }
@@ -95,7 +93,7 @@
       @if (missions.yesterdayIncomplete()) {
         <div class="ops-debrief-banner">
           <span class="material-symbols-outlined fill" style="font-size:15px">warning</span>
-          <span>DEBRIEF REQUIRED — yesterday's ops incomplete</span>
+          <span>{{ 'dashboard.debriefRequired' | translate }}</span>
         </div>
       }
 
@@ -103,7 +101,7 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined fill ops-radar-icon">radar</span>
-          <h3 class="hud-display text-xl text-white">Daily Ops</h3>
+          <h3 class="hud-display text-xl text-white">{{ 'dashboard.dailyOps' | translate }}</h3>
         </div>
         <div class="ops-timer">
           <span class="material-symbols-outlined" style="font-size:12px">schedule</span>
@@ -118,7 +116,7 @@
                [style.width.%]="(missions.doneCount() / 3) * 100"></div>
         </div>
         <span class="hud-caps text-[10px] text-[#e6bdb8]/50 ml-2 whitespace-nowrap">
-          {{ missions.doneCount() }}/3 COMPLETE
+          {{ missions.doneCount() }}{{ 'dashboard.ofComplete' | translate }}
         </span>
       </div>
 
@@ -166,7 +164,7 @@
             } @else if (missions.pending()[m.id]) {
               <div class="ops-in-mission-badge">
                 <span class="material-symbols-outlined fill" style="font-size:11px">bolt</span>
-                IN MISSION
+                {{ 'dashboard.inMission' | translate }}
               </div>
             } @else {
               <button class="ops-launch-btn"
@@ -186,7 +184,7 @@
           [progress]="streakProgress()"
           [color]="streakColor()"
           [centerValue]="streakPoints()"
-          label="STREAK PTS"
+          [label]="'dashboard.streakPtsLabel' | translate"
           [sublabel]="streakRank()"
           [size]="130"
           [stroke]="10">
@@ -194,11 +192,11 @@
 
         <div class="grid grid-cols-2 gap-3 w-full text-center">
           <div>
-            <p class="hud-caps text-[#e6bdb8]/60 mb-1">STREAK</p>
+            <p class="hud-caps text-[#e6bdb8]/60 mb-1">{{ 'dashboard.streakLabel' | translate }}</p>
             <p class="hud-display text-xl text-red-400">🔥 {{ streakDays() }}</p>
           </div>
           <div>
-            <p class="hud-caps text-[#e6bdb8]/60 mb-1">RANK XP</p>
+            <p class="hud-caps text-[#e6bdb8]/60 mb-1">{{ 'dashboard.rankXpLabel' | translate }}</p>
             <p class="hud-display text-xl" [style.color]="streakColor()">{{ experiencePoints() }}</p>
           </div>
         </div>
@@ -211,7 +209,7 @@
        STRATEGIC FOCUS: Subject Chips
        ============================================================= -->
   <section class="space-y-4">
-    <h2 class="hud-display text-2xl sm:text-3xl text-white">Strategic Focus</h2>
+    <h2 class="hud-display text-2xl sm:text-3xl text-white">{{ 'dashboard.strategicFocus' | translate }}</h2>
     <div class="flex flex-wrap gap-3">
       @for (chip of focusChips(); track chip.id) {
         <a [routerLink]="['/learn/books']"
@@ -220,7 +218,7 @@
            [class.hud-chip-active]="chip.active">
           <span class="material-symbols-outlined" style="font-size:16px">{{ chip.icon }}</span>
           {{ chip.name }}
-          @if (chip.active) { <span class="opacity-80">· ACTIVE</span> }
+          @if (chip.active) { <span class="opacity-80">{{ 'dashboard.activeLabel' | translate }}</span> }
         </a>
       }
       @if (focusChips().length === 0) {
@@ -254,17 +252,17 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined fill" style="color:#2DD4BF">library_books</span>
-            <h3 class="hud-display text-lg text-white">Smart Syllabus</h3>
+            <h3 class="hud-display text-lg text-white">{{ 'dashboard.smartSyllabus' | translate }}</h3>
           </div>
           <a routerLink="/learn/ncert"
              class="hud-caps text-[#2DD4BF]/80 hover:text-[#2DD4BF] transition-colors"
-             style="text-decoration:none;font-size:10px">EXPLORE ALL</a>
+             style="text-decoration:none;font-size:10px">{{ 'dashboard.exploreAll' | translate }}</a>
         </div>
 
         <!-- Class badge (hardcoded from profile, non-selectable) -->
         <div class="class-badge">
           <span class="material-symbols-outlined fill" style="font-size:14px;color:#CD7F32">school</span>
-          <span class="hud-caps text-[#CD7F32]">Class {{ grade() || '–' }} · NCERT Curriculum</span>
+          <span class="hud-caps text-[#CD7F32]">{{ 'dashboard.classGrade' | translate:{ grade: grade() || '–' } }}</span>
         </div>
 
         <!-- Subject links with simulated chapter name pre-read -->
@@ -280,7 +278,7 @@
               <div class="flex-1 text-left">
                 <p class="text-sm font-bold text-white truncate">{{ s }}</p>
                 <p class="text-xs text-[#e6bdb8]/50">
-                  Ch.1: {{ chapterNameHint(s, i) }}
+                  {{ 'dashboard.chHint' | translate }} {{ chapterNameHint(s, i) }}
                 </p>
               </div>
               <span class="material-symbols-outlined text-white/20" style="font-size:16px">chevron_right</span>
@@ -296,7 +294,7 @@
         <a routerLink="/learn/ncert" class="hud-btn-ghost w-full justify-center mt-auto"
            style="text-decoration:none">
           <span class="material-symbols-outlined" style="font-size:16px">open_in_full</span>
-          Full Syllabus
+          {{ 'dashboard.fullSyllabus' | translate }}
         </a>
       </div>
 
@@ -316,10 +314,10 @@
        ============================================================= -->
   <section class="space-y-4">
     <div class="flex items-end justify-between">
-      <h2 class="hud-display text-2xl sm:text-3xl text-white">Tactical Intel</h2>
+      <h2 class="hud-display text-2xl sm:text-3xl text-white">{{ 'dashboard.tacticalIntel' | translate }}</h2>
       <a routerLink="/learn/subjects"
          class="text-red-500 hover:text-white font-bold text-xs tracking-widest uppercase transition-colors"
-         style="text-decoration:none">VIEW ALL</a>
+         style="text-decoration:none">{{ 'dashboard.viewAll' | translate }}</a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -335,12 +333,12 @@
                 style="font-size:56px;color:#f59e0b;filter:drop-shadow(0 0 15px rgba(245,158,11,.6))">quiz</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">KNOWLEDGE CHECK</span>
-          <h4 class="text-white font-bold leading-tight">Quiz Drill</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">5 Questions · +1 Streak Pt</p>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.knowledgeCheck' | translate }}</span>
+          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.quizDrill' | translate }}</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.quizDrillDesc' | translate }}</p>
         </div>
         <div class="absolute top-3 right-3 bg-black/70 rounded px-2 py-0.5
-                    hud-caps text-[10px] text-amber-300 border border-amber-300/30">SOON</div>
+                    hud-caps text-[10px] text-amber-300 border border-amber-300/30">{{ 'dashboard.soon' | translate }}</div>
       </div>
 
       <!-- Ask a Doubt card (links to full page) -->
@@ -355,9 +353,9 @@
                 style="font-size:56px;color:#2DD4BF;filter:drop-shadow(0 0 15px rgba(45,212,191,.6))">psychology_alt</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">AI COMMAND CENTER</span>
-          <h4 class="text-white font-bold leading-tight">Ask a Doubt</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">Text · Image · Voice · AI</p>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.aiCenter' | translate }}</span>
+          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.askDoubt' | translate }}</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.aiDesc' | translate }}</p>
         </div>
       </a>
 
@@ -373,9 +371,9 @@
                 style="font-size:56px;color:#10b981;filter:drop-shadow(0 0 15px rgba(16,185,129,.6))">library_books</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">CURRICULUM EXPLORER</span>
-          <h4 class="text-white font-bold leading-tight">Smart Syllabus</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">NCERT PDFs with Focus Mode</p>
+          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.curriculumExplorer' | translate }}</span>
+          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.smartSyllabus' | translate }}</h4>
+          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.ncertDesc' | translate }}</p>
         </div>
       </a>
 
@@ -395,13 +393,13 @@
                     style="font-size:56px;color:#dc2626;filter:drop-shadow(0 0 15px rgba(220,38,38,.6))">target</span>
             </div>
             <div>
-              <span class="hud-caps text-red-400 mb-1 block">PRIORITY TARGET</span>
+              <span class="hud-caps text-red-400 mb-1 block">{{ 'dashboard.priorityTarget' | translate }}</span>
               <h4 class="text-white font-bold leading-tight truncate">{{ w.topicName || 'Topic #' + w.topicId }}</h4>
               <p class="text-sm text-[#e6bdb8]/80 mt-2">
-                Accuracy <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
+                {{ 'dashboard.accuracy' | translate }} <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
               </p>
               <span class="hud-caps text-red-400 mt-3 inline-flex items-center gap-1 group-hover:text-white transition-colors">
-                LAUNCH DRILL
+                {{ 'dashboard.launchDrill' | translate }}
                 <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
               </span>
             </div>

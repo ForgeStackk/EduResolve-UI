@@ -1,0 +1,58 @@
+<div class="p-6 space-y-6">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-white hud-caps tracking-widest">
+        Class Messages
+        @if (className()) {
+          <span class="text-red-500 ml-2">— {{ className() }}</span>
+        }
+      </h2>
+      <p class="text-xs text-gray-500 mt-0.5">Send messages to your class and their guardians</p>
+    </div>
+    <a
+      routerLink="/teacher/messages/sent"
+      class="text-sm text-red-400 hover:text-red-300 transition-colors">
+      View Sent →
+    </a>
+  </div>
+
+  @if (!classId()) {
+    <div class="hud-card rounded-xl p-8 flex items-center justify-center">
+      <p class="text-gray-500 text-sm">No class assigned to your profile.</p>
+    </div>
+  } @else {
+
+    <!-- ── Recipient toggle ─────────────────────────────────────────────────── -->
+    <div>
+      <label class="block text-xs hud-caps text-gray-500 mb-2">Send to</label>
+      <div class="flex flex-wrap gap-2">
+        @for (opt of recipientOptions; track opt.value) {
+          <button
+            type="button"
+            (click)="recipientType.set(opt.value)"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [class]="recipientType() === opt.value
+              ? 'bg-red-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:bg-gray-700'">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ── Composer ──────────────────────────────────────────────────────────── -->
+    <div class="hud-card rounded-xl p-5">
+      <app-message-composer
+        [classId]="classId()"
+        [recipientType]="recipientType()"
+        [recipientLabel]="recipientLabel()"
+        placeholder="Type your message to the class…"
+        submitLabel="Send Message"
+        (messageSent)="onMessageSent($event)" />
+    </div>
+
+  }
+
+</div>

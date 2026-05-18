@@ -25,6 +25,7 @@ interface LoginResponse {
   message: string;
   success: boolean;
   studentId?: number;
+  token?: string;
 }
 
 @Component({
@@ -77,6 +78,9 @@ export class LoginComponent {
             studentId: response.studentId,
             grade: response.className
           };
+          if (response.token) {
+            localStorage.setItem('access_token', response.token);
+          }
           this.authService.login(user as any);
           this.redirectBasedOnRole(response.role);
         } else {

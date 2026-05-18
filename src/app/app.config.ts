@@ -14,12 +14,13 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor])
     ),
-    // ngx-translate v17 - loads /i18n/{lang}.json from `public/i18n`
-    provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }),
+    // Order matters: provideTranslateService registers TranslateNoOpLoader first;
+    // provideTranslateHttpLoader then overrides it (Angular's last-provider-wins rule).
     provideTranslateService({
       fallbackLang: 'en',
       lang: 'en'
     }),
+    provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }),
     // Construct LanguageService eagerly so translations are fetched before the
     // first component renders. Without this, the first paint shows raw keys
     // until something (e.g. TopNav -> LanguageToggle) injects the service.

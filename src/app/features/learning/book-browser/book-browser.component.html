@@ -76,20 +76,32 @@
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (book of books(); track book.id) {
-          <button type="button"
-                  (click)="selectBook(book)"
-                  class="book-card">
+          <div class="book-card">
             <div class="book-card__stripe" [style.background]="getBookColor(book.subject)"></div>
-            <div class="flex-1 text-left px-5 py-4">
+            <button type="button"
+                    (click)="selectBook(book)"
+                    class="flex-1 text-left px-5 py-4 min-w-0 bg-transparent border-0 outline-none cursor-pointer">
               <p class="hud-caps text-[10px] mb-1" [style.color]="getBookColor(book.subject)">
                 {{ book.subject | uppercase }}
               </p>
               <h3 class="text-white font-bold text-sm leading-tight">{{ book.title }}</h3>
+            </button>
+            <div class="flex items-center gap-1 pr-3 shrink-0">
+              <button type="button"
+                      (click)="toggleBookmark(book, $event)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10
+                             transition-colors border-0 outline-none cursor-pointer"
+                      [attr.aria-label]="(isBookmarked(book.id) ? 'chapters.removeBookmark' : 'chapters.addBookmark') | translate">
+                <span class="material-symbols-outlined transition-colors"
+                      [class.fill]="isBookmarked(book.id)"
+                      [style.color]="isBookmarked(book.id) ? '#dc2626' : 'rgba(255,255,255,0.35)'"
+                      style="font-size:20px">bookmark</span>
+              </button>
+              <span class="material-symbols-outlined fill" style="color:rgba(255,255,255,0.4);font-size:18px">
+                picture_as_pdf
+              </span>
             </div>
-            <span class="material-symbols-outlined fill pr-4" style="color:rgba(255,255,255,0.4);font-size:18px">
-              picture_as_pdf
-            </span>
-          </button>
+          </div>
         }
       </div>
     </section>

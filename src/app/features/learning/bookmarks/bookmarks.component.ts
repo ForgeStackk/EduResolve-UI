@@ -46,10 +46,9 @@ export class BookmarksComponent implements OnInit {
   open(b: Bookmark): void {
     switch (b.targetType) {
       case 'CONTENT':
-        // Content chunks live under a chapter; the chunk id is the targetId
-        // but the list view takes a chapterId. Fall through to the chapter
-        // detail view by chapter id if that's what the bookmark refers to.
-        this.router.navigate(['/learn/chapters', b.targetId]);
+        this.router.navigate(['/learn/pdf-viewer'], {
+          queryParams: { bookId: b.targetId, title: b.label },
+        });
         break;
       case 'QUIZ_QUESTION':
         this.router.navigate(['/learn/quiz']);

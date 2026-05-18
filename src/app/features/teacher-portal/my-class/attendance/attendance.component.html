@@ -1,0 +1,252 @@
+<div class="p-6 space-y-6">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-white hud-caps tracking-widest">
+        Attendance
+        @if (className()) {
+          <span class="text-red-500 ml-2">— {{ className() }}</span>
+        }
+      </h2>
+      <p class="text-xs text-gray-500 mt-0.5">Mark daily attendance for your class</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="text-xs text-gray-400 hud-caps">Date</label>
+      <input
+        type="date"
+        [min]="minDate"
+        [max]="today"
+        [value]="selectedDate()"
+        (change)="onDateChange($any($event.target).value)"
+        class="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg px-3 py-1.5
+               focus:outline-none focus:border-red-500 transition-colors" />
+    </div>
+  </div>
+
+  <!-- ── Concurrent-edit banner (case 7) ─────────────────────────────────── -->
+  @if (concurrentEditErr()) {
+    <div class="bg-yellow-900/40 border border-yellow-700 rounded-lg px-4 py-3 text-sm text-yellow-300
+                flex items-center gap-2">
+      <span>⚠</span>
+      <span>Another teacher saved changes at the same time. Refreshing your view…</span>
+    </div>
+  }
+
+  <!-- ── Error banner ──────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="bg-red-900/40 border border-red-700 rounded-lg px-4 py-3 text-sm text-red-300">
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Success banners ───────────────────────────────────────────────────── -->
+  @if (notifySent()) {
+    <div class="bg-green-900/40 border border-green-700 rounded-lg px-4 py-3 text-sm text-green-300">
+      Attendance saved and guardians notified for {{ displayDate() }}.
+    </div>
+  } @else if (saved()) {
+    <div class="bg-green-900/40 border border-green-700 rounded-lg px-4 py-3 text-sm text-green-300">
+      Attendance saved for {{ displayDate() }}.
+    </div>
+  }
+
+  <!-- ── Loading ───────────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="hud-card rounded-xl p-10 flex items-center justify-center">
+      <p class="text-gray-500 text-sm animate-pulse">Loading student list…</p>
+    </div>
+
+  } @else if (rows().length === 0) {
+    <div class="hud-card rounded-xl p-10 flex items-center justify-center">
+      <p class="text-gray-500 text-sm">No students found for this class.</p>
+    </div>
+
+  } @else {
+
+    <!-- ── Toolbar ─────────────────────────────────────────────────────────── -->
+    <div class="flex items-center justify-between">
+      <span class="text-xs text-gray-500">{{ rows().length }} student(s)</span>
+      <button
+        (click)="markAllPresent()"
+        class="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500
+               rounded-lg px-3 py-1.5 transition-colors">
+        Mark All Present
+      </button>
+    </div>
+
+    <!-- ── Attendance table ────────────────────────────────────────────────── -->
+    <div class="hud-card rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-800">
+            <th class="px-4 py-3 text-left text-xs hud-caps text-gray-500 w-16">Roll</th>
+            <th class="px-4 py-3 text-left text-xs hud-caps text-gray-500">Student Name</th>
+            <th class="px-4 py-3 text-right text-xs hud-caps text-gray-500">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.studentId) {
+            <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3 text-gray-500 font-mono text-xs">{{ row.rollNumber }}</td>
+              <td class="px-4 py-3 text-white font-medium">{{ row.fullName }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1.5">
+                  @for (opt of quickOptions; track opt.value) {
+                    <button
+                      (click)="setStatus(row.studentId, opt.value)"
+                      [class]="row.editStatus === opt.value
+                        ? (opt.value === 'PRESENT'  ? 'bg-green-600  text-white border-green-600'
+                          : opt.value === 'ABSENT'  ? 'bg-red-600    text-white border-red-600'
+                          : opt.value === 'LATE'    ? 'bg-yellow-600 text-white border-yellow-600'
+                          :                           'bg-blue-600   text-white border-blue-600')
+                        : 'bg-transparent text-gray-500 border-gray-700 hover:border-gray-500 hover:text-white'"
+                      class="w-8 h-8 rounded-md border text-xs font-bold transition-all">
+                      {{ opt.label }}
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── Summary bar ─────────────────────────────────────────────────────── -->
+    <div class="flex flex-wrap gap-5 text-sm">
+      <span class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
+        <span class="text-green-400 font-semibold">{{ presentCount() }}</span>
+        <span class="text-gray-500">Present</span>
+      </span>
+      <span class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+        <span class="text-red-400 font-semibold">{{ absentCount() }}</span>
+        <span class="text-gray-500">Absent</span>
+      </span>
+      <span class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0"></span>
+        <span class="text-yellow-400 font-semibold">{{ lateCount() }}</span>
+        <span class="text-gray-500">Late</span>
+      </span>
+      <span class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+        <span class="text-blue-400 font-semibold">{{ halfDayCount() }}</span>
+        <span class="text-gray-500">Half Day</span>
+      </span>
+    </div>
+
+    <!-- ── Action buttons ──────────────────────────────────────────────────── -->
+    <div class="flex flex-wrap gap-3">
+      <button
+        (click)="saveAttendance()"
+        [disabled]="saving()"
+        class="px-5 py-2.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium
+               transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        @if (saving()) { Saving… } @else { Save Attendance }
+      </button>
+
+      <button
+        (click)="openNotifyModal()"
+        [disabled]="!hasAbsent() || saving()"
+        class="px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium
+               transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        title="{{ !hasAbsent() ? 'No absent students to notify' : 'Save and notify absent guardians' }}">
+        Save &amp; Notify Guardians
+      </button>
+    </div>
+
+  }
+</div>
+
+<!-- ── 409 Conflict modal (case 1: already marked) ───────────────────────── -->
+@if (showConflictModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div class="bg-gray-900 border border-yellow-700 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 space-y-4">
+
+      <div class="flex items-start gap-3">
+        <span class="text-2xl mt-0.5">⚠</span>
+        <div>
+          <h3 class="text-base font-bold text-white">Attendance Already Marked</h3>
+          <p class="text-sm text-gray-400 mt-1">
+            Attendance for {{ displayDate() }} was already recorded at
+            <span class="text-yellow-400 font-semibold">{{ conflictTime() }}</span>.
+            Do you want to overwrite it with your current selections?
+          </p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-1">
+        <button
+          (click)="dismissConflict()"
+          [disabled]="saving()"
+          class="flex-1 py-2.5 rounded-lg border border-gray-700 text-gray-400 hover:text-white
+                 hover:border-gray-500 text-sm font-medium transition-colors disabled:opacity-50">
+          Keep Existing
+        </button>
+        <button
+          (click)="confirmUpdate()"
+          [disabled]="saving()"
+          class="flex-1 py-2.5 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white
+                 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (saving()) { Updating… } @else { Yes, Update It }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── Confirmation modal ────────────────────────────────────────────────── -->
+@if (showModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+    (click)="dismissModal()">
+    <div
+      class="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 space-y-5"
+      (click)="$event.stopPropagation()">
+
+      <div>
+        <h3 class="text-base font-bold text-white hud-caps tracking-wider">Notify Absent Guardians</h3>
+        <p class="text-xs text-gray-400 mt-1">
+          A message will be sent to the guardians of the following students for {{ displayDate() }}.
+        </p>
+      </div>
+
+      <!-- Absent student list -->
+      <ul class="space-y-2 max-h-52 overflow-y-auto pr-1">
+        @for (row of absentRows(); track row.studentId) {
+          <li class="flex items-center gap-2 text-sm">
+            <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+            <span class="text-white">{{ row.fullName }}</span>
+            <span class="text-gray-600 text-xs ml-auto font-mono">{{ row.rollNumber }}</span>
+          </li>
+        }
+      </ul>
+
+      @if (notifyError()) {
+        <p class="text-xs text-red-400 bg-red-900/30 rounded-lg px-3 py-2">{{ notifyError() }}</p>
+      }
+
+      <div class="flex gap-3 pt-1">
+        <button
+          (click)="dismissModal()"
+          [disabled]="notifying()"
+          class="flex-1 py-2.5 rounded-lg border border-gray-700 text-gray-400 hover:text-white
+                 hover:border-gray-500 text-sm font-medium transition-colors disabled:opacity-50">
+          Cancel
+        </button>
+        <button
+          (click)="confirmNotify()"
+          [disabled]="notifying()"
+          class="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium
+                 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (notifying()) { Sending… } @else { Confirm &amp; Send }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -124,7 +124,7 @@
 
       @if (showSchoolName()) {
         <div class="form-group">
-          <label for="schoolName">School Name</label>
+          <label for="schoolName">{{ 'auth.schoolName' | translate }}</label>
           <select
             id="schoolName"
             [ngModel]="showCustomSchoolInput() ? 'other' : schoolName"

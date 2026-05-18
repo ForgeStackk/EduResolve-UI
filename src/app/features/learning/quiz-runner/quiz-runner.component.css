@@ -1,1 +1,29 @@
 /* Component-specific styles. Tailwind utilities live in the template. */
+
+.quiz-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.quiz-select:focus {
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+.quiz-select option {
+  background: #1f0f0d;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.quiz-chapter-list::-webkit-scrollbar        { width: 4px; }
+.quiz-chapter-list::-webkit-scrollbar-track  { background: transparent; }
+.quiz-chapter-list::-webkit-scrollbar-thumb  { background: rgba(220, 38, 38, 0.3); border-radius: 2px; }

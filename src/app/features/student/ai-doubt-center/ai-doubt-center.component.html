@@ -6,7 +6,7 @@
   (click)="togglePanel()"
   [class.fab-open]="isOpen()"
   aria-label="Open AI Doubt Command Center"
-  title="Ask a Doubt">
+  [title]="'aiBot.openTitle' | translate">
   <span class="material-symbols-outlined fill" style="font-size:26px">
     {{ isOpen() ? 'close' : 'psychology_alt' }}
   </span>
@@ -32,8 +32,8 @@
           <span class="material-symbols-outlined fill" style="color:#2DD4BF;font-size:18px">psychology_alt</span>
         </div>
         <div>
-          <h3 class="panel-title">Doubt Command</h3>
-          <p class="panel-subtitle">Class {{ grade }} · AI Tutor</p>
+          <h3 class="panel-title">{{ 'aiBot.panelTitle' | translate }}</h3>
+          <p class="panel-subtitle">{{ 'aiBot.panelSubtitle' | translate:{ grade: grade } }}</p>
         </div>
       </div>
       <button class="panel-close" (click)="togglePanel()" aria-label="Close">
@@ -46,28 +46,28 @@
       <button class="mode-chip" [class.mode-active]="mode() === 'text'"
               (click)="selectMode('text')">
         <span class="material-symbols-outlined" style="font-size:13px">keyboard</span>
-        Text
+        {{ 'aiBot.modeText' | translate }}
       </button>
       <button class="mode-chip" [class.mode-active]="mode() === 'image'"
               (click)="selectMode('image')">
         <span class="material-symbols-outlined" style="font-size:13px">image_search</span>
-        Image
+        {{ 'aiBot.modeImage' | translate }}
       </button>
       <button class="mode-chip" [class.mode-active]="mode() === 'voice'"
               (click)="selectMode('voice')">
         <span class="material-symbols-outlined" style="font-size:13px">mic</span>
-        Voice
+        {{ 'aiBot.modeVoice' | translate }}
       </button>
     </div>
 
     <!-- Subject context row -->
     @if (subjectsLoading()) {
-      <p class="subject-loading">Loading subjects…</p>
+      <p class="subject-loading">{{ 'aiBot.loadingSubjects' | translate }}</p>
     } @else if (subjects().length > 0) {
       <div class="subject-row">
-        <span class="subject-row-label">Subject</span>
+        <span class="subject-row-label">{{ 'aiBot.subject' | translate }}</span>
         <select class="subject-select" [(ngModel)]="selectedSubject">
-          <option value="">— Any —</option>
+          <option value="">{{ 'aiBot.anySubject' | translate }}</option>
           @for (s of subjects(); track s) {
             <option [value]="s">{{ s }}</option>
           }
@@ -93,9 +93,9 @@
         <textarea
           class="doubt-textarea"
           [(ngModel)]="queryText"
-          [placeholder]="mode() === 'voice' ? 'Listening… speak your question' :
-                         mode() === 'image' ? 'Describe what you see or ask about the image…' :
-                         'Ask anything — e.g., Why does photosynthesis need sunlight?'"
+          [placeholder]="mode() === 'voice' ? ('aiBot.placeholderVoice' | translate) :
+                         mode() === 'image' ? ('aiBot.placeholderImage' | translate) :
+                         ('aiBot.placeholderText' | translate)"
           rows="3"
           [readonly]="voiceActive()"
           (keydown.control.enter)="sendQuery()">
@@ -116,7 +116,7 @@
       @if (mode() === 'image' && !imagePreview()) {
         <label class="upload-zone">
           <span class="material-symbols-outlined" style="font-size:22px">upload_file</span>
-          <span>Upload Image (OCR)</span>
+          <span>{{ 'aiBot.uploadImage' | translate }}</span>
           <input type="file" accept="image/*" class="sr-only" (change)="onImageUpload($event)" />
         </label>
       }
@@ -125,7 +125,7 @@
       @if (mode() === 'voice' && !voiceActive()) {
         <button class="voice-trigger" (click)="startVoice()">
           <span class="material-symbols-outlined fill" style="font-size:18px">mic</span>
-          Tap to Speak
+          {{ 'aiBot.tapToSpeak' | translate }}
         </button>
       }
 
@@ -142,10 +142,10 @@
               [disabled]="(!queryText.trim() && !imageFile()) || isLoading()">
         @if (isLoading()) {
           <span class="btn-spinner"></span>
-          Analyzing…
+          {{ 'aiBot.analyzing' | translate }}
         } @else {
           <span class="material-symbols-outlined fill" style="font-size:15px">send</span>
-          Send to AI
+          {{ 'aiBot.sendToAi' | translate }}
         }
       </button>
     </div>
@@ -164,7 +164,7 @@
     @if (response(); as ans) {
       <div class="response-wrap">
         <div class="response-meta">
-          <span class="hud-caps" style="color:#2DD4BF">AI Response</span>
+          <span class="hud-caps" style="color:#2DD4BF">{{ 'aiBot.aiResponse' | translate }}</span>
           <span class="source-pill"
                 [class.pill-ai]="ans.source === 'AI'"
                 [class.pill-db]="ans.source === 'DB'"
