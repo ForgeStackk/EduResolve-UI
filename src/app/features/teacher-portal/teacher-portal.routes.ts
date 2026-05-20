@@ -7,7 +7,22 @@ export const TEACHER_PORTAL_ROUTES: Routes = [
     loadComponent: () =>
       import('./teacher-portal.component').then(m => m.TeacherPortalComponent),
     children: [
-      { path: '', redirectTo: 'messages/compose', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('../teacher/teacher-dashboard/teacher-dashboard.component').then(m => m.TeacherDashboardComponent)
+      },
+      {
+        path: 'classes',
+        loadComponent: () =>
+          import('./teacher-classes/teacher-classes.component').then(m => m.TeacherClassesComponent)
+      },
+      {
+        path: 'assignments',
+        loadComponent: () =>
+          import('./teacher-assignments/teacher-assignments.component').then(m => m.TeacherAssignmentsComponent)
+      },
 
       // My Class (class-teacher only)
       {

@@ -70,6 +70,8 @@ const ROOT_PATHS = new Set([
   '/learn/doubt',
   '/learn/bookmarks',
   '/teacher/dashboard',
+  '/teacher/classes',
+  '/teacher/assignments',
   '/admin/dashboard',
   '/parent/dashboard',
 ]);

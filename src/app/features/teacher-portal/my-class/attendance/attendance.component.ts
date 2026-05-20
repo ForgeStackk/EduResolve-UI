@@ -63,6 +63,12 @@ export class AttendanceComponent implements OnInit {
 
   // ── Derived ────────────────────────────────────────────────────────────────
   classId     = computed(() => this.portal.classTeacherClass()?.classId ?? '');
+  classLabel  = computed(() => {
+    const c = this.portal.classTeacherClass();
+    if (!c) return '';
+    const grade = c.className.replace('Class ', '').trim();
+    return c.section ? `${grade}${c.section}` : grade;
+  });
   className   = computed(() => {
     const c = this.portal.classTeacherClass();
     return c ? `${c.className}-${c.section}` : '';
@@ -95,7 +101,7 @@ export class AttendanceComponent implements OnInit {
     if (!id) return;
     this.loading.set(true);
     this.error.set(null);
-    this.svc.getByClassAndDate(id, this.selectedDate()).subscribe({
+    this.svc.getByClassAndDate(id, this.selectedDate(), this.classLabel()).subscribe({
       next: records => {
         this.rows.set(records.map(r => ({ ...r, editStatus: r.status ?? 'PRESENT' })));
         this.loading.set(false);
@@ -216,9 +222,10 @@ export class AttendanceComponent implements OnInit {
   private doSave(): Observable<unknown> {
     const isUpdate = this.isAlreadyMarked();
     const req: AttendanceMarkRequest = {
-      classId: this.classId(),
-      date:    this.selectedDate(),
-      records: this.rows().map(r => ({ studentId: r.studentId, status: r.editStatus }))
+      classId:    this.classId(),
+      classLabel: this.classLabel(),
+      date:       this.selectedDate(),
+      records:    this.rows().map(r => ({ studentId: r.studentId, status: r.editStatus }))
     };
     this._pendingReq = req;
     this.saving.set(true);
@@ -251,6 +258,7 @@ export class AttendanceComponent implements OnInit {
     const fd = new FormData();
     fd.append('targetClassId', this.classId());
     fd.append('recipientType', 'ABSENT_GUARDIANS');
+    fd.append('attendanceDate', this.selectedDate());
     const msg = `Dear Parent, your ward in Class ${this.className()} was marked Absent`
               + ` on ${this.displayDate()}. Please ensure regular attendance.`
               + ` — ${this.teacherName()}, Class Teacher`;

@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, NavigationEnd } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { forkJoin, of, Subject } from 'rxjs';
-import { catchError, filter, takeUntil } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { StudentApiService, StudentProfile } from '../../../core/api/student-api.service';
@@ -11,9 +11,8 @@ import { LearningApiService, Chapter, NcertBook } from '../../../core/api/learni
 import { PerformanceApiService, WeakTopic } from '../../../core/api/performance-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { StreakEngineService } from '../streak-engine.service';
-import { DailyMissionService, DailyMission } from '../daily-mission.service';
-import { LiquidProgressRingComponent } from '../liquid-progress-ring/liquid-progress-ring.component';
 import { AiDoubtCenterComponent } from '../ai-doubt-center/ai-doubt-center.component';
+import { StudentInboxApiService, StudentInboxItem } from '../../../core/api/student-inbox-api.service';
 import { LearningHeatmapComponent } from '../learning-heatmap/learning-heatmap.component';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 import { StreakGardenComponent } from '../streak-garden/streak-garden.component';
@@ -61,25 +60,24 @@ const RANK_TIERS = [
     CommonModule,
     RouterLink,
     TranslateModule,
-    LiquidProgressRingComponent,
     AiDoubtCenterComponent,
     LearningHeatmapComponent,
     LeaderboardComponent,
     StreakGardenComponent,
-],
+  ],
   templateUrl: './student-dashboard.component.html',
   styleUrl:    './student-dashboard.component.css'
 })
-export class StudentDashboardComponent implements OnInit, OnDestroy {
+export class StudentDashboardComponent implements OnInit {
   private studentApi      = inject(StudentApiService);
   private learningApi     = inject(LearningApiService);
   private performanceApi  = inject(PerformanceApiService);
   private auth            = inject(AuthService);
   private router          = inject(Router);
   private http            = inject(HttpClient);
+  private inboxApi        = inject(StudentInboxApiService);
   readonly streakEngine   = inject(StreakEngineService);
   readonly subjectCatalog = inject(SubjectCatalogService);
-  readonly missions       = inject(DailyMissionService);
 
   // ---- Profile signals ----
   studentId      = signal<number | null>(null);
@@ -99,11 +97,19 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   readingProgress = signal<ReadingProgress | null>(null);
 
   // ---- UI state ----
-  private completed  = signal<Record<number, boolean>>({});
-  private destroy$   = new Subject<void>();
+  private completed     = signal<Record<number, boolean>>({});
+  recentMessages        = signal<StudentInboxItem[]>([]);
 
   // ---- Computed ----
   firstName = computed(() => this.studentName().split(' ')[0] || '');
+
+  classDisplayLabel = computed(() => {
+    const cn = this.className();
+    if (!cn) return this.grade() ? `Class ${this.grade()}` : '–';
+    const g = cn.replace(/[^0-9]/g, '');
+    const s = cn.replace(/[0-9]/g, '').toUpperCase();
+    return s ? `Class ${g}-${s}` : `Class ${g}`;
+  });
 
   hasProgress = computed(() => this.readingProgress()?.chapterId != null);
 
@@ -197,28 +203,10 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     const grade = user?.grade ?? '9';
     this.loadStudentProfile(id);
     this.loadLearningData(grade, id);
-
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      takeUntil(this.destroy$),
-    ).subscribe(e => {
-      if ((e as NavigationEnd).urlAfterRedirects.includes('/student/dashboard')) {
-        const justDone = this.missions.onReturn();
-        justDone.forEach(missionId => {
-          const m = this.missions.missions().find(x => x.id === missionId);
-          if (m) {
-            this.experiencePoints.update(x => x + m.xpReward);
-            this.streakEngine.awardXp(Math.round(m.xpReward / 10));
-          }
-        });
-      }
+    this.inboxApi.getInbox(0, 5).subscribe({
+      next: msgs => this.recentMessages.set(msgs),
+      error: () => {}
     });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.missions.destroy();
   }
 
   private loadStudentProfile(studentId: number | undefined): void {
@@ -268,8 +256,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.chapters.set(chapters);
         this.weakTopicsRaw.set(weak);
         this.readingProgress.set(progress);
-        // Generate daily missions once subjects are loaded
-        this.missions.generate(grade, subjects);
       },
       error: e => console.error('Learning data failed', e),
     });
@@ -307,18 +293,25 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.router.navigate(['/learn/subjects'], { queryParams: { subject: this.recommendedSubjectName() } });
     }
   }
-  launchMission(m: DailyMission): void {
-    this.missions.setActive(m.id);
-    if (m.queryParams) {
-      this.router.navigate(m.route, { queryParams: m.queryParams });
-    } else {
-      this.router.navigate(m.route);
-    }
-  }
-
   navigateToSubject(subjectName: string): void {
     const g = this.grade() || '9';
     this.router.navigate(['/learn/books'], { queryParams: { classGrade: g, subject: subjectName } });
+  }
+
+  msgIcon(category: string): string {
+    if (category === 'HOMEWORK') return 'assignment';
+    if (category === 'ABSENCE_NOTIFICATION') return 'warning';
+    return 'forum';
+  }
+
+  formatMsgDate(iso: string): string {
+    const d = new Date(iso);
+    const diffH = Math.floor((Date.now() - d.getTime()) / 3600000);
+    if (diffH < 1) return 'Just now';
+    if (diffH < 24) return `${diffH}h ago`;
+    const diffD = Math.floor(diffH / 24);
+    if (diffD < 7) return `${diffD}d ago`;
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   }
 
   /**

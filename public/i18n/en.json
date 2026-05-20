@@ -234,6 +234,43 @@
     "loadError": "Could not load your documents. Please try again.",
     "deleteFailed": "Could not delete the document. Please try again."
   },
+  "inbox": {
+    "title": "Inbox",
+    "notifications": "Notifications",
+    "classNotices": "Class Notices",
+    "messages": "Messages",
+    "homework": "Homework",
+    "attendance": "My Attendance",
+    "noNotifications": "No notifications.",
+    "noClassNotices": "No class notices.",
+    "noMessages": "No messages.",
+    "noHomework": "No homework assigned.",
+    "noAttendance": "No attendance records for this month.",
+    "absentOn": "You were marked absent on {{date}}",
+    "dueDate": "Due: {{date}}",
+    "unread": "UNREAD"
+  },
+  "parent": {
+    "inbox": {
+      "title": "Inbox",
+      "alerts": "Alerts",
+      "schoolNotices": "School Notices",
+      "messages": "Messages",
+      "homework": "Homework",
+      "attendance": "Attendance",
+      "noAlerts": "No absence alerts.",
+      "childAbsentOn": "Your child was marked absent on {{date}}"
+    }
+  },
+  "attendance": {
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "halfDay": "Half Day",
+    "holiday": "Holiday",
+    "prevMonth": "Prev",
+    "nextMonth": "Next"
+  },
   "aiBot": {
     "openTitle": "Ask a Doubt",
     "panelTitle": "Doubt Command",

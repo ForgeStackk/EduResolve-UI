@@ -46,5 +46,7 @@ export const routes: Routes = [
         canActivate: [authGuard]
       }
     ]
-  }
+  },
+  // Catch-all wildcard route to prevent NG04002 crashes on unknown URLs
+  { path: '**', redirectTo: 'auth/login' }
 ];

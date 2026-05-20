@@ -1,7 +1,9 @@
 import { Injectable, OnDestroy, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
+// @ts-ignore
 import { Client, IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { environment } from '../../../environments/environment';
 
 export interface TeacherNotificationPush {
@@ -25,11 +27,7 @@ export class TeacherNotificationWsService implements OnDestroy {
     const wsUrl = environment.apiBaseUrl.replace('/api', '') + '/ws';
 
     this.client = new Client({
-      webSocketFactory: () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const SockJS = require('sockjs-client');
-        return new SockJS(wsUrl);
-      },
+      webSocketFactory: () => new SockJS(wsUrl),
       reconnectDelay: 5000,
       onConnect: () => {
         this.client!.subscribe(

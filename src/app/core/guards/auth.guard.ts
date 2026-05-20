@@ -20,8 +20,13 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   // If the user tries to navigate to a feature module that doesn't match their role
   if (role && !targetUrl.startsWith(`/${role}`)) {
-    // Safely bounce them back to their own role's dashboard
-    return router.createUrlTree([`/${role}/dashboard`]);
+    const defaults: Record<string, string> = {
+      teacher: '/teacher/dashboard',
+      admin:   '/admin/dashboard',
+      parent:  '/parent/dashboard',
+      student: '/student/dashboard',
+    };
+    return router.createUrlTree([defaults[role] ?? '/auth/login']);
   }
 
   return true;

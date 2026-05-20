@@ -1,9 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { EventApiService } from '../../../core/api/event-api.service';
 import { ComplaintApiService } from '../../../core/api/complaint-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { ParentInboxApiService, StudentInboxItem } from '../../../core/api/parent-inbox-api.service';
 
 interface UiEvent {
   id: string;
@@ -33,9 +35,26 @@ interface Ticket {
 export class ParentPortalComponent implements OnInit {
   private eventApi = inject(EventApiService);
   private complaintApi = inject(ComplaintApiService);
+  private auth = inject(AuthService);
+  private parentInboxApi = inject(ParentInboxApiService);
+
+  /** Child's class label derived from the parent's stored className (e.g., "9A" → "Class 9-A"). */
+  childClassLabel = computed(() => {
+    const cn = this.auth.currentUser()?.className ?? '';
+    if (!cn) return '';
+    const g = cn.replace(/[^0-9]/g, '');
+    const s = cn.replace(/[0-9]/g, '').toUpperCase();
+    return s ? `Class ${g}-${s}` : (g ? `Class ${g}` : '');
+  });
+
+  parentFirstName = computed(() => {
+    const user = this.auth.currentUser();
+    return user?.firstName || user?.name?.split(' ')[0] || 'Parent';
+  });
 
   tickets = signal<Ticket[]>([]);
   events = signal<UiEvent[]>([]);
+  absenceAlerts = signal<StudentInboxItem[]>([]);
   concern = '';
 
   /**
@@ -71,6 +90,18 @@ export class ParentPortalComponent implements OnInit {
         }))),
       error: err => console.error('Complaints load failed', err)
     });
+
+    this.parentInboxApi.getInbox(0, 20).subscribe({
+      next: items => this.absenceAlerts.set(
+        items.filter(i => i.category === 'ABSENCE_NOTIFICATION').slice(0, 5)
+      ),
+      error: () => {}
+    });
+  }
+
+  alertDate(sentAt: string): string {
+    const d = new Date(sentAt);
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   private toUiEvent(title: string, location: string, isoDate: string, time?: string, attendees?: number, id?: number): UiEvent {

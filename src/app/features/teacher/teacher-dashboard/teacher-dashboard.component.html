@@ -4,7 +4,9 @@
   <header class="space-y-3">
     <div class="flex items-center gap-2">
       <span class="hud-caps text-red-400">TEACHER SUITE</span>
-      <span class="hud-caps text-[#e6bdb8]/70">· ADVANCED CALCULUS — SEC II</span>
+      @if (classLabel()) {
+        <span class="hud-caps text-[#e6bdb8]/70">· {{ classLabel() }}</span>
+      }
     </div>
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
       <div>
@@ -15,9 +17,11 @@
           Optimized orchestration for your class. Intervene on bottlenecks and dispatch drills without leaving the HUD.
         </p>
       </div>
-      <button class="hud-btn-primary shrink-0">
+      <button class="hud-btn-primary shrink-0 opacity-50 cursor-not-allowed relative" disabled title="Coming soon">
         <span class="material-symbols-outlined fill">add_circle</span>
         Create Assignment
+        <span class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-bold
+                     px-1.5 py-0.5 rounded-full leading-none tracking-wide">SOON</span>
       </button>
     </div>
   </header>
@@ -63,129 +67,10 @@
         </div>
       </section>
 
-      <!-- Homework Dispatch -->
-      <section class="hud-card space-y-4">
-        <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-blue-400">send</span>
-          <h3 class="hud-display text-xl text-white">HOMEWORK DISPATCH</h3>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                        bg-blue-500/20 shadow-[inset_0_0_15px_rgba(59,130,246,0.3)]">
-              <span class="material-symbols-outlined text-blue-400">edit_note</span>
-            </div>
-            <h5 class="hud-display text-sm text-white">Text Instruction</h5>
-            <p class="text-xs text-[#e6bdb8]/80 mt-1">Write custom text prompts.</p>
-          </button>
-
-          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                        bg-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.3)]">
-              <span class="material-symbols-outlined text-emerald-400">photo_camera</span>
-            </div>
-            <h5 class="hud-display text-sm text-white">Capture Whiteboard</h5>
-            <p class="text-xs text-[#e6bdb8]/80 mt-1">Auto-OCR to text.</p>
-          </button>
-
-          <button class="hud-card-flat text-left hover:border-white/30 transition-all group">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                        bg-purple-500/20 shadow-[inset_0_0_15px_rgba(139,92,246,0.3)]">
-              <span class="material-symbols-outlined text-purple-400">mic</span>
-            </div>
-            <h5 class="hud-display text-sm text-white">Voice Memo</h5>
-            <p class="text-xs text-[#e6bdb8]/80 mt-1">Audio feedback &amp; guidance.</p>
-          </button>
-        </div>
-
-        <!-- Drop target -->
-        <label class="block border-2 border-dashed border-white/15 rounded-lg
-                      bg-black/30 p-6 text-center cursor-pointer
-                      hover:border-red-500/50 hover:bg-red-600/5 transition-all">
-          <span class="material-symbols-outlined text-[#ac8884] block mx-auto" style="font-size:32px">upload_file</span>
-          <p class="hud-caps text-[#e6bdb8] mt-2">Drop PDF or asset here</p>
-        </label>
-      </section>
     </div>
 
     <!-- ===== RIGHT COLUMN ============================================= -->
     <div class="space-y-6">
-
-      <!-- Class Roster -->
-      <section class="hud-card space-y-4">
-        <div class="hud-accent"></div>
-        <div class="flex items-center justify-between gap-2 flex-wrap">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-red-500">groups</span>
-            <h3 class="hud-display text-xl text-white">CLASS ROSTER</h3>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="hud-chip hud-chip-active">{{ totalCount() }} ACTIVE</span>
-            @if (atRiskCount() > 0) {
-              <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">
-                {{ atRiskCount() }} AT RISK
-              </span>
-            }
-          </div>
-        </div>
-
-        <!-- Column headers -->
-        <div class="grid grid-cols-[1.8fr_1.4fr_0.7fr_0.3fr] gap-3 px-1 pb-2 border-b border-white/10">
-          <span class="hud-caps text-[#e6bdb8]/70">STUDENT</span>
-          <span class="hud-caps text-[#e6bdb8]/70">ENGAGEMENT</span>
-          <span class="hud-caps text-[#e6bdb8]/70">GRADE</span>
-          <span class="hud-caps text-[#e6bdb8]/70 text-right">STATUS</span>
-        </div>
-
-        <!-- Rows -->
-        @if (loading()) {
-          <div class="text-center text-[#e6bdb8] py-6">Loading roster…</div>
-        } @else if (error()) {
-          <div class="text-center text-red-400 py-6">{{ error() }}</div>
-        } @else if (students().length === 0) {
-          <div class="text-center text-[#e6bdb8] py-6">No students yet.</div>
-        } @else {
-          <ul class="divide-y divide-white/5">
-            @for (s of students(); track s.id) {
-              <li class="grid grid-cols-[1.8fr_1.4fr_0.7fr_0.3fr] gap-3 items-center py-3 px-1">
-                <!-- student -->
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-9 h-9 rounded-full flex items-center justify-center
-                              text-sm font-bold text-white shrink-0
-                              border border-white/10"
-                       [style.background]="s.color || '#374151'">
-                    {{ s.initials }}
-                  </div>
-                  <div class="min-w-0">
-                    <p class="text-sm text-white truncate">{{ s.name }}</p>
-                    <p class="hud-caps text-[#e6bdb8]/60">{{ s.className || '10A' }}</p>
-                  </div>
-                </div>
-                <!-- engagement -->
-                <div class="flex items-center gap-2">
-                  <div class="hud-meter flex-1">
-                    <div [style.width.%]="s.engagement"></div>
-                  </div>
-                  <span class="text-xs text-white tabular-nums w-9 text-right">{{ s.engagement }}%</span>
-                </div>
-                <!-- grade -->
-                <span class="hud-chip hud-chip-active justify-center">
-                  {{ s.grade || '—' }}
-                </span>
-                <!-- status dot -->
-                <div class="flex justify-end">
-                  <span class="w-3 h-3 rounded-full"
-                        [style.background]="statusColor(s.status)"
-                        [style.box-shadow]="'0 0 8px ' + statusColor(s.status)"
-                        [title]="s.status"></span>
-                </div>
-              </li>
-            }
-          </ul>
-        }
-      </section>
 
       <!-- ForgeAI Test Builder -->
       <section class="hud-card space-y-5">
@@ -238,9 +123,11 @@
           <p class="text-sm text-[#e6bdb8]/70 italic">▸ [Read] Supplemental question…</p>
         </div>
 
-        <button class="hud-btn-primary w-full">
+        <button class="hud-btn-primary w-full opacity-50 cursor-not-allowed relative" disabled title="Coming soon">
           <span class="material-symbols-outlined fill">bolt</span>
           Forge Assessment
+          <span class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-bold
+                       px-1.5 py-0.5 rounded-full leading-none tracking-wide">SOON</span>
         </button>
       </section>
     </div>

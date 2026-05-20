@@ -19,11 +19,20 @@ export class ClassContextService {
     return numeric || '9';
   });
 
+  /** Letter section extracted from the user's className ("10A" → "A"). */
+  readonly section = computed<string>(() => {
+    const raw = this.auth.currentUser()?.className ?? '';
+    return raw.replace(/[0-9]/g, '').toUpperCase() || '';
+  });
+
   /** Full class string as stored in the profile (e.g., "10A"). */
   readonly className = computed<string>(() => {
     return this.auth.currentUser()?.className ?? '';
   });
 
-  /** Display label shown in locked-class badges ("Class 10"). */
-  readonly classLabel = computed<string>(() => `Class ${this.grade()}`);
+  /** Display label shown in locked-class badges ("Class 10" or "Class 10-A"). */
+  readonly classLabel = computed<string>(() => {
+    const s = this.section();
+    return s ? `Class ${this.grade()}-${s}` : `Class ${this.grade()}`;
+  });
 }

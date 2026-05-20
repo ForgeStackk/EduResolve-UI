@@ -1,0 +1,140 @@
+<div class="space-y-6 pb-6">
+
+  <!-- Header -->
+  <header class="space-y-1 px-1">
+    <div class="flex items-center gap-2">
+      <span class="hud-caps text-red-400">TEACHER SUITE</span>
+      <span class="hud-caps text-[#e6bdb8]/50">· MY CLASSES</span>
+    </div>
+    <h1 class="hud-display text-3xl text-white uppercase tracking-tight leading-none">
+      Class <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Management</span>
+    </h1>
+  </header>
+
+  <!-- Class selector pills -->
+  @if (classes().length > 1) {
+    <div class="flex flex-wrap gap-2 px-1">
+      @for (cls of classes(); track cls.classId) {
+        <button
+          (click)="selectClass(cls)"
+          [class]="selectedClass()?.classId === cls.classId
+            ? 'hud-chip hud-chip-active'
+            : 'hud-chip hover:border-white/40 transition-colors'"
+          class="flex items-center gap-1.5">
+          <span>{{ cls.className }}{{ cls.section ? '-' + cls.section : '' }}</span>
+          @if (cls.isClassTeacher) {
+            <span class="hud-caps text-[9px] text-red-400">CT</span>
+          }
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Tab bar -->
+  <div class="flex gap-1 border-b border-white/10 px-1">
+    @for (tab of visibleTabs(); track tab.id) {
+      <button
+        (click)="setTab(tab.id)"
+        [class]="activeTab() === tab.id
+          ? 'border-b-2 border-red-500 text-white'
+          : 'border-b-2 border-transparent text-[#e6bdb8]/60 hover:text-white'"
+        class="flex items-center gap-1.5 px-4 py-2.5 text-sm hud-caps transition-colors -mb-px">
+        <span class="material-symbols-outlined" style="font-size:16px">{{ tab.icon }}</span>
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <!-- ── ROSTER tab ──────────────────────────────────────────── -->
+  @if (activeTab() === 'roster') {
+    <section class="hud-card space-y-4">
+      <div class="hud-accent"></div>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-red-500">groups</span>
+          <h3 class="hud-display text-xl text-white">CLASS ROSTER</h3>
+        </div>
+        @if (!loading() && students().length > 0) {
+          <span class="hud-chip hud-chip-active">{{ students().length }} STUDENTS</span>
+        }
+      </div>
+
+      <!-- Column headers -->
+      <div class="grid grid-cols-[2fr_1.5fr_1fr] gap-3 px-1 pb-2 border-b border-white/10">
+        <span class="hud-caps text-[#e6bdb8]/70">STUDENT</span>
+        <span class="hud-caps text-[#e6bdb8]/70">PARENT / GUARDIAN</span>
+        <span class="hud-caps text-[#e6bdb8]/70">CONTACT</span>
+      </div>
+
+      @if (loading()) {
+        <div class="text-center text-[#e6bdb8]/60 py-8 animate-pulse">Loading roster…</div>
+      } @else if (error()) {
+        <div class="text-center text-red-400 py-8">{{ error() }}</div>
+      } @else if (students().length === 0) {
+        <div class="text-center text-[#e6bdb8]/60 py-8">No students in this class yet.</div>
+      } @else {
+        <ul class="divide-y divide-white/5">
+          @for (s of students(); track s.studentId) {
+            <li class="grid grid-cols-[2fr_1.5fr_1fr] gap-3 items-center py-3 px-1">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center
+                            text-sm font-bold text-white shrink-0 border border-white/10
+                            bg-gradient-to-br from-red-700/60 to-gray-800">
+                  {{ s.fullName.charAt(0).toUpperCase() }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm text-white truncate">{{ s.fullName }}</p>
+                  <p class="hud-caps text-[#e6bdb8]/50">ROLL {{ s.rollNumber }}</p>
+                </div>
+              </div>
+              <p class="text-sm text-[#e6bdb8] truncate">{{ s.parentName ?? '—' }}</p>
+              <p class="text-sm text-[#e6bdb8]/70 truncate">{{ s.parentPhone ?? '—' }}</p>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <!-- ── MESSAGES tab ─────────────────────────────────────────── -->
+  @if (activeTab() === 'messages') {
+    <section class="hud-card space-y-4">
+      <div class="hud-accent" style="background:#8b5cf6; box-shadow:0 0 10px rgba(139,92,246,0.5)"></div>
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-purple-400">forum</span>
+        <h3 class="hud-display text-xl text-white">CLASS MESSAGES</h3>
+      </div>
+      <app-class-messages
+        [selectedClassId]="selectedClass()?.classId ?? ''"
+        [selectedClassName]="selectedClass() ? (selectedClass()!.className + (selectedClass()!.section ? '-' + selectedClass()!.section : '')) : ''"
+      />
+    </section>
+  }
+
+  <!-- ── ATTENDANCE tab (CT only) ─────────────────────────────── -->
+  @if (activeTab() === 'attendance') {
+    <section class="hud-card space-y-4">
+      <div class="hud-accent" style="background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-emerald-400">fact_check</span>
+        <h3 class="hud-display text-xl text-white">ATTENDANCE</h3>
+        <span class="hud-chip bg-emerald-600/20 text-emerald-400 border-emerald-500/50 text-[10px]">CLASS TEACHER</span>
+      </div>
+      <app-attendance />
+    </section>
+  }
+
+  <!-- ── REPORTS tab (CT only) ────────────────────────────────── -->
+  @if (activeTab() === 'reports') {
+    <section class="hud-card space-y-4">
+      <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-amber-400">assessment</span>
+        <h3 class="hud-display text-xl text-white">ATTENDANCE REPORTS</h3>
+        <span class="hud-chip bg-amber-600/20 text-amber-400 border-amber-500/50 text-[10px]">CLASS TEACHER</span>
+      </div>
+      <app-reports />
+    </section>
+  }
+
+</div>

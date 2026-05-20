@@ -30,6 +30,7 @@ export interface AttendanceRecord {
 
 export interface AttendanceMarkRequest {
   classId: string;
+  classLabel: string;
   date: string;
   records: { studentId: string; status: AttendanceStatus; remarks?: string }[];
 }

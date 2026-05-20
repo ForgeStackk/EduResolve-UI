@@ -18,6 +18,41 @@
     </a>
   </div>
 
+  <!-- ── Target class selector ────────────────────────────────────────────── -->
+  <div>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">Target Class</label>
+    <div class="flex items-center gap-3">
+      <select
+        [ngModel]="selectedKey()"
+        (ngModelChange)="onTargetChange($event)"
+        class="flex-1 bg-[#1a1a2e] border border-white/10 rounded-lg px-3 py-2 text-sm text-white
+               focus:outline-none focus:border-red-500/60 transition-colors">
+        <option value="">My assigned class{{ selectedClassName ? ' (' + selectedClassName + ')' : '' }}</option>
+        @for (group of gradeGroups; track group.grade) {
+          <optgroup [label]="'Class ' + group.grade">
+            @for (opt of group.options; track opt.section) {
+              <option [value]="opt.grade + '_' + opt.section">{{ opt.label }}</option>
+            }
+          </optgroup>
+        }
+      </select>
+      @if (selectedKey()) {
+        <button
+          type="button"
+          (click)="onTargetChange('')"
+          class="hud-caps text-[10px] text-[#e6bdb8]/50 hover:text-white transition-colors whitespace-nowrap">
+          RESET
+        </button>
+      }
+    </div>
+    @if (resolving()) {
+      <p class="text-xs text-[#e6bdb8]/50 mt-1.5 animate-pulse">Resolving class ID…</p>
+    }
+    @if (resolveError()) {
+      <p class="text-xs text-red-400 mt-1.5">{{ resolveError() }}</p>
+    }
+  </div>
+
   @if (!classId()) {
     <div class="hud-card rounded-xl p-8 flex items-center justify-center">
       <p class="text-gray-500 text-sm">No class assigned to your profile.</p>

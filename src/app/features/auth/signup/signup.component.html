@@ -103,23 +103,148 @@
       </div>
 
       @if (showClassName()) {
+        <div class="form-row">
+          <div class="form-group">
+            <label for="className">Class</label>
+            <select
+              id="className"
+              [(ngModel)]="className"
+              name="className"
+              required
+              class="form-input"
+            >
+              <option value="">Select Class</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="section">Section</label>
+            <select
+              id="section"
+              [(ngModel)]="section"
+              name="section"
+              class="form-input"
+            >
+              <option value="none">None</option>
+              <option value="A">Section A</option>
+              <option value="B">Section B</option>
+              <option value="C">Section C</option>
+              <option value="D">Section D</option>
+              <option value="E">Section E</option>
+            </select>
+          </div>
+        </div>
+      }
+
+      @if (showClassTeacherSelect()) {
+        <div class="form-row">
+          <div class="form-group">
+            <label for="classTeacherGrade">Class Teacher of</label>
+            <select
+              id="classTeacherGrade"
+              [(ngModel)]="classTeacherGrade"
+              (ngModelChange)="onClassTeacherGradeChange()"
+              name="classTeacherGrade"
+              class="form-input"
+            >
+              <option value="">None (Not a class teacher)</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+          @if (classTeacherGrade) {
+            <div class="form-group">
+              <label for="classTeacherSection">Section</label>
+              <select
+                id="classTeacherSection"
+                [(ngModel)]="classTeacherSection"
+                name="classTeacherSection"
+                class="form-input"
+              >
+                <option value="">None / Not Assigned</option>
+                <option value="A">Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+                <option value="D">Section D</option>
+                <option value="E">Section E</option>
+              </select>
+            </div>
+          }
+        </div>
+      }
+
+      @if (showParentStudentFields()) {
         <div class="form-group">
-          <label for="className">Class</label>
+          <label for="parentClass">Child's Class</label>
           <select
-            id="className"
-            [(ngModel)]="className"
-            name="className"
-            required
+            id="parentClass"
+            [(ngModel)]="parentClass"
+            name="parentClass"
+            (change)="onParentClassChange()"
             class="form-input"
           >
-            <option value="">Select Class</option>
-            <option value="8">Class 8</option>
+            <option value="">Select Child's Class</option>
             <option value="9">Class 9</option>
             <option value="10">Class 10</option>
             <option value="11">Class 11</option>
             <option value="12">Class 12</option>
           </select>
         </div>
+
+        @if (parentClass) {
+          <div class="form-group">
+            <label for="parentSection">Child's Section</label>
+            <select
+              id="parentSection"
+              [(ngModel)]="parentSection"
+              name="parentSection"
+              (change)="onParentSectionChange()"
+              class="form-input"
+            >
+              <option value="">Select Section</option>
+              <option value="none">None / Not Assigned</option>
+              <option value="A">Section A</option>
+              <option value="B">Section B</option>
+              <option value="C">Section C</option>
+              <option value="D">Section D</option>
+              <option value="E">Section E</option>
+            </select>
+          </div>
+        }
+
+        @if (parentSection) {
+          <div class="form-group">
+            <label for="parentStudentId">Child's Name</label>
+            @if (parentStudentsLoading()) {
+              <div class="form-input" style="display:flex;align-items:center;gap:8px;color:#9ca3af">
+                <span class="loading-spinner" style="width:14px;height:14px;border-width:2px"></span>
+                Loading students...
+              </div>
+            } @else {
+              <select
+                id="parentStudentId"
+                [(ngModel)]="parentStudentId"
+                name="parentStudentId"
+                required
+                class="form-input"
+              >
+                <option value="">Select Child's Name</option>
+                @for (s of parentStudents(); track s.studentId) {
+                  <option [value]="s.studentId">{{ s.fullName }} (Roll: {{ s.rollNumber }})</option>
+                }
+              </select>
+              @if (parentStudents().length === 0) {
+                <span class="text-xs" style="color:#9ca3af">No students found. Try "None / Not Assigned" or contact your school admin.</span>
+              }
+            }
+          </div>
+        }
       }
 
       @if (showSchoolName()) {

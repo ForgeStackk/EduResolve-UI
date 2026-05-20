@@ -37,4 +37,8 @@ export class TeacherPortalService {
   getStudentsWithParents(classId: string): Observable<StudentRow[]> {
     return this.http.get<StudentRow[]>(`${this.base}/class/${classId}/students`);
   }
+
+  getAllClasses(): Observable<TeacherClass[]> {
+    return this.http.get<TeacherClass[]>(`${this.base}/all-classes`);
+  }
 }

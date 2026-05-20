@@ -13,8 +13,10 @@ export class AttendanceService {
   private http = inject(HttpClient);
   private base = `${environment.apiBaseUrl}/v1/teacher-portal/attendance`;
 
-  getByClassAndDate(classId: string, date: string): Observable<AttendanceRecord[]> {
-    return this.http.get<AttendanceRecord[]>(`${this.base}/${classId}`, { params: { date } });
+  getByClassAndDate(classId: string, date: string, classLabel?: string): Observable<AttendanceRecord[]> {
+    const params: Record<string, string> = { date };
+    if (classLabel) params['classLabel'] = classLabel;
+    return this.http.get<AttendanceRecord[]>(`${this.base}/${classId}`, { params });
   }
 
   mark(req: AttendanceMarkRequest): Observable<AttendanceMarkResponse> {

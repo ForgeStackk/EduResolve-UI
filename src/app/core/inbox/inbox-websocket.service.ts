@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
+// @ts-ignore
 import { Client, IMessage } from '@stomp/stompjs';
 import { environment } from '../../../environments/environment';
 
@@ -31,15 +32,12 @@ export class InboxWebSocketService implements OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
     this.disconnect();
 
-    const wsUrl = environment.apiBaseUrl.replace('/api', '') + '/ws';
+    const wsUrl = environment.apiBaseUrl
+      .replace('/api', '/ws/websocket')
+      .replace(/^http/, 'ws');
 
     this.client = new Client({
-      // SockJS fallback: import SockJS dynamically so the SSR bundle is not polluted.
-      webSocketFactory: () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const SockJS = require('sockjs-client');
-        return new SockJS(wsUrl);
-      },
+      brokerURL: wsUrl,
       reconnectDelay: 5000,
       onConnect: () => {
         this.client!.subscribe(`/topic/inbox/${recipientId}`, (frame: IMessage) => {
@@ -52,7 +50,7 @@ export class InboxWebSocketService implements OnDestroy {
           }
         });
       },
-      onStompError: (frame) => {
+      onStompError: (frame: any) => {
         console.error('STOMP error', frame);
       }
     });

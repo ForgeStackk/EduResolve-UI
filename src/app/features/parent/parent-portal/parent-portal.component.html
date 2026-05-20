@@ -5,11 +5,17 @@
     <p class="hud-caps text-red-400">FAMILY HUB</p>
     <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight leading-none">
       Welcome back,<br/>
-      <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Sarah</span>
+      <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">{{ parentFirstName() }}</span>
     </h1>
     <p class="text-base sm:text-lg text-[#e6bdb8] max-w-2xl">
-      Real-time visibility into <strong class="text-white">Alex&rsquo;s</strong> academic progress,
+      Real-time visibility into your child&rsquo;s academic progress,
       school updates, and open support tickets.
+      @if (childClassLabel()) {
+        <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#CD7F32]/40 bg-[#CD7F32]/10">
+          <span class="material-symbols-outlined fill" style="font-size:12px;color:#CD7F32">school</span>
+          <span class="hud-caps text-[#CD7F32]" style="font-size:10px">{{ childClassLabel() }}</span>
+        </span>
+      }
     </p>
   </header>
 
@@ -158,6 +164,51 @@
 
     <!-- ===== RIGHT COLUMN ========================================== -->
     <div class="space-y-6">
+
+      <!-- Absence Alerts -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-500">warning</span>
+            <h2 class="hud-display text-xl text-white">ABSENCE ALERTS</h2>
+          </div>
+          @if (absenceAlerts().length > 0) {
+            <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">
+              {{ absenceAlerts().length }} ALERT{{ absenceAlerts().length > 1 ? 'S' : '' }}
+            </span>
+          }
+        </div>
+        <div class="space-y-3">
+          @for (alert of absenceAlerts(); track alert.inboxId) {
+            <article class="hud-card-flat flex items-start gap-3">
+              <div class="hud-accent" style="background:#dc2626; box-shadow:0 0 10px rgba(220,38,38,0.5)"></div>
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                          bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.3)]">
+                <span class="material-symbols-outlined text-red-400">person_off</span>
+              </div>
+              <div class="flex-1 min-w-0 pl-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="hud-display text-sm text-white">Absent — {{ alertDate(alert.sentAt) }}</h4>
+                  @if (alert.readStatus === 'UNREAD') {
+                    <span class="hud-chip hud-chip-active">NEW</span>
+                  }
+                </div>
+                @if (alert.textBody) {
+                  <p class="text-xs text-[#fbdbd7] mt-1 leading-relaxed line-clamp-2">{{ alert.textBody }}</p>
+                }
+                <p class="hud-caps text-[#e6bdb8]/60 mt-1" style="font-size:10px">
+                  From {{ alert.senderName }}
+                </p>
+              </div>
+            </article>
+          } @empty {
+            <div class="hud-card-flat text-center py-8">
+              <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">check_circle</span>
+              <p class="text-sm text-[#e6bdb8] mt-2">No absence alerts. Great attendance!</p>
+            </div>
+          }
+        </div>
+      </section>
 
       <!-- Active Tickets -->
       <section class="space-y-4">

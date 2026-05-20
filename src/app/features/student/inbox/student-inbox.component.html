@@ -1,0 +1,291 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <header class="space-y-1">
+    <p class="hud-caps text-red-400">STUDENT HUB</p>
+    <h1 class="hud-display text-3xl text-white uppercase tracking-tight">
+      {{ 'inbox.title' | translate }}
+    </h1>
+  </header>
+
+  <!-- Tab bar -->
+  <nav class="flex gap-2 flex-wrap">
+    <button
+      class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'notifications'"
+      (click)="setTab('notifications')">
+      <span class="material-symbols-outlined text-sm">notifications</span>
+      {{ 'inbox.notifications' | translate }}
+      @if (notifBadge() > 0) {
+        <span class="hud-badge-red">{{ notifBadge() }}</span>
+      }
+    </button>
+    <button
+      class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'classNotices'"
+      (click)="setTab('classNotices')">
+      <span class="material-symbols-outlined text-sm">campaign</span>
+      {{ 'inbox.classNotices' | translate }}
+      @if (classBadge() > 0) {
+        <span class="hud-badge">{{ classBadge() }}</span>
+      }
+    </button>
+    <button
+      class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'messages'"
+      (click)="setTab('messages')">
+      <span class="material-symbols-outlined text-sm">chat</span>
+      {{ 'inbox.messages' | translate }}
+      @if (msgBadge() > 0) {
+        <span class="hud-badge">{{ msgBadge() }}</span>
+      }
+    </button>
+    <button
+      class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'homework'"
+      (click)="setTab('homework')">
+      <span class="material-symbols-outlined text-sm">assignment</span>
+      {{ 'inbox.homework' | translate }}
+      @if (hwBadge() > 0) {
+        <span class="hud-badge">{{ hwBadge() }}</span>
+      }
+    </button>
+    <button
+      class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'attendance'"
+      (click)="setTab('attendance')">
+      <span class="material-symbols-outlined text-sm">event_available</span>
+      {{ 'inbox.attendance' | translate }}
+    </button>
+  </nav>
+
+  @if (loading()) {
+    <div class="text-center py-12 text-[#e6bdb8]">{{ 'common.loading' | translate }}</div>
+  } @else {
+
+    <!-- NOTIFICATIONS tab -->
+    @if (activeTab() === 'notifications') {
+      <div class="space-y-3">
+        @if (notifications().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">notifications_none</span>
+            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noNotifications' | translate }}</p>
+          </div>
+        }
+        @for (item of notifications(); track item.inboxId) {
+          <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
+                   (click)="markRead(item)">
+            <div class="hud-accent" style="background:#dc2626;box-shadow:0 0 10px rgba(220,38,38,0.5)"></div>
+            <div class="flex items-start gap-3 pl-2">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                          bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.3)]">
+                <span class="material-symbols-outlined text-red-400">warning</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
+                  @if (item.readStatus === 'UNREAD') {
+                    <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">{{ 'inbox.unread' | translate }}</span>
+                  }
+                  <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                </div>
+                <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">
+                  {{ item.textBody ?? ('inbox.absentOn' | translate: { date: formatDate(item.sentAt) }) }}
+                </p>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- CLASS NOTICES tab -->
+    @if (activeTab() === 'classNotices') {
+      <div class="space-y-3">
+        @if (classNotices().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">campaign</span>
+            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noClassNotices' | translate }}</p>
+          </div>
+        }
+        @for (item of classNotices(); track item.inboxId) {
+          <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
+                   (click)="markRead(item)">
+            <div class="hud-accent" style="background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.4)"></div>
+            <div class="flex items-start gap-3 pl-2">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                          bg-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.2)]">
+                <span class="material-symbols-outlined text-amber-400">campaign</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
+                  @if (item.readStatus === 'UNREAD') {
+                    <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
+                  }
+                  <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                </div>
+                <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                <app-message-attachments [attachments]="item.attachments" />
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- MESSAGES tab -->
+    @if (activeTab() === 'messages') {
+      <div class="space-y-6">
+        @if (subjectMessages().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">chat_bubble_outline</span>
+            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noMessages' | translate }}</p>
+          </div>
+        }
+        @for (group of subjectMessages(); track group.subject) {
+          <section class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-500">menu_book</span>
+              <h2 class="hud-display text-lg text-white">{{ group.subject | uppercase }}</h2>
+            </div>
+            @for (item of group.items; track item.inboxId) {
+              <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
+                       (click)="markRead(item)">
+                <div class="hud-accent"></div>
+                <div class="flex items-start gap-3 pl-2">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                              bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.2)]">
+                    <span class="material-symbols-outlined text-red-400">chat</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
+                      @if (item.readStatus === 'UNREAD') {
+                        <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
+                      }
+                      <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                    </div>
+                    <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                    <app-message-attachments [attachments]="item.attachments" />
+                  </div>
+                </div>
+              </article>
+            }
+          </section>
+        }
+      </div>
+    }
+
+    <!-- HOMEWORK tab -->
+    @if (activeTab() === 'homework') {
+      <div class="space-y-6">
+        @if (homeworkItems().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">assignment_turned_in</span>
+            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noHomework' | translate }}</p>
+          </div>
+        }
+        @for (group of homeworkItems(); track group.subject) {
+          <section class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-500">assignment</span>
+              <h2 class="hud-display text-lg text-white">{{ group.subject | uppercase }}</h2>
+            </div>
+            @for (item of group.items; track item.inboxId) {
+              <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
+                       (click)="markRead(item)">
+                <div class="hud-accent"
+                     [style.background]="isDue(item.homeworkDueDate) ? '#dc2626' : '#f59e0b'"
+                     [style.box-shadow]="isDue(item.homeworkDueDate)
+                       ? '0 0 10px rgba(220,38,38,0.5)'
+                       : '0 0 10px rgba(245,158,11,0.4)'"></div>
+                <div class="flex items-start gap-3 pl-2">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                              bg-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.2)]">
+                    <span class="material-symbols-outlined text-amber-400">assignment</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
+                      @if (item.readStatus === 'UNREAD') {
+                        <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
+                      }
+                      @if (item.homeworkDueDate) {
+                        <span class="hud-chip"
+                              [style.color]="isDue(item.homeworkDueDate) ? '#f87171' : '#fbbf24'"
+                              [style.border-color]="isDue(item.homeworkDueDate) ? '#dc262680' : '#f59e0b80'">
+                          {{ 'inbox.dueDate' | translate: { date: formatDate(item.homeworkDueDate) } }}
+                        </span>
+                      }
+                      <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                    </div>
+                    <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                    <app-message-attachments [attachments]="item.attachments" />
+                  </div>
+                </div>
+              </article>
+            }
+          </section>
+        }
+      </div>
+    }
+
+    <!-- MY ATTENDANCE tab -->
+    @if (activeTab() === 'attendance') {
+      <div class="space-y-4">
+        <!-- Month navigation -->
+        <div class="flex items-center justify-between gap-3">
+          <button class="hud-btn-ghost" (click)="prevMonth()">
+            <span class="material-symbols-outlined">chevron_left</span>
+            {{ 'attendance.prevMonth' | translate }}
+          </button>
+          <span class="hud-display text-lg text-white">{{ currentMonthLabel() }}</span>
+          <button class="hud-btn-ghost" (click)="nextMonth()">
+            {{ 'attendance.nextMonth' | translate }}
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+
+        @if (attendance().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">event_busy</span>
+            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noAttendance' | translate }}</p>
+          </div>
+        } @else {
+          <!-- Summary chips -->
+          <div class="flex flex-wrap gap-2">
+            @for (s of attendanceStatuses; track s) {
+              @if (countStatus(s) > 0) {
+                <span class="hud-chip"
+                      [style.border-color]="attendanceColor(s) + '80'"
+                      [style.color]="attendanceColor(s)">
+                  {{ countStatus(s) }} {{ attendanceStatusLabel(s) }}
+                </span>
+              }
+            }
+          </div>
+
+          <!-- Daily grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            @for (rec of attendance(); track rec.date) {
+              <div class="hud-card-flat flex items-center gap-3"
+                   [style.border-color]="attendanceColor(rec.status) + '60'">
+                <div class="hud-accent"
+                     [style.background]="attendanceColor(rec.status)"
+                     [style.box-shadow]="'0 0 8px ' + attendanceColor(rec.status) + '60'"></div>
+                <div class="pl-2">
+                  <p class="hud-display text-sm text-white">{{ formatDay(rec.date) }}</p>
+                  <p class="hud-caps text-xs" [style.color]="attendanceColor(rec.status)">{{ rec.status }}</p>
+                  @if (rec.remarks) {
+                    <p class="text-xs text-[#e6bdb8]/70 mt-0.5 truncate">{{ rec.remarks }}</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

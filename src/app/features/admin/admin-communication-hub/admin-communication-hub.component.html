@@ -11,10 +11,36 @@
         <select id="audience" [ngModel]="audience()" (ngModelChange)="audience.set($event)" name="audience" required class="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-brand-orange bg-white">
           <option value="" disabled>Select target audience...</option>
           <option value="All Parents">All Parents</option>
-          <option value="Grade 9 Parents">Grade 9 Parents</option>
-          <option value="Grade 10 Parents">Grade 10 Parents</option>
-          <option value="All Teachers">All Teachers</option>
           <option value="All Students">All Students</option>
+          <option value="All Teachers">All Teachers</option>
+          <optgroup label="Grade 9">
+            <option value="Grade 9 Parents">Grade 9 — All Sections</option>
+            <option value="Grade 9-A Parents">Grade 9-A</option>
+            <option value="Grade 9-B Parents">Grade 9-B</option>
+            <option value="Grade 9-C Parents">Grade 9-C</option>
+            <option value="Grade 9-D Parents">Grade 9-D</option>
+            <option value="Grade 9-E Parents">Grade 9-E</option>
+          </optgroup>
+          <optgroup label="Grade 10">
+            <option value="Grade 10 Parents">Grade 10 — All Sections</option>
+            <option value="Grade 10-A Parents">Grade 10-A</option>
+            <option value="Grade 10-B Parents">Grade 10-B</option>
+            <option value="Grade 10-C Parents">Grade 10-C</option>
+            <option value="Grade 10-D Parents">Grade 10-D</option>
+            <option value="Grade 10-E Parents">Grade 10-E</option>
+          </optgroup>
+          <optgroup label="Grade 11">
+            <option value="Grade 11 Parents">Grade 11 — All Sections</option>
+            <option value="Grade 11-A Parents">Grade 11-A</option>
+            <option value="Grade 11-B Parents">Grade 11-B</option>
+            <option value="Grade 11-C Parents">Grade 11-C</option>
+          </optgroup>
+          <optgroup label="Grade 12">
+            <option value="Grade 12 Parents">Grade 12 — All Sections</option>
+            <option value="Grade 12-A Parents">Grade 12-A</option>
+            <option value="Grade 12-B Parents">Grade 12-B</option>
+            <option value="Grade 12-C Parents">Grade 12-C</option>
+          </optgroup>
         </select>
       </div>
 

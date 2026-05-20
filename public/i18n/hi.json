@@ -234,6 +234,43 @@
     "loadError": "दस्तावेज़ लोड नहीं हो सके। कृपया पुनः प्रयास करें।",
     "deleteFailed": "दस्तावेज़ हटाया नहीं जा सका। कृपया पुनः प्रयास करें।"
   },
+  "inbox": {
+    "title": "इनबॉक्स",
+    "notifications": "सूचनाएं",
+    "classNotices": "कक्षा सूचनाएं",
+    "messages": "संदेश",
+    "homework": "गृहकार्य",
+    "attendance": "मेरी उपस्थिति",
+    "noNotifications": "कोई सूचना नहीं।",
+    "noClassNotices": "कोई कक्षा सूचना नहीं।",
+    "noMessages": "कोई संदेश नहीं।",
+    "noHomework": "कोई गृहकार्य नहीं दिया।",
+    "noAttendance": "इस महीने का कोई उपस्थिति रिकॉर्ड नहीं।",
+    "absentOn": "{{date}} को आपकी अनुपस्थिति दर्ज की गई",
+    "dueDate": "नियत तिथि: {{date}}",
+    "unread": "अपठित"
+  },
+  "parent": {
+    "inbox": {
+      "title": "इनबॉक्स",
+      "alerts": "अलर्ट",
+      "schoolNotices": "स्कूल सूचनाएं",
+      "messages": "संदेश",
+      "homework": "गृहकार्य",
+      "attendance": "उपस्थिति",
+      "noAlerts": "कोई अनुपस्थिति अलर्ट नहीं।",
+      "childAbsentOn": "{{date}} को आपके बच्चे की अनुपस्थिति दर्ज हुई"
+    }
+  },
+  "attendance": {
+    "present": "उपस्थित",
+    "absent": "अनुपस्थित",
+    "late": "देर से",
+    "halfDay": "आधा दिन",
+    "holiday": "छुट्टी",
+    "prevMonth": "पिछला",
+    "nextMonth": "अगला"
+  },
   "aiBot": {
     "openTitle": "शंका पूछें",
     "panelTitle": "शंका कमांड",

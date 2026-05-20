@@ -17,6 +17,13 @@ interface RegisterRequest {
   role: string;
   phoneNumber: string;
   schoolName: string;
+  studentId?: string;
+}
+
+interface StudentOption {
+  studentId: string;
+  fullName: string;
+  rollNumber: string;
 }
 
 interface LoginResponse {
@@ -32,6 +39,7 @@ interface LoginResponse {
   message: string;
   success: boolean;
   studentId?: number;
+  token?: string;
 }
 
 @Component({
@@ -63,8 +71,24 @@ export class SignupComponent {
   showCustomSchoolInput = signal(false);
   usernameSuggestions = signal<string[]>([]);
   
+  // Teacher: class-teacher grade ("9"|"10"|"11"|"12"|"") and section ("A"-"E"|"")
+  classTeacherGrade = '';
+  classTeacherSection = '';
+
+  // Student section
+  section = '';
+
+  // Parent: child's class selector + section + student list
+  parentClass = '';
+  parentSection = '';
+  parentStudentId = '';
+  parentStudents = signal<StudentOption[]>([]);
+  parentStudentsLoading = signal(false);
+
   // Fields visibility based on role
-  showClassName = signal(true);
+  showClassName        = signal(true);   // student class
+  showClassTeacherSelect = signal(false); // teacher CT grade
+  showParentStudentFields = signal(false); // parent child selector
   showSchoolName = signal(true);
 
   constructor() {
@@ -132,6 +156,18 @@ export class SignupComponent {
       return;
     }
 
+    // Check parent child selection
+    if (this.showParentStudentFields()) {
+      if (!this.parentClass) {
+        this.errorMessage.set('Please select your child\'s class');
+        return;
+      }
+      if (!this.parentStudentId) {
+        this.errorMessage.set('Please select your child\'s name');
+        return;
+      }
+    }
+
     // Check school selection (required for all roles)
     if (!this.showCustomSchoolInput() && !this.schoolName) {
       this.errorMessage.set('Please select a school');
@@ -158,22 +194,35 @@ export class SignupComponent {
 
     const finalSchoolName = this.showCustomSchoolInput() ? this.customSchoolName : this.schoolName;
 
+    const sectionSuffix = (this.section && this.section !== 'none') ? this.section : '';
+    const ctSectionSuffix = (this.classTeacherSection && this.classTeacherSection !== 'none') ? this.classTeacherSection : '';
+    const parentSectionSuffix = (this.parentSection && this.parentSection !== 'none') ? this.parentSection : '';
+    const resolvedClassName = this.role === 'teacher'
+      ? (this.classTeacherGrade + ctSectionSuffix)
+      : this.role === 'parent'
+      ? (this.parentClass + parentSectionSuffix)
+      : (this.showClassName() ? (this.className + sectionSuffix) : '');
+
     const request: RegisterRequest = {
       firstName: this.firstName,
       lastName: this.lastName,
       username: this.username,
-      className: this.showClassName() ? this.className : '',
+      className: resolvedClassName,
       email: this.email,
       password: this.password,
       role: this.role,
       phoneNumber: this.phoneNumber,
-      schoolName: finalSchoolName
+      schoolName: finalSchoolName,
+      ...(this.parentStudentId ? { studentId: this.parentStudentId } : {})
     };
 
     this.http.post<LoginResponse>(`${environment.apiBaseUrl}/auth/register`, request).subscribe({
       next: (response) => {
         this.loading.set(false);
         if (response.success) {
+          if (response.token) {
+            localStorage.setItem('access_token', response.token);
+          }
           // Store user data in localStorage
           const user = {
             id: response.id.toString(),
@@ -226,15 +275,47 @@ export class SignupComponent {
   onRoleChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.role = select.value;
-    
-    // Show/hide fields based on role
+
     this.showClassName.set(this.role === 'student');
-    this.showSchoolName.set(true); // Show school name for all roles
-    
-    // Clear fields when they become hidden
-    if (!this.showClassName()) {
-      this.className = '';
-    }
+    this.showClassTeacherSelect.set(this.role === 'teacher');
+    this.showParentStudentFields.set(this.role === 'parent');
+    this.showSchoolName.set(true);
+
+    // Reset role-specific fields
+    this.className = '';
+    this.section = '';
+    this.classTeacherGrade = '';
+    this.classTeacherSection = '';
+    this.parentClass = '';
+    this.parentSection = '';
+    this.parentStudentId = '';
+    this.parentStudents.set([]);
+  }
+
+  onClassTeacherGradeChange(): void {
+    this.classTeacherSection = '';
+  }
+
+  onParentClassChange(): void {
+    this.parentSection = '';
+    this.parentStudentId = '';
+    this.parentStudents.set([]);
+  }
+
+  onParentSectionChange(): void {
+    this.parentStudentId = '';
+    this.parentStudents.set([]);
+    if (!this.parentClass || !this.parentSection) return;
+
+    this.parentStudentsLoading.set(true);
+    const sectionParam = (this.parentSection && this.parentSection !== 'none')
+      ? `?section=${this.parentSection}` : '';
+    this.http
+      .get<StudentOption[]>(`${environment.apiBaseUrl}/auth/students-by-grade/${this.parentClass}${sectionParam}`)
+      .subscribe({
+        next: list => { this.parentStudents.set(list); this.parentStudentsLoading.set(false); },
+        error: ()   => { this.parentStudentsLoading.set(false); }
+      });
   }
 
   private redirectBasedOnRole(role: string): void {
