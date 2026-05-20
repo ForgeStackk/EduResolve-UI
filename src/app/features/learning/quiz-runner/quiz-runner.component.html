@@ -1,8 +1,8 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 
   <!-- Header -->
   <header class="flex items-center justify-between gap-4">
-    <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
+    <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-ink-500 hover:text-white transition-colors cursor-pointer">
       <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
       EXIT
     </a>
@@ -32,7 +32,7 @@
             </p>
           </div>
           <button type="button" (click)="clearChapter()"
-                  class="text-[#e6bdb8]/50 hover:text-white transition-colors shrink-0">
+                  class="text-ink-300 hover:text-white transition-colors shrink-0">
             <span class="material-symbols-outlined" style="font-size:18px">close</span>
           </button>
         </div>
@@ -40,9 +40,9 @@
       } @else {
         <!-- Subject selector -->
         <div>
-          <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-2 block">SELECT SUBJECT</label>
+          <label class="hud-caps text-ink-500 text-[10px] mb-2 block">SELECT SUBJECT</label>
           @if (catalog.loading()) {
-            <div class="quiz-select flex items-center gap-2 text-[#e6bdb8]/50">
+            <div class="quiz-select flex items-center gap-2 text-ink-300">
               <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
               Loading subjects…
             </div>
@@ -61,14 +61,14 @@
         <!-- Book selector -->
         @if (selectedSubject()) {
           <div>
-            <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-2 block">SELECT BOOK</label>
+            <label class="hud-caps text-ink-500 text-[10px] mb-2 block">SELECT BOOK</label>
             @if (booksLoading()) {
-              <div class="quiz-select flex items-center gap-2 text-[#e6bdb8]/50">
+              <div class="quiz-select flex items-center gap-2 text-ink-300">
                 <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
                 Loading books…
               </div>
             } @else if (books().length === 0) {
-              <p class="text-sm text-[#e6bdb8]/50">No books found for this subject.</p>
+              <p class="text-sm text-ink-300">No books found for this subject.</p>
             } @else {
               <select class="quiz-select"
                       (change)="onBookChange(+$any($event.target).value)">
@@ -83,7 +83,7 @@
 
         <!-- Resolving chapters silently -->
         @if (chaptersLoading()) {
-          <div class="flex items-center gap-2 text-[#e6bdb8]/50 text-sm px-1">
+          <div class="flex items-center gap-2 text-ink-300 text-sm px-1">
             <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
             Resolving book…
           </div>
@@ -92,7 +92,7 @@
 
       <!-- Difficulty -->
       <div>
-        <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-3 block">{{ 'quiz.difficulty' | translate }}</label>
+        <label class="hud-caps text-ink-500 text-[10px] mb-3 block">{{ 'quiz.difficulty' | translate }}</label>
         <div class="grid grid-cols-3 gap-2">
           @for (d of difficulties; track d) {
             <button (click)="difficulty.set(d)"
@@ -105,11 +105,11 @@
       </div>
 
       <!-- Question count -->
-      <div class="bg-black/40 border border-white/10 rounded-xl p-4">
-        <p class="hud-caps text-[#e6bdb8]/80 mb-2">{{ 'quiz.count' | translate }}</p>
+      <div class="bg-black/40 border border-surface-3 rounded-xl p-4">
+        <p class="hud-caps text-ink-500 mb-2">{{ 'quiz.count' | translate }}</p>
         <div class="flex items-center justify-between">
           <span class="text-2xl font-bold text-red-400">{{ count() }}</span>
-          <span class="text-sm text-[#e6bdb8]/70">
+          <span class="text-sm text-ink-500">
             @switch (difficulty()) {
               @case ('EASY')   { Build confidence with more questions }
               @case ('HARD')   { Focused challenge with fewer questions }
@@ -138,7 +138,7 @@
       </button>
 
       @if (!chapterId()) {
-        <p class="text-xs text-[#e6bdb8]/50 text-center">
+        <p class="text-xs text-ink-300 text-center">
           Select a subject and chapter above to begin.
         </p>
       }
@@ -179,7 +179,7 @@
                      (change)="selectAnswer(cq.id, opt.id)"
                      class="mt-1 hud-radio"/>
               <span class="hud-caps text-red-400 mt-0.5 shrink-0">{{ ['A','B','C','D'][i] }}</span>
-              <span class="text-[15px] text-[#fbdbd7]">{{ opt.text }}</span>
+              <span class="text-[15px] text-ink-700">{{ opt.text }}</span>
             </label>
           }
         </div>
@@ -214,9 +214,9 @@
       <span class="hud-caps text-red-400">MISSION DEBRIEF</span>
       <div class="hud-display text-6xl sm:text-7xl text-red-500 leading-none mt-3
                   drop-shadow-[0_0_20px_rgba(220,38,38,0.5)] tabular-nums">
-        {{ score() }}<span class="text-3xl text-[#e6bdb8]"> / {{ q.questions.length }}</span>
+        {{ score() }}<span class="text-3xl text-ink-500"> / {{ q.questions.length }}</span>
       </div>
-      <p class="text-base text-[#e6bdb8] mt-2 mb-5">
+      <p class="text-base text-ink-500 mt-2 mb-5">
         {{ (score() / q.questions.length * 100) | number:'1.0-0' }}% accuracy
       </p>
 
@@ -245,7 +245,7 @@
                   {{ item.correct ? ('quiz.correct' | translate) : ('quiz.incorrect' | translate) }}
                 </p>
                 @if (item.question.explanation && !item.correct) {
-                  <p class="text-sm text-[#fbdbd7] mt-2 leading-relaxed">
+                  <p class="text-sm text-ink-700 mt-2 leading-relaxed">
                     <strong class="text-white">{{ 'quiz.explanation' | translate }}:</strong>
                     {{ item.question.explanation }}
                   </p>

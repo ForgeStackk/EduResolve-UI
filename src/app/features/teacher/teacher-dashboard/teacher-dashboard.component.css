@@ -1,2 +1,7 @@
-/* Teacher Dashboard styles moved to global HUD utilities in src/styles.css.
-   All presentation now uses Tailwind + HUD component classes from the template. */
+/* Teacher Dashboard — role accent: teal (#0D9488) */
+:host {
+  --role-color: #0D9488;
+  --role-color-soft: #CCFBF1;
+  --role-color-text: #134e4a;
+  display: block;
+}

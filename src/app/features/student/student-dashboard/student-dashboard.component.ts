@@ -16,7 +16,6 @@ import { StudentInboxApiService, StudentInboxItem } from '../../../core/api/stud
 import { LearningHeatmapComponent } from '../learning-heatmap/learning-heatmap.component';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 import { StreakGardenComponent } from '../streak-garden/streak-garden.component';
-import { LeaderboardComponent } from "../leaderboard/leaderboard.component";
 
 interface ReadingProgress {
   id: number; studentId: number;
@@ -62,7 +61,6 @@ const RANK_TIERS = [
     TranslateModule,
     AiDoubtCenterComponent,
     LearningHeatmapComponent,
-    LeaderboardComponent,
     StreakGardenComponent,
   ],
   templateUrl: './student-dashboard.component.html',

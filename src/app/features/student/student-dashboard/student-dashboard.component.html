@@ -1,27 +1,27 @@
-<div class="space-y-10">
+﻿<div class="space-y-10">
 
   <!-- =============================================================
        FROM TEACHER: Messages Feed
        ============================================================= -->
   <div class="hud-card flex flex-col gap-4 overflow-hidden">
-      <div class="hud-accent" style="background:#8b5cf6;box-shadow:0 0 10px rgba(139,92,246,0.5)"></div>
+      <div class="hud-accent" style="background:#8b5cf6"></div>
 
       <!-- Header -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined fill text-purple-400">forum</span>
-          <h3 class="hud-display text-xl text-white">FROM TEACHER</h3>
+          <h3 class="hud-display text-xl text-ink-900">FROM TEACHER</h3>
         </div>
         <a [routerLink]="['/student/inbox']"
-           class="hud-caps text-[#e6bdb8]/50 hover:text-white text-[10px] transition-colors"
+           class="hud-caps text-ink-500 hover:text-ink-900 text-[10px] transition-colors"
            style="text-decoration:none">VIEW ALL →</a>
       </div>
 
       <!-- Messages list -->
       @if (recentMessages().length === 0) {
         <div class="flex-1 flex flex-col items-center justify-center gap-2 py-8">
-          <span class="material-symbols-outlined text-[#e6bdb8]/25" style="font-size:40px">mark_email_read</span>
-          <p class="text-sm text-[#e6bdb8]/40">No messages yet</p>
+          <span class="material-symbols-outlined text-ink-300" style="font-size:40px">mark_email_read</span>
+          <p class="text-sm text-ink-300">No messages yet</p>
         </div>
       } @else {
         <div class="space-y-2 flex-1 overflow-y-auto" style="max-height:340px">
@@ -47,21 +47,21 @@
               <!-- Content -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between gap-1">
-                  <p class="text-xs font-semibold text-white truncate">{{ msg.senderName }}</p>
+                  <p class="text-xs font-semibold text-ink-900 truncate">{{ msg.senderName }}</p>
                   @if (msg.readStatus === 'UNREAD') {
                     <span class="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0 flex-none"></span>
                   }
                 </div>
-                <p class="text-[11px] text-[#e6bdb8]/60 mt-0.5 leading-snug"
+                <p class="text-[11px] text-ink-500 mt-0.5 leading-snug"
                    style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
                   {{ msg.textBody || '📎 Attachment' }}
                 </p>
                 <div class="flex items-center justify-between mt-1.5">
-                  <span class="hud-caps text-[9px] text-[#e6bdb8]/40">{{ formatMsgDate(msg.sentAt) }}</span>
+                  <span class="hud-caps text-[9px] text-ink-300">{{ formatMsgDate(msg.sentAt) }}</span>
                   @if (msg.attachments.length > 0) {
                     <span class="flex items-center gap-0.5">
-                      <span class="material-symbols-outlined text-[#e6bdb8]/40" style="font-size:10px">attach_file</span>
-                      <span class="hud-caps text-[9px] text-[#e6bdb8]/40">{{ msg.attachments.length }}</span>
+                      <span class="material-symbols-outlined text-ink-300" style="font-size:10px">attach_file</span>
+                      <span class="hud-caps text-[9px] text-ink-300">{{ msg.attachments.length }}</span>
                     </span>
                   }
                 </div>
@@ -85,7 +85,7 @@
        STRATEGIC FOCUS: Subject Chips
        ============================================================= -->
   <section class="space-y-4">
-    <h2 class="hud-display text-2xl sm:text-3xl text-white">{{ 'dashboard.strategicFocus' | translate }}</h2>
+    <h2 class="hud-display text-2xl sm:text-3xl text-ink-900">{{ 'dashboard.strategicFocus' | translate }}</h2>
     <div class="flex flex-wrap gap-3">
       @for (chip of focusChips(); track chip.id) {
         <a [routerLink]="['/learn/books']"
@@ -123,12 +123,12 @@
 
       <!-- Smart Syllabus Quick-Nav -->
       <div class="hud-card flex flex-col gap-4">
-        <div class="hud-accent" style="background:#2DD4BF;box-shadow:0 0 10px rgba(45,212,191,0.35)"></div>
+        <div class="hud-accent" style="background:#2DD4BF"></div>
 
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined fill" style="color:#2DD4BF">library_books</span>
-            <h3 class="hud-display text-lg text-white">{{ 'dashboard.smartSyllabus' | translate }}</h3>
+            <h3 class="hud-display text-lg text-ink-900">{{ 'dashboard.smartSyllabus' | translate }}</h3>
           </div>
           <a routerLink="/learn/ncert"
              class="hud-caps text-[#2DD4BF]/80 hover:text-[#2DD4BF] transition-colors"
@@ -152,12 +152,12 @@
                       [style.color]="subjectAccent(s)">{{ subjectIconFor(s) }}</span>
               </div>
               <div class="flex-1 text-left">
-                <p class="text-sm font-bold text-white truncate">{{ s }}</p>
-                <p class="text-xs text-[#e6bdb8]/50">
+                <p class="text-sm font-bold text-ink-900 truncate">{{ s }}</p>
+                <p class="text-xs text-ink-300">
                   {{ 'dashboard.chHint' | translate }} {{ chapterNameHint(s, i) }}
                 </p>
               </div>
-              <span class="material-symbols-outlined text-white/20" style="font-size:16px">chevron_right</span>
+              <span class="material-symbols-outlined text-ink-300" style="font-size:16px">chevron_right</span>
             </button>
           }
           @if (subjectNames().length === 0) {
@@ -178,11 +178,33 @@
   </section>
 
   <!-- =============================================================
-       COMMUNITY: Streak Garden + Class Leaderboard
+       COMMUNITY: Streak Garden + My Documents
        ============================================================= -->
   <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <app-streak-garden [studentId]="studentId()!"></app-streak-garden>
-    <app-leaderboard [classGrade]="className() || grade() || '9'"></app-leaderboard>
+
+    <!-- My Documents Card -->
+    <a routerLink="/learn/my-documents"
+       class="hud-card hover:border-brand-200 transition-all group cursor-pointer flex flex-col gap-4"
+       style="text-decoration:none;color:inherit">
+      <div class="hud-accent" style="background:#6366F1"></div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-50">
+          <span class="material-symbols-outlined fill text-indigo-600">folder_open</span>
+        </div>
+        <div>
+          <p class="hud-caps text-indigo-500" style="font-size:10px">MY LIBRARY</p>
+          <h3 class="hud-display text-lg text-ink-900">My Documents</h3>
+        </div>
+      </div>
+      <p class="text-sm text-ink-500 leading-relaxed">
+        Upload and access your personal study materials — notes, summaries, and PDF resources — all saved to your profile.
+      </p>
+      <div class="hud-btn-ghost w-full justify-center mt-auto group-hover:bg-brand-50 group-hover:border-brand-200 transition-colors">
+        <span class="material-symbols-outlined" style="font-size:16px">upload_file</span>
+        Upload &amp; Browse PDFs
+      </div>
+    </a>
   </section>
 
   <!-- =============================================================
@@ -190,9 +212,9 @@
        ============================================================= -->
   <section class="space-y-4">
     <div class="flex items-end justify-between">
-      <h2 class="hud-display text-2xl sm:text-3xl text-white">{{ 'dashboard.tacticalIntel' | translate }}</h2>
+      <h2 class="hud-display text-2xl sm:text-3xl text-ink-900">{{ 'dashboard.tacticalIntel' | translate }}</h2>
       <a routerLink="/learn/subjects"
-         class="text-red-500 hover:text-white font-bold text-xs tracking-widest uppercase transition-colors"
+         class="text-red-600 hover:text-red-700 font-bold text-xs tracking-widest uppercase transition-colors"
          style="text-decoration:none">{{ 'dashboard.viewAll' | translate }}</a>
     </div>
 
@@ -201,17 +223,17 @@
       <!-- Quiz Drill card (Coming Soon) -->
       <div class="hud-card-flat flex flex-col gap-3 relative overflow-hidden"
            style="cursor:not-allowed;opacity:0.55;filter:grayscale(0.6)">
-        <div class="hud-accent" style="background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
-        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+        <div class="hud-accent" style="background:#f59e0b"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-surface-3
                     flex items-center justify-center relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent"></div>
           <span class="material-symbols-outlined"
                 style="font-size:56px;color:#f59e0b;filter:drop-shadow(0 0 15px rgba(245,158,11,.6))">quiz</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.knowledgeCheck' | translate }}</span>
-          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.quizDrill' | translate }}</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.quizDrillDesc' | translate }}</p>
+          <span class="hud-caps text-ink-500 mb-1 block">{{ 'dashboard.knowledgeCheck' | translate }}</span>
+          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.quizDrill' | translate }}</h4>
+          <p class="text-sm text-ink-500 mt-2">{{ 'dashboard.quizDrillDesc' | translate }}</p>
         </div>
         <div class="absolute top-3 right-3 bg-black/70 rounded px-2 py-0.5
                     hud-caps text-[10px] text-amber-300 border border-amber-300/30">{{ 'dashboard.soon' | translate }}</div>
@@ -221,17 +243,17 @@
       <a routerLink="/learn/doubt"
          class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
          style="text-decoration:none;color:inherit">
-        <div class="hud-accent" style="background:#2DD4BF;box-shadow:0 0 10px rgba(45,212,191,0.5)"></div>
-        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+        <div class="hud-accent" style="background:#2DD4BF"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-surface-3
                     flex items-center justify-center relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-transparent"></div>
           <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
                 style="font-size:56px;color:#2DD4BF;filter:drop-shadow(0 0 15px rgba(45,212,191,.6))">psychology_alt</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.aiCenter' | translate }}</span>
-          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.askDoubt' | translate }}</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.aiDesc' | translate }}</p>
+          <span class="hud-caps text-ink-500 mb-1 block">{{ 'dashboard.aiCenter' | translate }}</span>
+          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.askDoubt' | translate }}</h4>
+          <p class="text-sm text-ink-500 mt-2">{{ 'dashboard.aiDesc' | translate }}</p>
         </div>
       </a>
 
@@ -239,17 +261,17 @@
       <a routerLink="/learn/ncert"
          class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
          style="text-decoration:none;color:inherit">
-        <div class="hud-accent" style="background:#10b981;box-shadow:0 0 10px rgba(16,185,129,0.5)"></div>
-        <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+        <div class="hud-accent" style="background:#10b981"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-surface-3
                     flex items-center justify-center relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent"></div>
           <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
                 style="font-size:56px;color:#10b981;filter:drop-shadow(0 0 15px rgba(16,185,129,.6))">library_books</span>
         </div>
         <div>
-          <span class="hud-caps text-[#e6bdb8]/70 mb-1 block">{{ 'dashboard.curriculumExplorer' | translate }}</span>
-          <h4 class="text-white font-bold leading-tight">{{ 'dashboard.smartSyllabus' | translate }}</h4>
-          <p class="text-sm text-[#e6bdb8]/80 mt-2">{{ 'dashboard.ncertDesc' | translate }}</p>
+          <span class="hud-caps text-ink-500 mb-1 block">{{ 'dashboard.curriculumExplorer' | translate }}</span>
+          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.smartSyllabus' | translate }}</h4>
+          <p class="text-sm text-ink-500 mt-2">{{ 'dashboard.ncertDesc' | translate }}</p>
         </div>
       </a>
 
@@ -262,7 +284,7 @@
                          hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(220,38,38,0.25)]
                          transition-all group">
             <div class="hud-accent"></div>
-            <div class="w-full aspect-video rounded-lg bg-black/40 border border-white/10
+            <div class="w-full aspect-video rounded-lg bg-black/40 border border-surface-3
                         flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-gradient-to-br from-red-600/25 to-transparent"></div>
               <span class="material-symbols-outlined fill group-hover:scale-110 transition-transform"
@@ -270,11 +292,11 @@
             </div>
             <div>
               <span class="hud-caps text-red-400 mb-1 block">{{ 'dashboard.priorityTarget' | translate }}</span>
-              <h4 class="text-white font-bold leading-tight truncate">{{ w.topicName || 'Topic #' + w.topicId }}</h4>
-              <p class="text-sm text-[#e6bdb8]/80 mt-2">
+              <h4 class="text-ink-900 font-bold leading-tight truncate">{{ w.topicName || 'Topic #' + w.topicId }}</h4>
+              <p class="text-sm text-ink-500 mt-2">
                 {{ 'dashboard.accuracy' | translate }} <span class="text-red-400 font-bold">{{ w.accuracy }}%</span>
               </p>
-              <span class="hud-caps text-red-400 mt-3 inline-flex items-center gap-1 group-hover:text-white transition-colors">
+              <span class="hud-caps text-red-600 mt-3 inline-flex items-center gap-1 group-hover:text-red-700 transition-colors">
                 {{ 'dashboard.launchDrill' | translate }}
                 <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
               </span>

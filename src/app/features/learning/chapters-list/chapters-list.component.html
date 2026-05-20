@@ -1,7 +1,7 @@
-<div class="space-y-8">
+﻿<div class="space-y-8">
 
   <!-- Back link -->
-  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
+  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-ink-500 hover:text-ink-900 transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
     {{ 'chapters.backToSubjects' | translate }}
   </a>
@@ -38,7 +38,7 @@
       <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
         <span class="material-symbols-outlined text-5xl" style="color:#ac8884">folder_off</span>
         <h3 class="hud-display text-xl text-white">{{ 'chapters.notFound' | translate }}</h3>
-        <p class="text-[#e6bdb8]/70 text-sm max-w-xs">{{ 'chapters.notFoundHint' | translate }}</p>
+        <p class="text-ink-500 text-sm max-w-xs">{{ 'chapters.notFoundHint' | translate }}</p>
         <a routerLink="/learn/subjects"
            class="hud-btn-ghost mt-2" style="text-decoration:none">
           <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>
@@ -57,14 +57,14 @@
                 <div class="flex items-center gap-3 mb-1">
                   <span class="hud-caps text-red-400">CH {{ idx + 1 | number:'2.0' }}</span>
                   @if (c.estimatedMinutes) {
-                    <span class="hud-caps text-[#e6bdb8]/70">{{ c.estimatedMinutes }} MIN</span>
+                    <span class="hud-caps text-ink-500">{{ c.estimatedMinutes }} MIN</span>
                   }
                 </div>
                 <h3 class="hud-display text-lg text-white group-hover:text-red-400 transition-colors">
                   {{ sanitizeChapterName(c.name, idx) }}
                 </h3>
                 @if (c.summary) {
-                  <p class="text-sm text-[#e6bdb8]/80 mt-2 line-clamp-2 leading-relaxed">{{ c.summary }}</p>
+                  <p class="text-sm text-ink-500 mt-2 line-clamp-2 leading-relaxed">{{ c.summary }}</p>
                 }
               </div>
 

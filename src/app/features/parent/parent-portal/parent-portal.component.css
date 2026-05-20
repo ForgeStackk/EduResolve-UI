@@ -1,13 +1,7 @@
-/*
- * Parent Portal - component-scoped styles.
- *
- * All visual styling for this view is delivered by the global High-Energy HUD
- * utilities defined in `src/styles.css` (.hud-card, .hud-card-flat, .hud-chip,
- * .hud-meter, .hud-display, .hud-caps, .hud-btn-primary, etc.). This file is
- * intentionally kept as a dedicated slot so future parent-specific overrides
- * can be added here without touching the global sheet.
- */
-
+/* Parent Portal — role accent: emerald (#16A34A) */
 :host {
+  --role-color: #16A34A;
+  --role-color-soft: #DCFCE7;
+  --role-color-text: #14532d;
   display: block;
 }

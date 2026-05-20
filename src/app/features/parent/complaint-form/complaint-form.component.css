@@ -12,8 +12,8 @@ textarea:focus {
 }
 
 button[type='submit']:not(:disabled):hover {
-  background-color: #d97706;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  background-color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.22);
 }
 
 button[type='submit']:disabled {

@@ -1,193 +1,303 @@
 /* =====================================================================
  * EduResolve global styles
- * Design system: Academic Excellence (red / black / white)
+ * Design system: Lumina (Indigo / White / Light)
+ * Calm, friendly learning platform — no neon, no glows, no uppercase noise
  * ===================================================================== */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* --- Design tokens (mirror tailwind.config.js for places that can't use
-       Tailwind classes, e.g. inline styles, charts, SVGs) ----------------- */
+/* --- Design tokens ---------------------------------------------------- */
 :root {
-  --brand-50:  #fef2f2;
-  --brand-100: #fee2e2;
-  --brand-500: #ef4444;
-  --brand-600: #dc2626;
-  --brand-700: #b91c1c;
-  --brand-900: #7f1d1d;
+  /* Brand — indigo */
+  --brand:       #6366F1;
+  --brand-soft:  #EEF0FF;
+  --brand-50:    #eef2ff;
+  --brand-100:   #e0e7ff;
+  --brand-200:   #c7d2fe;
+  --brand-500:   #6366f1;
+  --brand-600:   #4f46e5;
+  --brand-700:   #4338ca;
+  --brand-900:   #312e81;
 
-  --surface-base: #ffffff;
-  --surface-dim:  #f7f7f8;
-  --surface-low:  #f3f3f4;
-  --surface-line: #e5e5e5;
+  /* Surfaces */
+  --bg:          #F7F8FC;
+  --surface:     #FFFFFF;
+  --surface-2:   #F1F3F9;
+  --surface-dim: #F1F3F9;
+  --surface-low: #E5E9F2;
+  --surface-base:#F7F8FC;
+  --surface-line:#E5E9F2;
+  --surface-ring:#CBD5E1;
 
-  --ink:       #0a0a0a;
-  --ink-mute:  #525252;
-  --ink-soft:  #737373;
+  /* Ink (text) */
+  --ink:         #0F172A;
+  --ink-900:     #0F172A;
+  --ink-700:     #334155;
+  --ink-500:     #64748B;
+  --ink-300:     #CBD5E1;
+  --ink-mute:    #64748B;
+  --ink-soft:    #94A3B8;
 
-  /* ── Gamification palette ── */
-  --gam-bronze:  #CD7F32;
-  --gam-teal:    #2DD4BF;
-  --gam-purple:  #A855F7;
-  --gam-gold:    #fbbf24;
+  /* Dividers */
+  --line:        #E5E9F2;
+
+  /* Semantic status */
+  --accent:      #22C55E;
+  --accent-soft: #E8F8EE;
+  --warn:        #F59E0B;
+  --warn-soft:   #FEF6E7;
+  --danger:      #EF4444;
+  --danger-soft: #FEF2F2;
+
+  /* Role accent — defaults to student/indigo; overridden per role container */
+  --role-color:      #6366F1;
+  --role-color-soft: #EEF0FF;
+  --role-color-text: #312e81;
+
+  /* AI / tutor panel (only allowed dark surface) */
+  --ai-bg:    #0F172A;
+  --ai-panel: #1E293B;
+  --ai-text:  #E2E8F0;
+  --ai-muted: #94A3B8;
+  --ai-brand: #818cf8;
+
+  /* Legacy HUD tokens — remapped so old references don't break visually */
+  --hud-bg:       #F7F8FC;
+  --hud-surface:  #FFFFFF;
+  --hud-text:     #0F172A;
+  --hud-muted:    #64748B;
+  --hud-brand:    #6366f1;
+  --hud-brand-dark: #4f46e5;
+
+  /* Gamification palette */
+  --gam-bronze: #CD7F32;
+  --gam-teal:   #2DD4BF;
+  --gam-purple: #A855F7;
+  --gam-gold:   #fbbf24;
 }
+
+/* Role accent overrides — add these classes to the role shell element */
+.role-student { --role-color: #6366F1; --role-color-soft: #EEF0FF; --role-color-text: #312e81; }
+.role-teacher { --role-color: #0D9488; --role-color-soft: #CCFBF1; --role-color-text: #134e4a; }
+.role-admin   { --role-color: #7C3AED; --role-color-soft: #EDE9FE; --role-color-text: #4c1d95; }
+.role-parent  { --role-color: #16A34A; --role-color-soft: #DCFCE7; --role-color-text: #14532d; }
 
 /* --- Base resets ------------------------------------------------------- */
 html, body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--surface-dim);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--ink-900);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hindi locale gets a slightly larger line-height for readability. */
-html[lang="hi"] body {
-  line-height: 1.6;
-}
+html[lang="hi"] body { line-height: 1.65; }
 
 /* --- Reusable component helpers --------------------------------------- */
 @layer components {
-  /* Card surface: 1px outline, no shadow (per design system) */
+
+  /* Cards */
   .card {
-    @apply bg-white border border-surface-line rounded-lg;
+    @apply bg-white rounded-lg border border-[#E5E9F2];
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   }
   .card-pad { @apply p-4; }
+  .card-md  { @apply bg-white rounded-[14px] border border-[#E5E9F2]; box-shadow: 0 4px 12px rgba(15,23,42,0.06); }
+  .card-lg  { @apply bg-white rounded-[20px] border border-[#E5E9F2]; box-shadow: 0 12px 32px rgba(15,23,42,0.08); }
 
-  /* Solid primary action */
+  /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg
-           bg-brand-700 text-white font-semibold px-4 py-2.5
-           hover:bg-brand-800 active:bg-brand-900 disabled:opacity-50
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           bg-brand-500 text-white font-semibold px-5 py-2.5
+           hover:bg-brand-600 active:bg-brand-700 disabled:opacity-50
            transition-colors;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22);
   }
-  /* Outlined secondary action */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg
-           bg-white text-surface-ink font-semibold px-4 py-2.5
-           border border-surface-line hover:bg-surface-low
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           bg-white text-ink-700 font-semibold px-5 py-2.5
+           border border-[#E5E9F2] hover:bg-surface-2
+           disabled:opacity-50 transition-colors;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           bg-transparent text-brand-600 font-semibold px-5 py-2.5
+           hover:bg-brand-50 disabled:opacity-50 transition-colors;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           bg-transparent text-ink-700 font-semibold px-5 py-2.5
+           border border-[#E5E9F2] hover:bg-surface-2
            disabled:opacity-50 transition-colors;
   }
-  /* Subtle chip / tag */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           bg-danger text-white font-semibold px-5 py-2.5
+           hover:bg-red-600 active:bg-red-700 disabled:opacity-50
+           transition-colors;
+  }
+
+  /* Chips */
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
            text-xs font-semibold bg-brand-50 text-brand-700;
   }
   .chip-neutral {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
-           text-xs font-semibold bg-surface-low text-surface-mute;
+           text-xs font-semibold bg-surface-2 text-ink-500;
   }
-  /* Section heading: small uppercase eyebrow */
+  .chip-success { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[#E8F8EE] text-[#15803d]; }
+  .chip-warn    { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[#FEF6E7] text-[#92400e]; }
+  .chip-danger  { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[#FEF2F2] text-[#b91c1c]; }
+
+  /* Eyebrow label — sentence case, no uppercase */
   .eyebrow {
-    @apply text-label-md uppercase text-surface-mute;
+    @apply text-xs font-semibold tracking-wide text-ink-500;
+  }
+
+  /* Form input — light */
+  .form-input {
+    @apply w-full rounded-[10px] border border-[#E5E9F2] px-4 py-3
+           bg-white text-ink-900 placeholder-ink-300
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100
+           disabled:opacity-50 transition-colors;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   }
 
   /* ===================================================================
-   * HIGH-ENERGY HUD COMPONENTS
-   * Used by /student and /learn screens. Dark-mode first, glassmorphic.
+   * HUD-SHELL — remapped to light app shell
+   * Class name kept to avoid renaming 50+ templates
    * =================================================================== */
   .hud-shell {
-    background: #1f0f0d;
-    color: #fbdbd7;
+    background: var(--bg);
+    color: var(--ink-900);
     min-height: 100vh;
     font-family: 'Inter', system-ui, sans-serif;
   }
-  .hud-shell::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 25%, rgba(220, 38, 38, 0.08) 0%, transparent 55%);
-    z-index: 0;
-    pointer-events: none;
-  }
+
+  /* Removed: dark radial gradient pseudo-element */
+  .hud-shell::before { display: none; }
+
   .hud-display {
-    font-family: 'Lexend', 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
+
+  /* hud-caps: was all-caps label; now a soft label (no uppercase per spec) */
   .hud-caps {
     font-family: 'Inter', sans-serif;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    line-height: 1;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    color: var(--ink-500);
   }
+
+  /* hud-card → white card with soft shadow */
   .hud-card {
-    @apply rounded-xl border border-white/10 p-6;
-    background: rgba(45, 27, 25, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    @apply rounded-[14px] border border-[#E5E9F2] p-6 bg-white;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
     position: relative;
   }
   .hud-card-flat {
-    @apply rounded-xl border border-white/10 p-6;
-    background: rgba(40, 23, 21, 0.6);
-    backdrop-filter: blur(12px);
+    @apply rounded-[14px] border border-[#E5E9F2] p-6 bg-[#F7F8FC];
     position: relative;
   }
+
+  /* hud-accent → left border accent strip using role color */
   .hud-accent {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 4px;
-    background: #dc2626;
+    width: 3px;
+    background: var(--role-color, #6366F1);
     border-top-left-radius: inherit;
     border-bottom-left-radius: inherit;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
   }
+
+  /* hud-input → light input */
   .hud-input {
-    @apply w-full rounded-lg border border-white/10 px-4 py-3 text-[#fbdbd7]
-           focus:border-[#dc2626] focus:outline-none focus:ring-1 focus:ring-[#dc2626]
-           transition-colors;
-    background: rgba(25, 10, 8, 0.5);
+    @apply w-full rounded-[10px] border border-[#E5E9F2] px-4 py-3 text-ink-900
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100
+           transition-colors bg-white;
   }
-  .hud-input::placeholder { color: rgba(230, 189, 184, 0.5); }
+  .hud-input::placeholder { color: #CBD5E1; }
+
+  /* hud-btn-primary → indigo CTA */
   .hud-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl
-           px-5 py-3 font-bold text-white
-           transition-all active:scale-95
-           border border-white/10;
-    background: #dc2626;
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           px-5 py-3 font-semibold text-white
+           bg-brand-500 hover:bg-brand-600 active:bg-brand-700
+           transition-colors disabled:opacity-50;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22);
   }
-  .hud-btn-primary:hover { box-shadow: 0 0 30px rgba(220, 38, 38, 0.55); }
-  .hud-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  .hud-btn-primary:hover { box-shadow: 0 6px 18px rgba(99, 102, 241, 0.30); }
+  .hud-btn-primary:disabled { box-shadow: none; }
+
+  /* hud-btn-ghost → outline/ghost */
   .hud-btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3
-           font-bold text-[#fbdbd7] transition-all active:scale-95
-           border border-white/15;
-    background: rgba(255, 255, 255, 0.05);
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3
+           font-semibold text-ink-700 transition-colors
+           border border-[#E5E9F2] bg-white hover:bg-surface-2;
   }
-  .hud-btn-ghost:hover { background: rgba(255, 255, 255, 0.10); }
+
+  /* hud-chip → soft label chip */
   .hud-chip {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1
-           text-[12px] font-bold uppercase tracking-wider
-           border border-white/15 text-[#e6bdb8];
-    background: rgba(255, 255, 255, 0.05);
+           text-[12px] font-semibold tracking-wide
+           border border-[#E5E9F2] text-ink-500 bg-white;
   }
   .hud-chip-active {
-    border-color: #dc2626;
-    color: #fff6f5;
-    background: rgba(220, 38, 38, 0.20);
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.25);
+    border-color: var(--role-color, #6366F1);
+    color: var(--role-color, #6366F1);
+    background: var(--role-color-soft, #EEF0FF);
   }
+
+  /* hud-meter → light progress bar */
   .hud-meter {
-    @apply h-1.5 w-full overflow-hidden rounded-full border border-white/10;
-    background: rgba(25, 10, 8, 0.6);
+    @apply h-1.5 w-full overflow-hidden rounded-full;
+    background: #E5E9F2;
   }
   .hud-meter > div {
     @apply h-full rounded-full;
-    background: #dc2626;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+    background: var(--role-color, #6366F1);
   }
-  .hud-radio {
-    accent-color: #dc2626;
+
+  /* hud-radio */
+  .hud-radio { accent-color: var(--role-color, #6366F1); }
+
+  /* ===================================================================
+   * AI / TUTOR PANEL — the ONE allowed dark surface
+   * Use .ai-panel as the wrapper for AI/quiz immersive screens
+   * =================================================================== */
+  .ai-panel {
+    background: var(--ai-bg);
+    color: var(--ai-text);
+    font-family: 'Inter', system-ui, sans-serif;
   }
-  /* Material Symbols base */
+  .ai-panel .card, .ai-panel .hud-card {
+    background: var(--ai-panel);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--ai-text);
+  }
+  .ai-card {
+    @apply rounded-[14px] p-6;
+    background: var(--ai-panel);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .ai-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px]
+           px-5 py-3 font-semibold text-white transition-colors;
+    background: var(--ai-brand);
+  }
+
+  /* Material icons */
   .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -197,18 +307,71 @@ html[lang="hi"] body {
     user-select: none;
   }
   .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+  /* glass-card + school-card — remapped to light */
+  .school-card, .glass-card {
+    @apply rounded-[14px] border border-[#E5E9F2] bg-white;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  }
 }
 
-/* HUD scrollbar (subtle, dark) */
-.hud-shell ::-webkit-scrollbar { width: 8px; height: 8px; }
-.hud-shell ::-webkit-scrollbar-track { background: transparent; }
-.hud-shell ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-}
-.hud-shell ::-webkit-scrollbar-thumb:hover { background: rgba(220, 38, 38, 0.30); }
+/* ── Global text-visibility patch ──────────────────────────────────────
+   Components migrated from the dark theme may carry text-white.
+   Headings, paragraph body copy, and cap labels must always be legible
+   on the white / light-gray card surfaces used in the Lumina theme.
+   Avatar initials and icon badges (which have their own dark bg) are
+   excluded because they sit on explicitly-coloured backgrounds.
+   ─────────────────────────────────────────────────────────────────── */
 
-/* Custom range slider (HUD) */
+/* Headings are never decorative — force dark ink on light cards */
+.hud-card :is(h1, h2, h3, h4, h5).text-white,
+.hud-card-flat :is(h1, h2, h3, h4, h5).text-white {
+  color: var(--ink-900) !important;
+}
+
+/* Paragraph body copy */
+.hud-card p.text-white,
+.hud-card-flat p.text-white {
+  color: var(--ink-700) !important;
+}
+
+/* hud-display is always a heading — keep it dark */
+.hud-display { color: var(--ink-900); }
+
+/* red-400 text (#f87171) has contrast ratio ~2.3:1 on white — use red-600 */
+.hud-caps.text-red-400,
+.hud-card .text-red-400,
+.hud-card-flat .text-red-400 { color: #dc2626 !important; }
+
+/* ink-300 secondary text (#CBD5E1) is near-invisible on white — lift it */
+.hud-card .text-ink-300,
+.hud-card-flat .text-ink-300,
+.doc-row .text-ink-300 {
+  color: var(--ink-500) !important;
+}
+
+/* Hover-to-white on light backgrounds becomes hover-to-dark */
+.hud-card a.hover\:text-white:hover,
+.hud-card button.hover\:text-white:hover,
+.hud-card-flat a.hover\:text-white:hover,
+.hud-card-flat button.hover\:text-white:hover {
+  color: var(--ink-900) !important;
+}
+
+/* doc-row has white bg — force any text-white inside it to be readable */
+.doc-row .text-white { color: var(--ink-900) !important; }
+
+/* --- Scrollbar (app-wide light) --------------------------------------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* AI panel scrollbar */
+.ai-panel ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+.ai-panel ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* Custom range slider */
 .hud-range {
   -webkit-appearance: none;
   appearance: none;
@@ -218,7 +381,7 @@ html[lang="hi"] body {
 .hud-range::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.20);
+  background: #E5E9F2;
 }
 .hud-range::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -226,19 +389,19 @@ html[lang="hi"] body {
   width: 16px;
   margin-top: -6px;
   border-radius: 9999px;
-  background: #dc2626;
-  box-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+  background: var(--brand, #6366F1);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.30);
   cursor: pointer;
   border: 0;
 }
 .hud-range::-moz-range-track {
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.20);
+  background: #E5E9F2;
 }
 .hud-range::-moz-range-thumb {
   height: 16px; width: 16px; border-radius: 9999px;
-  background: #dc2626;
-  box-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+  background: var(--brand, #6366F1);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.30);
   border: 0; cursor: pointer;
 }

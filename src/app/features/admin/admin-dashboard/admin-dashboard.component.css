@@ -1,1 +1,7 @@
-/* Styles migrated to HUD utilities in src/styles.css. */
+/* Admin Dashboard — role accent: violet (#7C3AED) */
+:host {
+  --role-color: #7C3AED;
+  --role-color-soft: #EDE9FE;
+  --role-color-text: #4c1d95;
+  display: block;
+}

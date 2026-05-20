@@ -2,7 +2,7 @@
 
   <!-- ── Back navigation ── -->
   <button (click)="goBack()"
-          class="inline-flex items-center gap-2 text-[#e6bdb8]/60 hover:text-white
+          class="inline-flex items-center gap-2 text-ink-500 hover:text-ink-900
                  transition-colors text-sm font-semibold group">
     <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
           style="font-size:18px">arrow_back</span>
@@ -11,9 +11,9 @@
 
   <!-- ── Page Header ── -->
   <header class="space-y-1">
-    <p class="hud-caps text-red-400">NCERT CURRICULUM · CLASS {{ selectedClass }}</p>
-    <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight">
-      {{ selectedSubject || 'Browse Subjects' }}
+    <p class="hud-caps text-red-600">NCERT CURRICULUM · CLASS {{ selectedClass }}</p>
+    <h1 class="hud-display text-4xl sm:text-5xl text-ink-900 uppercase tracking-tight">
+      {{ selectedSubject || 'All Books' }}
     </h1>
   </header>
 
@@ -27,26 +27,26 @@
                   bg-[#CD7F32]/10 border border-[#CD7F32]/30 rounded-xl shrink-0">
         <span class="material-symbols-outlined fill" style="color:#CD7F32;font-size:16px">lock</span>
         <div>
-          <p class="hud-caps text-[#CD7F32] text-[9px]">YOUR CLASS</p>
-          <p class="text-white font-bold text-sm">Class {{ selectedClass }}</p>
+          <p class="hud-caps text-[9px]" style="color:#92400e">YOUR CLASS</p>
+          <p class="text-ink-900 font-bold text-sm">Class {{ selectedClass }}</p>
         </div>
       </div>
 
       <!-- Subject select -->
       <div class="flex-1 min-w-[200px]">
-        <label class="hud-caps text-[#e6bdb8]/60 text-[10px] mb-2 block">SELECT SUBJECT</label>
+        <label class="hud-caps text-ink-500 text-[10px] mb-2 block">FILTER BY SUBJECT</label>
         @if (catalog.loading()) {
-          <div class="hud-input flex items-center gap-2 text-[#e6bdb8]/50">
+          <div class="hud-input flex items-center gap-2 text-ink-500">
             <span class="material-symbols-outlined animate-spin" style="font-size:14px">sync</span>
             Loading subjects…
           </div>
         } @else if (catalog.hasError()) {
-          <div class="hud-input text-amber-400/80">Content coming soon for Class {{ selectedClass }}</div>
+          <div class="hud-input text-amber-600">Content coming soon for Class {{ selectedClass }}</div>
         } @else {
           <select class="hud-subject-select"
                   [ngModel]="selectedSubject"
                   (ngModelChange)="onSubjectSelect($event)">
-            <option value="">— Choose a subject —</option>
+            <option value="">— All Subjects —</option>
             @for (s of subjects(); track s) {
               <option [value]="s">{{ s }}</option>
             }
@@ -70,9 +70,9 @@
   <!-- ── Books list (hidden while a book's chapters are open) ── -->
   @if (!loading() && books().length > 0 && !selectedBook()) {
     <section class="space-y-4">
-      <h2 class="hud-display text-xl text-white">
+      <h2 class="hud-display text-xl text-ink-900">
         Available Books
-        <span class="hud-caps text-[#e6bdb8]/40 text-sm ml-2">— click to open</span>
+        <span class="hud-caps text-ink-500 text-sm ml-2">— click to see chapters</span>
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (book of books(); track book.id) {
@@ -84,25 +84,22 @@
               <p class="hud-caps text-[10px] mb-1" [style.color]="getBookColor(book.subject)">
                 {{ book.subject | uppercase }}
               </p>
-              <h3 class="text-white font-bold text-sm leading-tight">{{ book.title }}</h3>
-              @if (!book.pdfFilename) {
-                <p class="text-[11px] text-[#e6bdb8]/50 mt-0.5">Tap to see chapters →</p>
-              }
+              <h3 class="text-ink-900 font-bold text-sm leading-tight">{{ book.title }}</h3>
+              <p class="text-[11px] text-ink-500 mt-0.5">Tap to see chapters →</p>
             </button>
             <div class="flex items-center gap-1 pr-3 shrink-0">
               <button type="button"
                       (click)="toggleBookmark(book, $event)"
-                      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10
+                      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-2
                              transition-colors border-0 outline-none cursor-pointer"
                       [attr.aria-label]="(isBookmarked(book.id) ? 'chapters.removeBookmark' : 'chapters.addBookmark') | translate">
                 <span class="material-symbols-outlined transition-colors"
                       [class.fill]="isBookmarked(book.id)"
-                      [style.color]="isBookmarked(book.id) ? '#dc2626' : 'rgba(255,255,255,0.35)'"
+                      [style.color]="isBookmarked(book.id) ? '#dc2626' : '#94A3B8'"
                       style="font-size:20px">bookmark</span>
               </button>
               <span class="material-symbols-outlined fill"
-                    style="font-size:18px"
-                    [style.color]="'rgba(255,255,255,0.4)'">
+                    style="font-size:18px;color:#94A3B8">
                 {{ book.pdfFilename ? 'picture_as_pdf' : 'menu_book' }}
               </span>
             </div>
@@ -112,52 +109,68 @@
     </section>
   }
 
-  <!-- ── Chapter list (shown after selecting a folder-type book) ── -->
+  <!-- ── Chapter list (shown after selecting a book) ── -->
   @if (selectedBook()) {
     <section class="space-y-4">
-      <!-- Back + title row -->
-      <div class="flex items-center gap-3">
-        <button (click)="backToBooks()"
-                class="inline-flex items-center gap-1 text-[#e6bdb8]/60 hover:text-white
-                       transition-colors text-sm font-semibold group border-0 bg-transparent cursor-pointer">
-          <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
-                style="font-size:16px">arrow_back</span>
-          Books
-        </button>
-        <span class="text-[#e6bdb8]/30">›</span>
-        <h2 class="hud-display text-xl text-white truncate">{{ selectedBook()!.title }}</h2>
+      <!-- Breadcrumb row -->
+      <div class="flex items-center gap-3 flex-wrap">
+        @if (books().length > 1) {
+          <!-- Multiple books available — let user go back to book list -->
+          <button (click)="backToBooks()"
+                  class="inline-flex items-center gap-1 text-ink-500 hover:text-ink-900
+                         transition-colors text-sm font-semibold group border-0 bg-transparent cursor-pointer">
+            <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
+                  style="font-size:16px">arrow_back</span>
+            All Books
+          </button>
+          <span class="text-ink-300">›</span>
+        }
+        <div>
+          <p class="hud-caps text-[10px]" [style.color]="getBookColor(selectedBook()!.subject)">
+            {{ selectedBook()!.subject | uppercase }}
+          </p>
+          <h2 class="hud-display text-xl text-ink-900 truncate">{{ selectedBook()!.title }}</h2>
+        </div>
       </div>
 
       @if (loadingChapters()) {
         <div class="space-y-3">
           @for (_ of [1,2,3,4]; track $index) {
-            <div class="hud-card-flat h-14 relative overflow-hidden">
+            <div class="hud-card-flat h-16 relative overflow-hidden">
               <div class="skeleton-sweep"></div>
             </div>
           }
         </div>
-      } @else if (chapterPdfs().length > 0) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          @for (chapter of chapterPdfs(); track chapter.id; let i = $index) {
-            <div class="book-card">
-              <div class="book-card__stripe" [style.background]="getBookColor(chapter.subject)"></div>
-              <button type="button"
-                      (click)="openChapterPdf(chapter)"
-                      class="flex-1 text-left px-5 py-4 min-w-0 bg-transparent border-0 outline-none cursor-pointer">
-                <p class="hud-caps text-[10px] mb-1" [style.color]="getBookColor(chapter.subject)">
-                  CHAPTER {{ i + 1 }}
-                </p>
-                <h3 class="text-white font-bold text-sm leading-tight">{{ chapter.title }}</h3>
-              </button>
-              <span class="material-symbols-outlined fill pr-4 shrink-0"
-                    style="color:rgba(255,255,255,0.4);font-size:18px">picture_as_pdf</span>
-            </div>
+      } @else if (chapters().length > 0) {
+        <div class="space-y-2">
+          @for (chapter of chapters(); track chapter.id; let i = $index) {
+            <button type="button"
+                    class="chapter-row w-full"
+                    (click)="openChapter(chapter)">
+              <!-- Chapter number badge -->
+              <div class="chapter-num shrink-0">
+                <span class="text-xs font-bold" style="color:#6366F1">Ch</span>
+                <span class="text-sm font-extrabold" style="color:#6366F1">{{ chapter.chapterNumber || (i + 1) }}</span>
+              </div>
+              <!-- Chapter info -->
+              <div class="flex-1 min-w-0 text-left">
+                <p class="text-ink-900 font-semibold text-sm leading-tight truncate">{{ chapter.title }}</p>
+                @if (!chapterOwnPdf() && chapter.startPage) {
+                  <p class="text-ink-500 text-xs mt-0.5">Page {{ chapter.startPage }}</p>
+                }
+              </div>
+              <!-- Open pill -->
+              <span class="pdf-pill shrink-0">
+                <span class="material-symbols-outlined" style="font-size:12px">picture_as_pdf</span>
+                OPEN
+              </span>
+            </button>
           }
         </div>
       } @else {
         <div class="hud-card-flat flex flex-col items-center gap-4 py-12 text-center">
-          <span class="material-symbols-outlined text-4xl" style="color:#ac8884">folder_off</span>
-          <p class="text-[#e6bdb8]/70 text-sm">No chapters found in this book.</p>
+          <span class="material-symbols-outlined text-4xl text-ink-300">folder_off</span>
+          <p class="text-ink-500 text-sm">No chapters found for this book.</p>
         </div>
       }
     </section>
@@ -166,33 +179,23 @@
   <!-- ── Error state ── -->
   @if (!loading() && booksError()) {
     <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
-      <span class="material-symbols-outlined text-5xl" style="color:#ac8884">cloud_off</span>
-      <h3 class="hud-display text-xl text-white">Content Coming Soon</h3>
-      <p class="text-[#e6bdb8]/70 text-sm max-w-xs">
-        NCERT content for Class {{ selectedClass }} {{ selectedSubject }} is being prepared.
+      <span class="material-symbols-outlined text-5xl text-ink-300">cloud_off</span>
+      <h3 class="hud-display text-xl text-ink-900">Content Coming Soon</h3>
+      <p class="text-ink-500 text-sm max-w-xs">
+        NCERT content for Class {{ selectedClass }} is being prepared.
       </p>
     </div>
   }
 
-  <!-- ── No subject chosen ── -->
-  @if (!loading() && !selectedSubject && !booksError()) {
+  <!-- ── No books found state ── -->
+  @if (!loading() && !booksError() && !selectedBook() && allBooks().length > 0 && books().length === 0) {
     <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
-      <span class="material-symbols-outlined text-5xl" style="color:#ac8884">local_library</span>
-      <h3 class="hud-display text-xl text-white">Select a Subject</h3>
-      <p class="text-[#e6bdb8]/70 text-sm">
-        Choose a subject above to see NCERT books for Class {{ selectedClass }}.
+      <span class="material-symbols-outlined text-5xl text-ink-300">search_off</span>
+      <h3 class="hud-display text-xl text-ink-900">No Books for {{ selectedSubject }}</h3>
+      <p class="text-ink-500 text-sm">
+        No NCERT books found for {{ selectedSubject }} in Class {{ selectedClass }}.
       </p>
-    </div>
-  }
-
-  <!-- ── Subject chosen but no books ── -->
-  @if (!loading() && selectedSubject && !booksError() && books().length === 0) {
-    <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
-      <span class="material-symbols-outlined text-5xl" style="color:#ac8884">menu_book</span>
-      <h3 class="hud-display text-xl text-white">No Books Found</h3>
-      <p class="text-[#e6bdb8]/70 text-sm">
-        No NCERT books available for Class {{ selectedClass }} {{ selectedSubject }}.
-      </p>
+      <button class="hud-btn-ghost" (click)="onSubjectSelect('')">Show All Books</button>
     </div>
   }
 

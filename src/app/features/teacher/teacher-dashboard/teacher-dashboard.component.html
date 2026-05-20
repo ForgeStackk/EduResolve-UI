@@ -1,27 +1,27 @@
-<div class="space-y-8">
+﻿<div class="space-y-8">
 
   <!-- Header briefing -->
   <header class="space-y-3">
     <div class="flex items-center gap-2">
-      <span class="hud-caps text-red-400">TEACHER SUITE</span>
+      <span class="hud-caps text-teal-600">Teacher</span>
       @if (classLabel()) {
-        <span class="hud-caps text-[#e6bdb8]/70">· {{ classLabel() }}</span>
+        <span class="hud-caps text-ink-500">· {{ classLabel() }}</span>
       }
     </div>
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
       <div>
-        <h1 class="hud-display text-4xl sm:text-5xl text-white uppercase tracking-tight leading-none">
-          Workflows &amp; <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Insights</span>
+        <h1 class="hud-display text-4xl sm:text-5xl text-ink-900 tracking-tight leading-none">
+          Teacher <span class="text-brand-500">Dashboard</span>
         </h1>
-        <p class="text-base sm:text-lg text-[#e6bdb8] mt-2 max-w-2xl">
-          Optimized orchestration for your class. Intervene on bottlenecks and dispatch drills without leaving the HUD.
+        <p class="text-base sm:text-lg text-ink-500 mt-2 max-w-2xl">
+          Monitor your class, identify topics that need attention, and dispatch practice drills.
         </p>
       </div>
       <button class="hud-btn-primary shrink-0 opacity-50 cursor-not-allowed relative" disabled title="Coming soon">
         <span class="material-symbols-outlined fill">add_circle</span>
         Create Assignment
         <span class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-bold
-                     px-1.5 py-0.5 rounded-full leading-none tracking-wide">SOON</span>
+                     px-1.5 py-0.5 rounded-full leading-none tracking-wide">Soon</span>
       </button>
     </div>
   </header>
@@ -32,36 +32,34 @@
     <!-- ===== LEFT COLUMN ============================================== -->
     <div class="space-y-6">
 
-      <!-- ForgeAI Bottleneck Analysis -->
+      <!-- AI insights: Needs attention -->
       <section class="hud-card space-y-4">
         <div class="hud-accent"></div>
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined fill text-red-500">auto_awesome</span>
-          <span class="hud-caps text-red-400">FORGEAI BOTTLENECK ANALYSIS</span>
+          <span class="material-symbols-outlined fill text-teal-600">auto_awesome</span>
+          <span class="hud-caps">AI insights: Needs attention</span>
         </div>
 
-        <!-- Doubt Cluster -->
-        <div class="rounded-lg border border-red-500/40 bg-red-600/10 p-4
-                    shadow-[0_0_15px_rgba(220,38,38,0.15)]">
+        <!-- Needs attention -->
+        <div class="rounded-lg border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="material-symbols-outlined text-red-400" style="font-size:18px">warning</span>
-            <h4 class="hud-display text-base text-white">DoubtCluster: Integration by Parts</h4>
+            <span class="material-symbols-outlined text-red-500" style="font-size:18px">warning</span>
+            <h4 class="hud-display text-base text-ink-900">Needs attention: Integration by Parts</h4>
           </div>
-          <p class="text-sm text-[#fbdbd7] leading-relaxed">
-            65% of students failed to identify <strong class="text-white">u/v substitution</strong>
+          <p class="text-sm text-ink-700 leading-relaxed">
+            65% of students failed to identify <strong class="text-ink-900">u/v substitution</strong>
             in the mid-week quiz. Recommend targeted drill.
           </p>
         </div>
 
-        <!-- Velocity Alert -->
-        <div class="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4
-                    shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+        <!-- On track -->
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="material-symbols-outlined text-amber-400" style="font-size:18px">rocket_launch</span>
-            <h4 class="hud-display text-base text-white">Velocity Alert: Rapid Completion</h4>
+            <span class="material-symbols-outlined text-amber-500" style="font-size:18px">rocket_launch</span>
+            <h4 class="hud-display text-base text-ink-900">On track: Rapid Completion</h4>
           </div>
-          <p class="text-sm text-[#fbdbd7] leading-relaxed">
-            Top 15% finishing <strong class="text-white">Vector Spaces</strong> 2 days ahead of
+          <p class="text-sm text-ink-700 leading-relaxed">
+            Top 15% finishing <strong class="text-ink-900">Vector Spaces</strong> 2 days ahead of
             schedule. Auto-unlock advanced modules?
           </p>
         </div>
@@ -72,20 +70,20 @@
     <!-- ===== RIGHT COLUMN ============================================= -->
     <div class="space-y-6">
 
-      <!-- ForgeAI Test Builder -->
+      <!-- AI Test Builder -->
       <section class="hud-card space-y-5">
-        <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+        <div class="hud-accent"></div>
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined fill text-amber-400">settings_suggest</span>
+          <span class="material-symbols-outlined fill text-teal-600">settings_suggest</span>
           <div>
-            <h3 class="hud-display text-xl text-white">FORGEAI TEST BUILDER</h3>
-            <p class="text-xs text-[#e6bdb8]/80">Generate tests with the Assessment Wizard.</p>
+            <h3 class="hud-display text-xl text-ink-900">AI Test Builder</h3>
+            <p class="text-xs text-ink-500">Generate tests with the Assessment Wizard.</p>
           </div>
         </div>
 
         <!-- Syllabus scope -->
         <div>
-          <label class="hud-caps text-[#e6bdb8]/80 mb-2 block">SELECT SYLLABUS SCOPE</label>
+          <label class="hud-caps mb-2 block">Select syllabus scope</label>
           <div class="flex flex-wrap gap-2">
             <span class="hud-chip hud-chip-active">Chapter 5 — Integrals</span>
             <span class="hud-chip">+ Add Chapter</span>
@@ -94,40 +92,39 @@
 
         <!-- Difficulty Matrix -->
         <div>
-          <label class="hud-caps text-[#e6bdb8]/80 mb-3 block">DIFFICULTY MATRIX</label>
+          <label class="hud-caps mb-3 block">Difficulty mix</label>
           <div class="space-y-3">
             @for (row of [
-              { label: 'REMEMBERING', pct: 20, color: '#3b82f6' },
-              { label: 'APPLYING',    pct: 50, color: '#f59e0b' },
-              { label: 'ANALYSING',   pct: 80, color: '#dc2626' }
+              { label: 'Remembering', pct: 20, color: '#3b82f6' },
+              { label: 'Applying',    pct: 50, color: '#f59e0b' },
+              { label: 'Analysing',   pct: 80, color: '#dc2626' }
             ]; track row.label) {
-              <div class="grid grid-cols-[90px_1fr_34px] items-center gap-3">
-                <span class="hud-caps text-[#e6bdb8]">{{ row.label }}</span>
-                <div class="h-[6px] rounded-full border border-white/10 bg-[#44302e] relative">
+              <div class="grid grid-cols-[100px_1fr_34px] items-center gap-3">
+                <span class="text-xs text-ink-500 font-medium">{{ row.label }}</span>
+                <div class="h-[6px] rounded-full bg-surface-2 relative">
                   <div class="h-full rounded-full"
                        [style.width.%]="row.pct"
-                       [style.background]="row.color"
-                       [style.box-shadow]="'0 0 8px ' + row.color"></div>
+                       [style.background]="row.color"></div>
                 </div>
-                <span class="text-xs text-white text-right tabular-nums">{{ row.pct }}%</span>
+                <span class="text-xs text-ink-700 text-right tabular-nums font-medium">{{ row.pct }}%</span>
               </div>
             }
           </div>
         </div>
 
         <!-- Draft preview -->
-        <div class="rounded-lg border border-white/10 bg-black/30 p-4 space-y-1.5">
-          <p class="hud-caps text-[#e6bdb8]/70 mb-2">DRAFT PREVIEW</p>
-          <p class="text-sm text-[#fbdbd7]">▸ MCQ on Chain Rule and Applications</p>
-          <p class="text-sm text-[#fbdbd7]">▸ Fill — Fundamental Theorem</p>
-          <p class="text-sm text-[#e6bdb8]/70 italic">▸ [Read] Supplemental question…</p>
+        <div class="rounded-lg border border-surface-3 bg-surface-2 p-4 space-y-1.5">
+          <p class="hud-caps mb-2">Draft preview</p>
+          <p class="text-sm text-ink-700">▸ MCQ on Chain Rule and Applications</p>
+          <p class="text-sm text-ink-700">▸ Fill — Fundamental Theorem</p>
+          <p class="text-sm text-ink-500 italic">▸ [Read] Supplemental question…</p>
         </div>
 
         <button class="hud-btn-primary w-full opacity-50 cursor-not-allowed relative" disabled title="Coming soon">
           <span class="material-symbols-outlined fill">bolt</span>
-          Forge Assessment
+          Generate Assessment
           <span class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-bold
-                       px-1.5 py-0.5 rounded-full leading-none tracking-wide">SOON</span>
+                       px-1.5 py-0.5 rounded-full leading-none tracking-wide">Soon</span>
         </button>
       </section>
     </div>

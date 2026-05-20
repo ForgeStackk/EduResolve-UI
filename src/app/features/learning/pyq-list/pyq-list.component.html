@@ -1,6 +1,6 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 
-  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
+  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-ink-500 hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
     BACK TO LIBRARY
   </a>
@@ -10,16 +10,16 @@
     <h1 class="hud-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
       {{ 'pyq.title' | translate }}
     </h1>
-    <p class="text-base text-[#e6bdb8] max-w-2xl">
+    <p class="text-base text-ink-500 max-w-2xl">
       Battle-tested questions from prior board examinations. Filter by year and difficulty to drill targeted scenarios.
     </p>
   </header>
 
   <!-- Filters -->
   <section class="hud-card grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+    <div class="hud-accent" style="background:#f59e0b"></div>
     <div>
-      <label for="difficulty" class="hud-caps text-[#e6bdb8]/80 mb-2 block">
+      <label for="difficulty" class="hud-caps text-ink-500 mb-2 block">
         {{ 'pyq.filterDifficulty' | translate }}
       </label>
       <select id="difficulty" [(ngModel)]="difficulty" (ngModelChange)="reload()"
@@ -31,7 +31,7 @@
       </select>
     </div>
     <div>
-      <label for="year" class="hud-caps text-[#e6bdb8]/80 mb-2 block">
+      <label for="year" class="hud-caps text-ink-500 mb-2 block">
         {{ 'pyq.filterYear' | translate }}
       </label>
       <input id="year" type="number" [(ngModel)]="year" (change)="reload()"
@@ -41,9 +41,9 @@
 
   <!-- Results -->
   @if (loading()) {
-    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
+    <div class="hud-card-flat text-center text-ink-500 py-10">{{ 'common.loading' | translate }}</div>
   } @else if (rows().length === 0) {
-    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.noResults' | translate }}</div>
+    <div class="hud-card-flat text-center text-ink-500 py-10">{{ 'common.noResults' | translate }}</div>
   } @else {
     <ul class="space-y-3">
       @for (row of rows(); track row.id) {
@@ -68,7 +68,7 @@
                 {{ 'pyq.showAnswer' | translate }}
                 <span class="material-symbols-outlined group-open:rotate-180 transition-transform" style="font-size:16px">expand_more</span>
               </summary>
-              <p class="mt-4 text-sm text-[#fbdbd7] whitespace-pre-line leading-relaxed pt-4 border-t border-white/10">
+              <p class="mt-4 text-sm text-ink-700 whitespace-pre-line leading-relaxed pt-4 border-t border-surface-3">
                 {{ row.modelAnswer }}
               </p>
             </details>

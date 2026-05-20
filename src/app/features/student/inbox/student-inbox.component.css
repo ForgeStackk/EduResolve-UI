@@ -3,29 +3,27 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.4rem 0.875rem;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0,0,0,0.3);
-  color: #e6bdb8;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 0.375rem;
+  border: 1px solid #E5E9F2;
+  background: #ffffff;
+  color: #64748B;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 99px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.04);
 }
-
 .hud-tab:hover {
-  border-color: rgba(255,255,255,0.25);
-  color: #fff;
+  border-color: #CBD5E1;
+  color: #334155;
+  background: #F1F3F9;
 }
-
 .hud-tab-active {
-  border-color: #dc2626;
-  color: #fff;
-  background: rgba(220,38,38,0.12);
-  box-shadow: 0 0 12px rgba(220,38,38,0.25);
+  border-color: #6366F1;
+  color: #4338ca;
+  background: #EEF0FF;
+  box-shadow: none;
 }
 
 .hud-badge {
@@ -36,8 +34,8 @@
   height: 1.1rem;
   padding: 0 0.25rem;
   border-radius: 9999px;
-  background: rgba(220,38,38,0.2);
-  color: #fca5a5;
+  background: #EEF0FF;
+  color: #6366F1;
   font-size: 0.6rem;
   font-weight: 700;
 }
@@ -50,9 +48,8 @@
   height: 1.1rem;
   padding: 0 0.25rem;
   border-radius: 9999px;
-  background: #dc2626;
+  background: #EF4444;
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
-  box-shadow: 0 0 6px rgba(220,38,38,0.6);
 }

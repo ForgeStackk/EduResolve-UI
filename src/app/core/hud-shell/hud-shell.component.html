@@ -1,9 +1,9 @@
-<div class="hud-shell relative min-h-screen text-[#fbdbd7]">
+<div class="hud-shell relative min-h-screen text-ink-900">
 
   <!-- Fixed Top App Bar -->
   <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 h-16
-                 bg-black/40 backdrop-blur-xl border-b border-white/10
-                 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                 bg-white/90 backdrop-blur-xl border-b border-surface-3
+                 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
 
     <!-- Left: Back (contextual) + Brand -->
     <div class="flex items-center gap-2">
@@ -17,13 +17,12 @@
       }
 
       <a [routerLink]="theme().homeLink" class="flex items-center gap-3 group">
-        <div class="w-9 h-9 rounded-full overflow-hidden border border-[#dc2626]/60
-                    bg-[#382523] flex items-center justify-center
-                    shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+        <div class="w-9 h-9 rounded-full overflow-hidden border border-brand-200
+                    bg-brand-soft flex items-center justify-center">
           @if (role() === 'student') {
-            <span class="font-bold text-sm tracking-wide text-[#fbdbd7]">{{ initials() || '?' }}</span>
+            <span class="font-bold text-sm tracking-wide text-brand-600">{{ initials() || '?' }}</span>
           } @else {
-            <span class="material-symbols-outlined text-[#ffb4ab]" style="font-size:20px">
+            <span class="material-symbols-outlined text-brand-500" style="font-size:20px">
               @switch (role()) {
                 @case ('teacher') { school }
                 @case ('admin')   { shield_person }
@@ -33,8 +32,8 @@
           }
         </div>
         @if (!showBackBtn()) {
-          <span class="hud-display text-lg sm:text-xl text-white italic tracking-widest
-                       group-hover:text-[#ffb4ab] transition-colors">{{ theme().brand }}</span>
+          <span class="hud-display text-lg sm:text-xl text-ink-900 tracking-tight
+                       group-hover:text-brand-600 transition-colors">{{ theme().brand }}</span>
         }
       </a>
     </div>
@@ -42,12 +41,10 @@
     <!-- Center: School badge -->
     @if (schoolName()) {
       <div class="hidden sm:flex items-center gap-2.5 pl-1.5 pr-4 py-1.5
-                  bg-gradient-to-r from-amber-500/20 to-yellow-400/10
-                  rounded-full border border-amber-400/40
-                  shadow-[0_0_16px_rgba(251,191,36,0.25)]">
+                  bg-surface-2 rounded-full border border-surface-3">
         <img src="/images/school emblem.jpg" alt="School emblem"
-             class="w-8 h-8 rounded-full object-cover border-2 border-amber-300/60 bg-white shrink-0">
-        <span class="text-amber-200 font-bold text-sm tracking-wide">{{ schoolName() }}</span>
+             class="w-8 h-8 rounded-full object-cover border-2 border-surface-3 bg-white shrink-0">
+        <span class="text-ink-700 font-semibold text-sm tracking-wide">{{ schoolName() }}</span>
       </div>
     }
 
@@ -56,26 +53,26 @@
       <app-language-toggle></app-language-toggle>
 
       @if (role() === 'student') {
-        <div class="flex items-center gap-1 text-red-500 font-bold tracking-tight px-3 py-1.5
-                    bg-white/5 rounded-full border border-white/10">
+        <div class="flex items-center gap-1 text-amber-600 font-semibold tracking-tight px-3 py-1.5
+                    bg-amber-50 rounded-full border border-amber-200">
           <span class="text-base leading-none">🔥</span>
           <span class="text-sm tabular-nums">{{ streak() }}</span>
         </div>
       } @else {
-        <div class="hidden sm:flex items-center gap-1 hud-caps text-red-400 px-3 py-1.5
-                    bg-white/5 rounded-full border border-white/10">
+        <div class="hidden sm:flex items-center gap-1 hud-caps text-brand-600 px-3 py-1.5
+                    bg-brand-soft rounded-full border border-brand-200">
           <span class="material-symbols-outlined" style="font-size:14px">verified</span>
-          <span>{{ role() | uppercase }}</span>
+          <span>{{ role() }}</span>
         </div>
       }
 
       <button (click)="logout()"
-              class="flex items-center gap-1 text-white/60 hover:text-white
-                     bg-white/5 hover:bg-red-900/40 px-3 py-1.5
-                     rounded-full border border-white/10 transition-colors"
+              class="flex items-center gap-1 text-ink-500 hover:text-red-600
+                     bg-surface-2 hover:bg-red-50 px-3 py-1.5
+                     rounded-full border border-surface-3 hover:border-red-200 transition-colors"
               title="Logout">
         <span class="material-symbols-outlined" style="font-size:18px">logout</span>
-        <span class="hidden sm:inline text-xs tracking-widest uppercase">{{ 'nav.logout' | translate }}</span>
+        <span class="hidden sm:inline text-xs font-medium">{{ 'nav.logout' | translate }}</span>
       </button>
     </div>
   </header>
@@ -87,18 +84,17 @@
 
   <!-- Fixed Bottom Navigation -->
   <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center
-              px-3 pb-3 pt-2 bg-black/60 backdrop-blur-xl
-              rounded-t-2xl border-t border-white/15
-              shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+              px-3 pb-3 pt-2 bg-white/95 backdrop-blur-xl
+              rounded-t-2xl border-t border-surface-3
+              shadow-[0_-4px_12px_rgba(15,23,42,0.06)]">
     @for (item of theme().nav; track item.link) {
       @if (item.comingSoon) {
-        <!-- Coming Soon nav item: greyed out, unclickable -->
         <div class="hud-nav-link hud-nav-coming-soon flex flex-col items-center gap-0.5"
              [attr.aria-label]="(item.labelKey | translate) + ' — Coming Soon'"
              title="Coming Soon">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
-          <span class="text-[10px] tracking-widest uppercase opacity-60">{{ item.labelKey | translate }}</span>
-          <span class="coming-soon-dot">SOON</span>
+          <span class="text-[10px] font-medium">{{ item.labelKey | translate }}</span>
+          <span class="coming-soon-dot">Soon</span>
         </div>
       } @else {
         <a [routerLink]="item.link"
@@ -107,7 +103,7 @@
            class="hud-nav-link flex flex-col items-center gap-0.5"
            [attr.aria-label]="item.labelKey | translate">
           <span class="material-symbols-outlined">{{ item.icon }}</span>
-          <span class="text-[10px] tracking-widest uppercase opacity-80">{{ item.labelKey | translate }}</span>
+          <span class="text-[10px] font-medium">{{ item.labelKey | translate }}</span>
         </a>
       }
     }

@@ -1,6 +1,6 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 
-  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
+  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-ink-500 hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
     {{ 'doubt.backToHud' | translate }}
   </a>
@@ -10,21 +10,21 @@
     <h1 class="hud-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
       {{ 'doubt.title' | translate }}
     </h1>
-    <p class="text-base text-[#e6bdb8] max-w-2xl">{{ 'doubt.subtitle' | translate }}</p>
+    <p class="text-base text-ink-500 max-w-2xl">{{ 'doubt.subtitle' | translate }}</p>
   </header>
 
   <!-- Input -->
   <section class="hud-card space-y-4">
-    <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+    <div class="hud-accent" style="background:#3b82f6"></div>
 
     <!-- Subject context bar -->
     @if (catalog.loading()) {
-      <p class="text-xs text-[#e6bdb8]/50">{{ 'doubt.loadingSubjects' | translate }}</p>
+      <p class="text-xs text-ink-300">{{ 'doubt.loadingSubjects' | translate }}</p>
     } @else if (catalog.hasError()) {
       <p class="text-xs text-amber-400/70">{{ 'doubt.comingSoon' | translate }}</p>
     } @else if (catalog.subjects().length > 0) {
       <div class="flex flex-wrap items-center gap-2">
-        <span class="hud-caps text-[#e6bdb8]/50 text-[10px]">SUBJECT:</span>
+        <span class="hud-caps text-ink-300 text-[10px]">SUBJECT:</span>
         @for (s of catalog.subjects(); track s) {
           <button type="button"
                   (click)="selectedSubject.set(selectedSubject() === s ? '' : s)"
@@ -68,18 +68,18 @@
         </span>
       </div>
 
-      <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ a.answer }}</p>
+      <p class="text-[15px] text-ink-700 whitespace-pre-line leading-relaxed">{{ a.answer }}</p>
 
       <!-- Images Gallery -->
       @if (a.images && a.images.length > 0) {
-        <div class="pt-4 border-t border-white/10">
+        <div class="pt-4 border-t border-surface-3">
           <p class="hud-caps text-red-400 mb-3 flex items-center gap-2">
             <span class="material-symbols-outlined" style="font-size:16px">image_search</span>
             {{ 'doubt.relatedVisuals' | translate }}
           </p>
           <div class="grid grid-cols-2 gap-3">
             @for (image of a.images; track $index) {
-              <div class="overflow-hidden rounded-lg border border-white/10 hover:border-blue-400 transition-colors">
+              <div class="overflow-hidden rounded-lg border border-surface-3 hover:border-blue-400 transition-colors">
                 <img [src]="image"
                      alt="Educational visual for: {{ a.answer | slice:0:50 }}"
                      class="w-full h-40 object-cover hover:scale-105 transition-transform"
@@ -90,7 +90,7 @@
         </div>
       }
 
-      <div class="pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
+      <div class="pt-4 border-t border-surface-3 grid grid-cols-2 gap-3">
         <button type="button"
                 (click)="rate('up')"
                 [disabled]="feedback() !== null"
@@ -124,11 +124,11 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="hud-card-flat">
         <p class="hud-caps text-red-400 mb-2">{{ 'doubt.tip1Title' | translate }}</p>
-        <p class="text-sm text-[#fbdbd7]">{{ 'doubt.tip1Body' | translate }}</p>
+        <p class="text-sm text-ink-700">{{ 'doubt.tip1Body' | translate }}</p>
       </div>
       <div class="hud-card-flat">
         <p class="hud-caps text-red-400 mb-2">{{ 'doubt.tip2Title' | translate }}</p>
-        <p class="text-sm text-[#fbdbd7]">{{ 'doubt.tip2Body' | translate }}</p>
+        <p class="text-sm text-ink-700">{{ 'doubt.tip2Body' | translate }}</p>
       </div>
     </div>
   </section>

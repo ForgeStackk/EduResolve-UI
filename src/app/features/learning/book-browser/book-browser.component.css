@@ -1,35 +1,29 @@
 /* =============================================================
-   Book Browser — HUD Design System
-   All layout utilities are Tailwind classes in the template.
-   This file only defines custom component classes.
+   Book Browser — Lumina light theme
    ============================================================= */
 
 /* ── Subject Select ─────────────────────────────────────────── */
-/* Native <select> gives us full control over text color,
-   eliminating the white-on-light invisible-text bug. */
 .hud-subject-select {
   width: 100%;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #ffffff;
+  border: 1px solid #E5E9F2;
   border-radius: 10px;
-  /* High-contrast white text — always visible against the dark HUD */
-  color: #ffffff;
+  color: #0F172A;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.01em;
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.04);
 }
 .hud-subject-select:focus {
-  border-color: rgba(220, 38, 38, 0.5);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
-/* Option text must also be high-contrast (dark background) */
 .hud-subject-select option {
-  background: #1f0f0d;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0F172A;
   font-weight: 600;
 }
 
@@ -37,37 +31,34 @@
 .book-card {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #E5E9F2;
   border-radius: 14px;
   cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
   overflow: hidden;
   text-align: left;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.04);
 }
 .book-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: #F7F8FC;
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.06);
   transform: translateY(-1px);
 }
-.book-card:active {
-  transform: scale(0.98);
-}
+.book-card:active { transform: scale(0.98); }
 .book-card--active {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: #EEF0FF;
+  border-color: #a5b4fc;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.12);
 }
-/* Colored left stripe — subject accent */
 .book-card__stripe {
   width: 4px;
   align-self: stretch;
   flex-shrink: 0;
   transition: width 0.15s ease;
 }
-.book-card--active .book-card__stripe {
-  width: 6px;
-}
+.book-card--active .book-card__stripe { width: 5px; }
 
 /* ── Chapter Row ─────────────────────────────────────────────── */
 .chapter-row {
@@ -76,23 +67,22 @@
   gap: 14px;
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #E5E9F2;
   border-radius: 12px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
   text-align: left;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.04);
 }
 .chapter-row:hover {
-  background: rgba(220, 38, 38, 0.08);
-  border-color: rgba(220, 38, 38, 0.28);
-  transform: translateX(4px);
+  background: #EEF0FF;
+  border-color: #c7d2fe;
+  transform: translateX(3px);
 }
-.chapter-row:active {
-  transform: scale(0.98) translateX(0);
-}
+.chapter-row:active { transform: scale(0.99) translateX(0); }
 
-/* Chapter number badge (red ring) */
+/* Chapter number badge */
 .chapter-num {
   display: flex;
   flex-direction: column;
@@ -101,9 +91,10 @@
   width: 46px;
   height: 46px;
   border-radius: 10px;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.22);
-  color: #dc2626;
+  background: #EEF0FF;
+  border: 1px solid #c7d2fe;
+  color: #6366F1;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -114,20 +105,19 @@
   gap: 4px;
   padding: 5px 10px;
   border-radius: 20px;
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid rgba(220, 38, 38, 0.22);
-  color: #f87171;
+  background: #E8F8EE;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background 0.15s, border-color 0.15s;
 }
 .chapter-row:hover .pdf-pill {
-  background: rgba(220, 38, 38, 0.18);
-  border-color: rgba(220, 38, 38, 0.45);
-  color: #fca5a5;
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
 }
 
 /* ── Skeleton Sweep ──────────────────────────────────────────── */
@@ -141,7 +131,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.06) 50%,
+    rgba(99, 102, 241, 0.06) 50%,
     transparent 100%
   );
   animation: skeleton-sweep 1.4s ease-in-out infinite;

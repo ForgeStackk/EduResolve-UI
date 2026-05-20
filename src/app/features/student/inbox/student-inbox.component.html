@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 
   <!-- Header -->
   <header class="space-y-1">
@@ -60,7 +60,7 @@
   </nav>
 
   @if (loading()) {
-    <div class="text-center py-12 text-[#e6bdb8]">{{ 'common.loading' | translate }}</div>
+    <div class="text-center py-12 text-ink-500">{{ 'common.loading' | translate }}</div>
   } @else {
 
     <!-- NOTIFICATIONS tab -->
@@ -68,17 +68,17 @@
       <div class="space-y-3">
         @if (notifications().length === 0) {
           <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">notifications_none</span>
-            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noNotifications' | translate }}</p>
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">notifications_none</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noNotifications' | translate }}</p>
           </div>
         }
         @for (item of notifications(); track item.inboxId) {
           <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
                    (click)="markRead(item)">
-            <div class="hud-accent" style="background:#dc2626;box-shadow:0 0 10px rgba(220,38,38,0.5)"></div>
+            <div class="hud-accent" style="background:#dc2626"></div>
             <div class="flex items-start gap-3 pl-2">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                          bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.3)]">
+                          bg-red-600/20">
                 <span class="material-symbols-outlined text-red-400">warning</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -87,9 +87,9 @@
                   @if (item.readStatus === 'UNREAD') {
                     <span class="hud-chip bg-red-600/20 text-red-400 border-red-500/50">{{ 'inbox.unread' | translate }}</span>
                   }
-                  <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                  <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
                 </div>
-                <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">
+                <p class="text-sm text-ink-700 mt-1 leading-relaxed">
                   {{ item.textBody ?? ('inbox.absentOn' | translate: { date: formatDate(item.sentAt) }) }}
                 </p>
               </div>
@@ -104,17 +104,17 @@
       <div class="space-y-3">
         @if (classNotices().length === 0) {
           <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">campaign</span>
-            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noClassNotices' | translate }}</p>
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">campaign</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noClassNotices' | translate }}</p>
           </div>
         }
         @for (item of classNotices(); track item.inboxId) {
           <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
                    (click)="markRead(item)">
-            <div class="hud-accent" style="background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.4)"></div>
+            <div class="hud-accent" style="background:#f59e0b"></div>
             <div class="flex items-start gap-3 pl-2">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                          bg-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.2)]">
+                          bg-amber-500/20">
                 <span class="material-symbols-outlined text-amber-400">campaign</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -123,9 +123,9 @@
                   @if (item.readStatus === 'UNREAD') {
                     <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
                   }
-                  <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                  <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
                 </div>
-                <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
                 <app-message-attachments [attachments]="item.attachments" />
               </div>
             </div>
@@ -139,8 +139,8 @@
       <div class="space-y-6">
         @if (subjectMessages().length === 0) {
           <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">chat_bubble_outline</span>
-            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noMessages' | translate }}</p>
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">chat_bubble_outline</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noMessages' | translate }}</p>
           </div>
         }
         @for (group of subjectMessages(); track group.subject) {
@@ -155,7 +155,7 @@
                 <div class="hud-accent"></div>
                 <div class="flex items-start gap-3 pl-2">
                   <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                              bg-red-600/20 shadow-[inset_0_0_15px_rgba(220,38,38,0.2)]">
+                              bg-red-600/20">
                     <span class="material-symbols-outlined text-red-400">chat</span>
                   </div>
                   <div class="flex-1 min-w-0">
@@ -164,9 +164,9 @@
                       @if (item.readStatus === 'UNREAD') {
                         <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
                       }
-                      <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                      <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
                     </div>
-                    <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                    <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
                     <app-message-attachments [attachments]="item.attachments" />
                   </div>
                 </div>
@@ -182,8 +182,8 @@
       <div class="space-y-6">
         @if (homeworkItems().length === 0) {
           <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">assignment_turned_in</span>
-            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noHomework' | translate }}</p>
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">assignment_turned_in</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noHomework' | translate }}</p>
           </div>
         }
         @for (group of homeworkItems(); track group.subject) {
@@ -202,7 +202,7 @@
                        : '0 0 10px rgba(245,158,11,0.4)'"></div>
                 <div class="flex items-start gap-3 pl-2">
                   <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                              bg-amber-500/20 shadow-[inset_0_0_15px_rgba(245,158,11,0.2)]">
+                              bg-amber-500/20">
                     <span class="material-symbols-outlined text-amber-400">assignment</span>
                   </div>
                   <div class="flex-1 min-w-0">
@@ -218,9 +218,9 @@
                           {{ 'inbox.dueDate' | translate: { date: formatDate(item.homeworkDueDate) } }}
                         </span>
                       }
-                      <span class="hud-caps text-[#e6bdb8]/60 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                      <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
                     </div>
-                    <p class="text-sm text-[#fbdbd7] mt-1 leading-relaxed">{{ item.textBody }}</p>
+                    <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
                     <app-message-attachments [attachments]="item.attachments" />
                   </div>
                 </div>
@@ -249,8 +249,8 @@
 
         @if (attendance().length === 0) {
           <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-[#ac8884]" style="font-size:40px">event_busy</span>
-            <p class="text-sm text-[#e6bdb8] mt-2">{{ 'inbox.noAttendance' | translate }}</p>
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">event_busy</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noAttendance' | translate }}</p>
           </div>
         } @else {
           <!-- Summary chips -->
@@ -278,7 +278,7 @@
                   <p class="hud-display text-sm text-white">{{ formatDay(rec.date) }}</p>
                   <p class="hud-caps text-xs" [style.color]="attendanceColor(rec.status)">{{ rec.status }}</p>
                   @if (rec.remarks) {
-                    <p class="text-xs text-[#e6bdb8]/70 mt-0.5 truncate">{{ rec.remarks }}</p>
+                    <p class="text-xs text-ink-500 mt-0.5 truncate">{{ rec.remarks }}</p>
                   }
                 </div>
               </div>

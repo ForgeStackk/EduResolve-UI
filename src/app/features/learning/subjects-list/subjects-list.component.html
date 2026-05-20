@@ -1,8 +1,8 @@
-<div class="space-y-8">
+﻿<div class="space-y-8">
 
   <!-- ── Back navigation ── -->
   <button (click)="goBack()"
-          class="inline-flex items-center gap-2 text-[#e6bdb8]/60 hover:text-white
+          class="inline-flex items-center gap-2 text-ink-500 hover:text-ink-900
                  transition-colors text-sm font-semibold group">
     <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
           style="font-size:18px">arrow_back</span>
@@ -13,29 +13,29 @@
   <header class="space-y-3">
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <h1 class="hud-display text-3xl sm:text-5xl uppercase tracking-tight leading-none">
-        <span class="text-white">Class</span>
-        <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)] ml-2">{{ classGrade() }}</span>
-        <span class="text-white ml-2">Subjects</span>
+        <span class="text-ink-900">Class</span>
+        <span class="text-red-600 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)] ml-2">{{ classGrade() }}</span>
+        <span class="text-ink-900 ml-2">Subjects</span>
       </h1>
-      <span class="hud-caps text-[#e6bdb8]/50 text-xs self-center hidden sm:inline">· NCERT CURRICULUM</span>
+      <span class="hud-caps text-ink-500 text-xs self-center hidden sm:inline">· NCERT CURRICULUM</span>
     </div>
-    <p class="text-sm sm:text-base text-[#e6bdb8]/80 max-w-xl leading-relaxed">
+    <p class="text-sm sm:text-base text-ink-500 max-w-xl leading-relaxed">
       Your complete NCERT curriculum — select a subject to browse chapters and open PDFs.
     </p>
   </header>
 
   <!-- Subjects grid -->
   @if (loading()) {
-    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
+    <div class="hud-card-flat text-center text-ink-500 py-10">{{ 'common.loading' | translate }}</div>
   } @else if (cards().length === 0) {
-    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
+    <div class="hud-card-flat text-center text-ink-500 py-10">
       No subjects found for Class {{ classGrade() }}. Check the NCERT folder.
     </div>
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       @for (c of cards(); track c.name) {
         <div (click)="openSubject(c.name)"
-             class="relative bg-[#281715]/60 backdrop-blur-[12px] border border-white/10
+             class="relative bg-[#281715]/60 backdrop-blur-[12px] border border-surface-3
                     rounded-xl p-5 flex flex-row items-center justify-between
                     hover:border-white/30 transition-all duration-300 overflow-hidden cursor-pointer
                     group hover:shadow-[0_0_20px_rgba(220,38,38,0.25)]">
@@ -52,7 +52,7 @@
 
           <div class="flex-1 pr-5 z-10 min-w-0">
             <h3 class="hud-display text-xl text-white truncate">{{ c.name }}</h3>
-            <p class="hud-caps text-[#ac8884] mt-1">{{ c.tag }}</p>
+            <p class="hud-caps text-ink-300 mt-1">{{ c.tag }}</p>
 
             <!-- Chapter count badge -->
             <div class="mt-4 flex items-center gap-2">

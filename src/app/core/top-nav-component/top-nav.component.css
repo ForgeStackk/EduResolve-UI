@@ -1,13 +1,13 @@
-/* Top Nav Styles */
+/* Top Nav — Lumina light theme */
 
 .school-badge {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 18px 6px 8px;
-  background: linear-gradient(135deg, #dc2626 0%, #9f1239 100%);
+  padding: 6px 16px 6px 8px;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
   border-radius: 40px;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4), 0 0 0 2px rgba(252, 165, 165, 0.2);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22);
 }
 
 .school-emblem-img {
@@ -15,7 +15,7 @@
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   background: #fff;
   flex-shrink: 0;
 }
@@ -25,6 +25,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.01em;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
 }
 
 .logout-btn {
@@ -33,25 +34,19 @@
   gap: 6px;
   padding: 6px 14px;
   background: transparent;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5E9F2;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: #64748B;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-
 .logout-btn:hover {
-  background: #fee2e2;
+  background: #FEF2F2;
   color: #b91c1c;
-  border-color: #fca5a5;
+  border-color: #fecaca;
 }
 
-.logout-icon {
-  font-size: 14px;
-}
-
-.logout-text {
-  white-space: nowrap;
-}
+.logout-icon { font-size: 14px; }
+.logout-text { white-space: nowrap; }

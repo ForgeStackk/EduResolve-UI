@@ -1,5 +1,5 @@
-<div class="space-y-6">
-  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors cursor-pointer">
+﻿<div class="space-y-6">
+  <a (click)="back()" class="inline-flex items-center gap-2 hud-caps text-ink-500 hover:text-white transition-colors cursor-pointer">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
     BACK TO LIBRARY
   </a>
@@ -12,13 +12,13 @@
       <span class="hud-caps text-red-400">CHAPTER BRIEFING</span>
       <h1 class="hud-display text-3xl sm:text-4xl text-white mt-2 leading-tight">{{ c.name }}</h1>
       @if (c.summary) {
-        <p class="text-base text-[#e6bdb8] mt-3 leading-relaxed">{{ c.summary }}</p>
+        <p class="text-base text-ink-500 mt-3 leading-relaxed">{{ c.summary }}</p>
       }
 
       <!-- Progress -->
-      <div class="mt-5 pt-4 border-t border-white/10">
+      <div class="mt-5 pt-4 border-t border-surface-3">
         <div class="flex items-center justify-between mb-2">
-          <span class="hud-caps text-[#e6bdb8]/80">MODULE PROGRESS</span>
+          <span class="hud-caps text-ink-500">MODULE PROGRESS</span>
           <span class="text-base font-bold text-red-400 tabular-nums">{{ progressPercent() }}%</span>
         </div>
         <div class="hud-meter">
@@ -81,21 +81,21 @@
                       <h4 class="hud-display text-base text-white">{{ chunk.title }}</h4>
                     }
                     @if (chunk.body) {
-                      <p class="text-[15px] text-[#fbdbd7] whitespace-pre-line leading-relaxed">{{ chunk.body }}</p>
+                      <p class="text-[15px] text-ink-700 whitespace-pre-line leading-relaxed">{{ chunk.body }}</p>
                     }
                     @if (chunk.imageUrl) {
-                      <div class="mt-3 rounded-lg overflow-hidden border border-white/10">
+                      <div class="mt-3 rounded-lg overflow-hidden border border-surface-3">
                         <img [src]="chunk.imageUrl" [alt]="chunk.title || 'Diagram'" class="w-full h-auto" />
                       </div>
                     }
                     @if (!chunk.body && !chunk.imageUrl) {
-                      <p class="text-sm text-[#e6bdb8]/70 italic">Loading detailed content...</p>
+                      <p class="text-sm text-ink-500 italic">Loading detailed content...</p>
                     }
                   </div>
                 }
               </div>
             } @else {
-              <p class="text-sm text-[#e6bdb8]/70 text-center py-6">
+              <p class="text-sm text-ink-500 text-center py-6">
                 No content available for this section yet. 
                 @if (active()[t.id] === 'SUMMARY') {
                   Try switching to Explanation tab for more details.
@@ -118,7 +118,7 @@
             <span class="material-symbols-outlined text-blue-400 shrink-0 mt-1">info</span>
             <div>
               <p class="hud-caps text-blue-400 mb-1">NCERT CONTENT AVAILABLE</p>
-              <p class="text-sm text-[#fbdbd7]">
+              <p class="text-sm text-ink-700">
                 This chapter is enhanced with NCERT textbook content. Additional diagrams, 3D models, and interactive visualizations will appear here as they're loaded from NCERT resources.
               </p>
             </div>
@@ -126,7 +126,7 @@
         </section>
       }
     } @else if (!loading()) {
-      <div class="hud-card-flat text-center text-[#e6bdb8] py-10">
+      <div class="hud-card-flat text-center text-ink-500 py-10">
         {{ 'common.noResults' | translate }}
       </div>
     }

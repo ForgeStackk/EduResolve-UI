@@ -15,7 +15,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 1px solid #E5E9F2;
   flex-shrink: 0;
 }
 
@@ -34,7 +34,7 @@
 .header-title h1 {
   font-size: 1.8rem;
   font-weight: 500;
-  color: #1976d2;
+  color: #6366F1;
   margin: 0 0 4px 0;
 }
 
@@ -103,7 +103,7 @@
 
 .slider-value {
   font-size: 0.85rem;
-  color: #1976d2;
+  color: #6366F1;
   font-weight: 500;
   text-align: center;
   margin-top: 4px;
@@ -182,7 +182,7 @@
 }
 
 .info-panel {
-  background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #EEF0FF 0%, #F7F8FC 100%);
   border-radius: 8px;
   padding: 16px;
   margin-top: 16px;
@@ -192,7 +192,7 @@
 .info-panel h3 {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #1976d2;
+  color: #6366F1;
   margin: 0 0 8px 0;
 }
 
@@ -221,7 +221,7 @@
   font-size: 16px;
   width: 16px;
   height: 16px;
-  color: #1976d2;
+  color: #6366F1;
 }
 
 /* Instructions Panel */
@@ -268,7 +268,7 @@
   font-size: 24px;
   width: 24px;
   height: 24px;
-  color: #1976d2;
+  color: #6366F1;
   flex-shrink: 0;
 }
 
@@ -418,7 +418,7 @@
 
 /* Focus States */
 .three-container:focus-within {
-  outline: 2px solid #1976d2;
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
 }
 
@@ -490,12 +490,12 @@
 
 /* Accessibility */
 .instruction-item:focus-within {
-  outline: 2px solid #1976d2;
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
 }
 
 .mat-button:focus,
 .mat-raised-button:focus {
-  outline: 2px solid #1976d2;
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
 }

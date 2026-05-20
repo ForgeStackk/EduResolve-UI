@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center justify-center p-4">
+﻿<div class="flex flex-col items-center justify-center p-4">
   @if (streak()?.gardenState === 'TREE') {
     <div class="w-32 h-32 mb-2 flex items-center justify-center" [ngClass]="animateGrowth() ? 'growth-pulse' : ''">
       <!-- Lottie Web Player for the Tree -->
@@ -16,7 +16,7 @@
       {{ getGardenEmoji() }}
     </div>
   }
-  <h3 (click)="triggerConfetti()" class="text-white font-bold text-lg mt-2 cursor-pointer hover:text-green-400 transition-colors" title="Click to test Confetti!">Streak Garden</h3>
-  <p class="text-red-400 font-bold text-2xl">🔥 {{ streak()?.currentStreak || 0 }} Days</p>
-  <p class="text-[#e6bdb8]/60 text-xs mt-1 uppercase tracking-widest">{{ streak()?.gardenState || 'WILTED' }}</p>
+  <h3 (click)="triggerConfetti()" class="text-ink-900 font-bold text-lg mt-2 cursor-pointer hover:text-green-600 transition-colors" title="Click to test Confetti!">Streak Garden</h3>
+  <p class="text-red-600 font-bold text-2xl">🔥 {{ streak()?.currentStreak || 0 }} Days</p>
+  <p class="text-ink-500 text-xs mt-1 uppercase tracking-widest">{{ streak()?.gardenState || 'WILTED' }}</p>
 </div>

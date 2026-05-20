@@ -3,34 +3,55 @@
 @tailwind utilities;
 
 @layer components {
+  /* Light card */
   .school-card {
-    @apply p-6 rounded-xl transition-all duration-300;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #e4e2e1;
+    @apply p-6 rounded-[14px] bg-white border border-[#E5E9F2] transition-all duration-200;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   }
-  
+
   .glass-card {
-    @apply rounded-xl transition-all duration-300;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply rounded-[14px] bg-white border border-[#E5E9F2] transition-all duration-200;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   }
-  
+
+  /* Primary CTA — indigo */
   .btn-primary {
-    @apply px-6 py-3 bg-[#ff5625] text-[#541100] font-bold rounded-lg hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-[#ff5625]/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-[#ff5625] focus:ring-offset-2 focus:ring-offset-[#131313];
+    @apply px-5 py-3 bg-brand-500 text-white font-semibold rounded-[10px]
+           hover:bg-brand-600 active:bg-brand-700
+           transition-all active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center gap-2
+           outline-none focus:ring-2 focus:ring-brand-200 focus:ring-offset-2 focus:ring-offset-white;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22);
   }
-  
+
+  /* Secondary — white outline */
   .btn-secondary {
-    @apply px-6 py-3 bg-[#1a1a2e] text-[#bef264] font-bold rounded-lg hover:opacity-90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-[#bef264] focus:ring-offset-2 focus:ring-offset-[#131313];
+    @apply px-5 py-3 bg-white text-ink-700 font-semibold rounded-[10px]
+           border border-[#E5E9F2]
+           hover:bg-surface-2 active:bg-surface-low
+           transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center gap-2
+           outline-none focus:ring-2 focus:ring-brand-100 focus:ring-offset-2;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   }
-  
+
+  /* Ghost — transparent with border */
   .btn-outline {
-    @apply px-6 py-3 border border-white/10 text-white font-bold rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center gap-2 outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-5 py-3 border border-[#E5E9F2] text-ink-700 font-semibold rounded-[10px]
+           hover:bg-surface-2 transition-colors
+           flex items-center justify-center gap-2
+           outline-none focus:ring-2 focus:ring-brand-100
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
+  /* Light form input */
   .form-input {
-    @apply w-full p-4 border border-white/10 rounded-xl outline-none focus:ring-0 transition-all bg-[#2a2a2a] text-white placeholder-slate-500 disabled:opacity-50;
+    @apply w-full px-4 py-3 border border-[#E5E9F2] rounded-[10px]
+           outline-none bg-white text-ink-900 placeholder-ink-300
+           focus:border-brand-400 focus:ring-2 focus:ring-brand-100
+           transition-all disabled:opacity-50;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   }
 }

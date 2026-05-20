@@ -1,10 +1,10 @@
-<div class="space-y-6 pb-6">
+﻿<div class="space-y-6 pb-6">
 
   <!-- Header -->
   <header class="space-y-1 px-1">
     <div class="flex items-center gap-2">
       <span class="hud-caps text-red-400">TEACHER SUITE</span>
-      <span class="hud-caps text-[#e6bdb8]/50">· ASSIGNMENTS</span>
+      <span class="hud-caps text-ink-300">· ASSIGNMENTS</span>
     </div>
     <h1 class="hud-display text-3xl text-white uppercase tracking-tight leading-none">
       Dispatch &amp; <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Archive</span>
@@ -12,13 +12,13 @@
   </header>
 
   <!-- Tab bar -->
-  <div class="flex gap-1 border-b border-white/10 px-1">
+  <div class="flex gap-1 border-b border-surface-3 px-1">
     @for (tab of tabs; track tab.id) {
       <button
         (click)="activeTab.set(tab.id)"
         [class]="activeTab() === tab.id
-          ? 'border-b-2 border-red-500 text-white'
-          : 'border-b-2 border-transparent text-[#e6bdb8]/60 hover:text-white'"
+          ? 'border-b-2 border-red-600 text-ink-900'
+          : 'border-b-2 border-transparent text-ink-500 hover:text-ink-900'"
         class="flex items-center gap-1.5 px-4 py-2.5 text-sm hud-caps transition-colors -mb-px">
         <span class="material-symbols-outlined" style="font-size:16px">{{ tab.icon }}</span>
         {{ tab.label }}
@@ -29,7 +29,7 @@
   <!-- ── HOMEWORK tab ──────────────────────────────────────────── -->
   @if (activeTab() === 'homework') {
     <section class="hud-card space-y-5">
-      <div class="hud-accent" style="background:#3b82f6; box-shadow:0 0 10px rgba(59,130,246,0.5)"></div>
+      <div class="hud-accent" style="background:#3b82f6"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-blue-400">send</span>
         <h3 class="hud-display text-xl text-white">HOMEWORK DISPATCH</h3>
@@ -39,27 +39,27 @@
       <div class="grid grid-cols-3 gap-3">
         <div class="hud-card-flat">
           <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                      bg-blue-500/20 shadow-[inset_0_0_15px_rgba(59,130,246,0.3)]">
+                      bg-blue-500/20">
             <span class="material-symbols-outlined text-blue-400">edit_note</span>
           </div>
-          <h5 class="hud-display text-sm text-white">Text Instruction</h5>
-          <p class="text-xs text-[#e6bdb8]/80 mt-1">Write custom text prompts.</p>
+          <h5 class="hud-display text-sm text-ink-900">Text Instruction</h5>
+          <p class="text-xs text-ink-500 mt-1">Write custom text prompts.</p>
         </div>
         <div class="hud-card-flat">
           <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                      bg-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.3)]">
+                      bg-emerald-500/20">
             <span class="material-symbols-outlined text-emerald-400">photo_camera</span>
           </div>
-          <h5 class="hud-display text-sm text-white">Capture Whiteboard</h5>
-          <p class="text-xs text-[#e6bdb8]/80 mt-1">Auto-OCR to text.</p>
+          <h5 class="hud-display text-sm text-ink-900">Capture Whiteboard</h5>
+          <p class="text-xs text-ink-500 mt-1">Auto-OCR to text.</p>
         </div>
         <div class="hud-card-flat">
           <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3
-                      bg-purple-500/20 shadow-[inset_0_0_15px_rgba(139,92,246,0.3)]">
+                      bg-purple-500/20">
             <span class="material-symbols-outlined text-purple-400">mic</span>
           </div>
-          <h5 class="hud-display text-sm text-white">Voice Memo</h5>
-          <p class="text-xs text-[#e6bdb8]/80 mt-1">Audio feedback &amp; guidance.</p>
+          <h5 class="hud-display text-sm text-ink-900">Voice Memo</h5>
+          <p class="text-xs text-ink-500 mt-1">Audio feedback &amp; guidance.</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
   <!-- ── MESSAGES tab ─────────────────────────────────────────── -->
   @if (activeTab() === 'messages') {
     <section class="hud-card space-y-4">
-      <div class="hud-accent" style="background:#8b5cf6; box-shadow:0 0 10px rgba(139,92,246,0.5)"></div>
+      <div class="hud-accent" style="background:#8b5cf6"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-purple-400">send</span>
         <h3 class="hud-display text-xl text-white">COMPOSE MESSAGE</h3>
@@ -83,7 +83,7 @@
   <!-- ── ARCHIVE tab ──────────────────────────────────────────── -->
   @if (activeTab() === 'archive') {
     <section class="hud-card space-y-4">
-      <div class="hud-accent" style="background:#f59e0b; box-shadow:0 0 10px rgba(245,158,11,0.5)"></div>
+      <div class="hud-accent" style="background:#f59e0b"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-amber-400">inventory_2</span>
         <h3 class="hud-display text-xl text-white">REPORT ARCHIVE</h3>

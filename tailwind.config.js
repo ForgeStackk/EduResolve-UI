@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config}
  *
- *  Design system: "Academic Excellence" mapped to a red / black / white palette.
- *  Tonal layering with 1px borders (no heavy shadows) - see styles.css for the
- *  CSS variables that mirror these tokens.
+ * Design system: "Lumina" — Indigo / White / Light
+ * Calm, focused learning platform for rural Indian students.
+ * Role accents: student=indigo, teacher=teal, admin=violet, parent=emerald
  */
 module.exports = {
   content: [
@@ -11,100 +11,143 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary brand red (used across legacy + HUD)
+        // Primary brand — indigo
         brand: {
-          50:  '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
-          DEFAULT: '#dc2626',
+          50:  '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
+          DEFAULT: '#6366f1',
+          soft: '#eef2ff',
         },
-        // Neutral surfaces - kept for legacy admin/teacher screens.
+
+        // Semantic ink (text) scale
+        ink: {
+          900: '#0F172A',
+          700: '#334155',
+          500: '#64748B',
+          300: '#CBD5E1',
+        },
+
+        // Light surface scale
         surface: {
-          base:  '#ffffff',
-          dim:   '#f7f7f8',
-          low:   '#f3f3f4',
-          DEFAULT: '#eeeeef',
-          high:  '#e6e6e8',
-          ink:   '#0a0a0a',
-          mute:  '#525252',
-          line:  '#e5e5e5',
-          ring:  '#d4d4d4',
+          DEFAULT: '#FFFFFF',
+          base:    '#F7F8FC',
+          2:       '#F1F3F9',
+          dim:     '#F1F3F9',
+          low:     '#E5E9F2',
+          line:    '#E5E9F2',
+          ring:    '#CBD5E1',
+          ink:     '#0F172A',
+          mute:    '#64748B',
         },
-        // ---------------------------------------------------------------
-        // High-Energy HUD palette (student / learn screens)
-        // Mirrors stitch_eduresolve_master_design_spec/high_energy_hud
-        // ---------------------------------------------------------------
+
+        // Semantic status colors — color carries MEANING only
+        accent:         '#22C55E',
+        'accent-soft':  '#E8F8EE',
+        warn:           '#F59E0B',
+        'warn-soft':    '#FEF6E7',
+        danger:         '#EF4444',
+        'danger-soft':  '#FEF2F2',
+
+        // Role accent palette — used only for active nav indicator + role badge
+        role: {
+          student: '#6366F1',
+          teacher: '#0D9488',
+          admin:   '#7C3AED',
+          parent:  '#16A34A',
+        },
+
+        // AI / tutor dark panel — the ONE allowed dark surface
+        ai: {
+          bg:    '#0F172A',
+          panel: '#1E293B',
+          card:  '#263347',
+          text:  '#E2E8F0',
+          muted: '#94A3B8',
+          brand: '#818cf8',
+        },
+
+        // Subject accent colors — used only in subject badges / icons
+        subject: {
+          physics: '#3b82f6',
+          math:    '#8b5cf6',
+          chem:    '#10b981',
+          cs:      '#f59e0b',
+          english: '#ec4899',
+          bio:     '#22c55e',
+          history: '#f97316',
+          geo:     '#06b6d4',
+        },
+
+        // Legacy alias so existing templates using `hud.*` colors don't break
         hud: {
-          bg:                '#1f0f0d',
-          'surface':         '#1f0f0d',
-          'surface-dim':     '#1f0f0d',
-          'surface-bright':  '#493432',
-          'container-lowest':'#190a08',
-          'container-low':   '#281715',
-          'container':       '#2d1b19',
-          'container-high':  '#382523',
-          'container-highest':'#44302e',
-          'on-surface':      '#fbdbd7',
-          'on-surface-variant':'#e6bdb8',
-          outline:           '#ac8884',
-          'outline-variant': '#5c403c',
-          primary:           '#ffb4ab',
-          'primary-container':'#dc2626',
-          'on-primary':      '#690005',
-          'on-primary-container':'#fff6f5',
-          secondary:         '#c9c6c5',
-          tertiary:          '#c6c6c7',
-          // subject accents
-          physics:  '#3b82f6',
-          math:     '#8b5cf6',
-          chem:     '#10b981',
-          cs:       '#f59e0b',
-          english:  '#ec4899',
+          physics: '#3b82f6',
+          math:    '#8b5cf6',
+          chem:    '#10b981',
+          cs:      '#f59e0b',
+          english: '#ec4899',
         },
       },
+
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Lexend', 'Inter', 'system-ui', 'sans-serif'],
-        lexend:  ['Lexend', 'Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
+
       borderRadius: {
-        sm: '0.125rem',
-        DEFAULT: '0.25rem',
-        md: '0.375rem',
-        lg: '0.5rem',
-        xl: '0.75rem',
-        '2xl': '1rem',
+        none:    '0',
+        sm:      '10px',
+        DEFAULT: '10px',
+        md:      '14px',
+        lg:      '20px',
+        xl:      '28px',
+        '2xl':   '36px',
+        full:    '9999px',
       },
+
       fontSize: {
-        'display-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '700' }],
-        'title-lg':   ['20px', { lineHeight: '28px', fontWeight: '600' }],
-        'body-lg':    ['16px', { lineHeight: '24px', fontWeight: '400' }],
-        'body-md':    ['14px', { lineHeight: '20px', fontWeight: '400' }],
-        'label-md':   ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
-        // HUD scale (per DESIGN.md)
-        'hud-h1':     ['44px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'hud-h2':     ['28px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
-        'hud-h3':     ['22px', { lineHeight: '1.3', fontWeight: '600' }],
-        'hud-body-lg':['18px', { lineHeight: '1.6', fontWeight: '400' }],
-        'hud-body':   ['16px', { lineHeight: '1.6', fontWeight: '400' }],
-        'hud-caps':   ['11px', { lineHeight: '1', letterSpacing: '0.12em', fontWeight: '700' }],
+        'display-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-md': ['24px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'title-lg':   ['20px', { lineHeight: '28px', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'title-md':   ['16px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'body-lg':    ['16px', { lineHeight: '26px', fontWeight: '400' }],
+        'body-md':    ['14px', { lineHeight: '22px', fontWeight: '400' }],
+        'label-md':   ['12px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '600' }],
+        'label-sm':   ['11px', { lineHeight: '14px', letterSpacing: '0.02em', fontWeight: '500' }],
+        // Legacy aliases (templates still use these class names)
+        'hud-h1':     ['32px', { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'hud-h2':     ['24px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'hud-h3':     ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        'hud-body-lg':['16px', { lineHeight: '26px', fontWeight: '400' }],
+        'hud-body':   ['14px', { lineHeight: '22px', fontWeight: '400' }],
+        'hud-caps':   ['11px', { lineHeight: '16px', letterSpacing: '0.04em', fontWeight: '600' }],
       },
+
       boxShadow: {
-        fab: '0 4px 16px 0 rgb(220 38 38 / 0.16)',
-        'hud-glow':       '0 0 20px rgba(220, 38, 38, 0.35)',
-        'hud-glow-sm':    '0 0 12px rgba(220, 38, 38, 0.30)',
-        'hud-glow-lg':    '0 0 30px rgba(220, 38, 38, 0.45)',
-        'hud-card':       '0 0 20px rgba(0, 0, 0, 0.5)',
+        sm:      '0 1px 3px rgba(15, 23, 42, 0.06)',
+        DEFAULT: '0 4px 12px rgba(15, 23, 42, 0.06)',
+        md:      '0 4px 12px rgba(15, 23, 42, 0.06)',
+        lg:      '0 12px 32px rgba(15, 23, 42, 0.08)',
+        xl:      '0 20px 48px rgba(15, 23, 42, 0.10)',
+        brand:   '0 4px 14px rgba(99, 102, 241, 0.22)',
+        inner:   'inset 0 1px 3px rgba(15, 23, 42, 0.06)',
+        // Legacy aliases — mapped to soft shadows (no neon)
+        fab:           '0 4px 12px rgba(15, 23, 42, 0.12)',
+        'hud-glow':    '0 4px 12px rgba(15, 23, 42, 0.08)',
+        'hud-glow-sm': '0 2px 8px rgba(15, 23, 42, 0.06)',
+        'hud-glow-lg': '0 8px 24px rgba(15, 23, 42, 0.10)',
+        'hud-card':    '0 4px 12px rgba(15, 23, 42, 0.06)',
       },
+
       backdropBlur: {
         hud: '12px',
       },

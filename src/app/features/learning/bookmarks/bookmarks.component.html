@@ -1,33 +1,32 @@
 <div class="space-y-6">
 
   <a routerLink="/student/dashboard"
-     class="inline-flex items-center gap-2 hud-caps text-[#e6bdb8] hover:text-white transition-colors">
+     class="inline-flex items-center gap-2 text-sm text-ink-500 hover:text-brand-600 transition-colors font-medium">
     <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
-    BACK TO HUD
+    Back to Dashboard
   </a>
 
   <header class="space-y-2">
-    <p class="hud-caps text-red-400">PERSONAL ARCHIVE</p>
-    <h1 class="hud-display text-3xl sm:text-4xl text-white uppercase tracking-tight">
+    <p class="hud-caps">Saved items</p>
+    <h1 class="hud-display text-3xl sm:text-4xl text-ink-900 tracking-tight">
       {{ 'bookmarks.title' | translate }}
     </h1>
   </header>
 
   @if (loading()) {
-    <div class="hud-card-flat text-center text-[#e6bdb8] py-10">{{ 'common.loading' | translate }}</div>
+    <div class="hud-card-flat text-center text-ink-500 py-10">{{ 'common.loading' | translate }}</div>
   } @else if (rows().length === 0) {
     <div class="hud-card-flat text-center py-12 border-dashed">
-      <span class="material-symbols-outlined text-[#ac8884]" style="font-size:48px">bookmark_border</span>
-      <p class="hud-display text-lg text-white mt-3">{{ 'bookmarks.empty' | translate }}</p>
-      <p class="text-sm text-[#e6bdb8] mt-2">{{ 'bookmarks.emptyHint' | translate }}</p>
+      <span class="material-symbols-outlined text-ink-300" style="font-size:48px">bookmark_border</span>
+      <p class="hud-display text-lg text-ink-900 mt-3">{{ 'bookmarks.empty' | translate }}</p>
+      <p class="text-sm text-ink-500 mt-2">{{ 'bookmarks.emptyHint' | translate }}</p>
     </div>
   } @else {
     <ul class="space-y-3">
       @for (b of rows(); track b.id) {
         <li class="hud-card-flat">
           <div class="hud-accent"
-               [style.background]="colorFor(b.targetType)"
-               [style.box-shadow]="'0 0 10px ' + colorFor(b.targetType) + '99'"></div>
+               [style.background]="colorFor(b.targetType)"></div>
           <div class="flex items-center justify-between gap-3 pl-2">
             <button type="button"
                     (click)="open(b)"
@@ -35,8 +34,7 @@
                            hover:opacity-90 transition-opacity group">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
                           group-hover:scale-105 transition-transform"
-                   [style.background]="colorFor(b.targetType) + '20'"
-                   [style.box-shadow]="'inset 0 0 15px ' + colorFor(b.targetType) + '40'">
+                   [style.background]="colorFor(b.targetType) + '18'">
                 <span class="material-symbols-outlined" [style.color]="colorFor(b.targetType)">
                   {{ iconFor(b.targetType) }}
                 </span>
@@ -45,11 +43,11 @@
                 <span class="hud-caps" [style.color]="colorFor(b.targetType)">
                   {{ b.targetType.replace('_',' ') }}
                 </span>
-                <p class="hud-display text-base text-white mt-1 truncate group-hover:text-red-400 transition-colors">
+                <p class="hud-display text-base text-ink-900 mt-1 truncate group-hover:text-brand-600 transition-colors">
                   {{ b.label || ('#' + b.targetId) }}
                 </p>
               </div>
-              <span class="material-symbols-outlined text-[#ac8884] group-hover:text-white transition-colors shrink-0"
+              <span class="material-symbols-outlined text-ink-300 group-hover:text-ink-700 transition-colors shrink-0"
                     style="font-size:20px">
                 chevron_right
               </span>

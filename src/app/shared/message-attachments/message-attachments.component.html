@@ -1,4 +1,4 @@
-@if (attachments.length > 0) {
+﻿@if (attachments.length > 0) {
   <div class="space-y-2 mt-3">
     @for (att of attachments; track att.attachmentId) {
 
@@ -6,19 +6,19 @@
         <img
           [src]="url(att.attachmentId)"
           [alt]="att.fileName"
-          class="max-w-full rounded-lg border border-white/10"
+          class="max-w-full rounded-lg border border-surface-3"
           style="max-height:280px;object-fit:contain;background:#0f0f0f;display:block"
         />
       }
 
       @if (att.fileType === 'VOICE') {
         <div
-          class="flex items-center gap-2 bg-black/30 border border-white/10 rounded-lg p-2"
+          class="flex items-center gap-2 bg-black/30 border border-surface-3 rounded-lg p-2"
           (click)="$event.stopPropagation()"
         >
           <span class="material-symbols-outlined text-red-400 shrink-0">mic</span>
           <audio controls [src]="url(att.attachmentId)" class="flex-1 min-w-0 h-8"></audio>
-          <span class="text-xs text-[#e6bdb8] shrink-0 truncate max-w-[120px]">{{ att.fileName }}</span>
+          <span class="text-xs text-ink-500 shrink-0 truncate max-w-[120px]">{{ att.fileName }}</span>
         </div>
       }
 
@@ -28,11 +28,11 @@
           target="_blank"
           rel="noopener"
           (click)="$event.stopPropagation()"
-          class="flex items-center gap-2 text-xs text-[#e6bdb8] bg-white/5 hover:bg-white/10 border border-white/10 rounded px-3 py-2 transition-colors"
+          class="flex items-center gap-2 text-xs text-ink-500 bg-surface-2 hover:bg-surface-2 border border-surface-3 rounded px-3 py-2 transition-colors"
         >
-          <span class="material-symbols-outlined text-[#ac8884] shrink-0" style="font-size:16px">description</span>
+          <span class="material-symbols-outlined text-ink-300 shrink-0" style="font-size:16px">description</span>
           <span class="truncate">{{ att.fileName }}</span>
-          <span class="material-symbols-outlined text-[#ac8884] shrink-0 ml-auto" style="font-size:14px">download</span>
+          <span class="material-symbols-outlined text-ink-300 shrink-0 ml-auto" style="font-size:14px">download</span>
         </a>
       }
 
