@@ -1,92 +1,9 @@
 <div class="space-y-10">
 
   <!-- =============================================================
-       HERO BENTO: Active Module + Daily Directives
+       FROM TEACHER: Messages Feed
        ============================================================= -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-    <!-- ── Active Module Card (Glassmorphism) ── -->
-    <div class="hud-card lg:col-span-8 overflow-hidden">
-      <div class="hud-accent"
-           [style.background]="subjectAccent(recommendedSubjectName())"
-           [style.box-shadow]="'0 0 12px ' + subjectAccent(recommendedSubjectName()) + '99'"></div>
-
-      <div class="flex flex-col md:flex-row items-center gap-6 relative">
-        <!-- Subject art -->
-        <div class="w-40 h-40 md:w-48 md:h-48 rounded-xl border border-white/10
-                    bg-black/40 flex items-center justify-center relative overflow-hidden shrink-0 module-art"
-             [style.box-shadow]="'inset 0 0 30px ' + subjectAccent(recommendedSubjectName()) + '40'">
-          <div class="art-bg-ring"
-               [style.background]="subjectAccent(recommendedSubjectName()) + '15'"></div>
-          <span class="material-symbols-outlined fill"
-                style="font-size:96px;position:relative"
-                [style.color]="subjectAccent(recommendedSubjectName())">
-            {{ subjectIconFor(recommendedSubjectName()) }}
-          </span>
-        </div>
-
-        <div class="flex-1 space-y-3 w-full text-center md:text-left">
-          <span class="hud-caps"
-                [style.color]="subjectAccent(recommendedSubjectName())">
-            ● {{ 'dashboard.activeModule' | translate }}
-          </span>
-
-          @if (recommendedChapter(); as c) {
-            <h1 class="hud-display text-3xl sm:text-4xl text-white leading-tight">
-              {{ c.name }}
-            </h1>
-            <p class="text-[#e6bdb8] text-base leading-relaxed">
-              @if (recommendedAccuracy() != null) {
-                {{ 'dashboard.youAre' | translate }} <span class="text-white font-bold">{{ recommendedAccuracy() }}%</span>
-                {{ 'dashboard.throughModule' | translate }}
-              } @else {
-                {{ 'dashboard.resumeHint' | translate }}
-              }
-            </p>
-
-            <!-- Progress bar -->
-            <div class="hud-meter mt-2">
-              <div [style.width.%]="recommendedProgressPercent()"
-                   [style.background]="subjectAccent(recommendedSubjectName())"
-                   [style.box-shadow]="'0 0 10px ' + subjectAccent(recommendedSubjectName())"></div>
-            </div>
-
-            <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
-              <button (click)="continueLearning()" class="hud-btn-primary resume-pulse">
-                <span class="material-symbols-outlined fill">play_arrow</span>
-                {{ 'dashboard.resumeTraining' | translate }}
-              </button>
-              <button (click)="openPdf()" class="hud-btn-ghost">
-                <span class="material-symbols-outlined">picture_as_pdf</span>
-                {{ 'dashboard.openPdf' | translate }}
-              </button>
-            </div>
-          } @else if (subjectNames().length === 0) {
-            <!-- Loading shimmer while data is fetching -->
-            <div class="space-y-3 w-full">
-              <div class="h-8 w-56 rounded shimmer-line"></div>
-              <div class="h-4 w-80 rounded shimmer-line"></div>
-              <div class="h-4 w-64 rounded shimmer-line"></div>
-            </div>
-          } @else {
-            <!-- No progress yet — show Start Your Journey CTA -->
-            <div class="flex flex-col items-center md:items-start gap-4 py-2">
-              <span class="text-5xl">🚀</span>
-              <h1 class="hud-display text-3xl sm:text-4xl text-white">{{ 'dashboard.startJourney' | translate }}</h1>
-              <p class="text-[#e6bdb8] text-base leading-relaxed">{{ 'dashboard.startJourneyHint' | translate }}</p>
-              <a [routerLink]="['/learn/subjects']"
-                 class="hud-btn-primary" style="text-decoration:none">
-                <span class="material-symbols-outlined fill">rocket_launch</span>
-                {{ 'dashboard.beginTraining' | translate }}
-              </a>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- ── FROM TEACHER: Messages Feed ── -->
-    <div class="hud-card lg:col-span-4 flex flex-col gap-4 overflow-hidden">
+  <div class="hud-card flex flex-col gap-4 overflow-hidden">
       <div class="hud-accent" style="background:#8b5cf6;box-shadow:0 0 10px rgba(139,92,246,0.5)"></div>
 
       <!-- Header -->
@@ -163,7 +80,6 @@
         Open Inbox
       </a>
     </div>
-  </section>
 
   <!-- =============================================================
        STRATEGIC FOCUS: Subject Chips
@@ -266,7 +182,7 @@
        ============================================================= -->
   <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <app-streak-garden [studentId]="studentId()!"></app-streak-garden>
-    <app-leaderboard [classGrade]="grade() || '9'"></app-leaderboard>
+    <app-leaderboard [classGrade]="className() || grade() || '9'"></app-leaderboard>
   </section>
 
   <!-- =============================================================

@@ -200,7 +200,11 @@ export class StudentDashboardComponent implements OnInit {
   ngOnInit(): void {
     const user  = this.auth.currentUser();
     const id    = user?.studentId ?? this.auth.currentStudentId() ?? undefined;
-    const grade = user?.grade ?? '9';
+    // Extract numeric grade from className ("10C" → "10") immediately so leaderboard
+    // and subject loading both get the correct value before async profile returns.
+    const cn    = user?.className ?? user?.grade ?? '9';
+    const grade = cn.replace(/[^0-9]/g, '') || '9';
+    this.grade.set(grade);
     this.loadStudentProfile(id);
     this.loadLearningData(grade, id);
     this.inboxApi.getInbox(0, 5).subscribe({
@@ -230,7 +234,9 @@ export class StudentDashboardComponent implements OnInit {
     this.studentName.set(me.name ?? '');
     this.className.set(me.className ?? '');
     this.initials.set(me.initials ?? '');
-    this.grade.set(me.grade ?? '');
+    // grade field in StudentProfile is often null; derive from className as fallback
+    const derivedGrade = me.grade || (me.className ? me.className.replace(/[^0-9]/g, '') : '') || '9';
+    this.grade.set(derivedGrade);
     this.streakDays.set(me.streakDays ?? 0);
     this.experiencePoints.set(me.experiencePoints ?? 0);
     this.topPercentage.set(me.topPercentage ?? 0);

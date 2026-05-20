@@ -67,12 +67,12 @@
     </div>
   }
 
-  <!-- ── Books list ── -->
-  @if (!loading() && books().length > 0) {
+  <!-- ── Books list (hidden while a book's chapters are open) ── -->
+  @if (!loading() && books().length > 0 && !selectedBook()) {
     <section class="space-y-4">
       <h2 class="hud-display text-xl text-white">
         Available Books
-        <span class="hud-caps text-[#e6bdb8]/40 text-sm ml-2">— click to open PDF</span>
+        <span class="hud-caps text-[#e6bdb8]/40 text-sm ml-2">— click to open</span>
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (book of books(); track book.id) {
@@ -85,6 +85,9 @@
                 {{ book.subject | uppercase }}
               </p>
               <h3 class="text-white font-bold text-sm leading-tight">{{ book.title }}</h3>
+              @if (!book.pdfFilename) {
+                <p class="text-[11px] text-[#e6bdb8]/50 mt-0.5">Tap to see chapters →</p>
+              }
             </button>
             <div class="flex items-center gap-1 pr-3 shrink-0">
               <button type="button"
@@ -97,13 +100,66 @@
                       [style.color]="isBookmarked(book.id) ? '#dc2626' : 'rgba(255,255,255,0.35)'"
                       style="font-size:20px">bookmark</span>
               </button>
-              <span class="material-symbols-outlined fill" style="color:rgba(255,255,255,0.4);font-size:18px">
-                picture_as_pdf
+              <span class="material-symbols-outlined fill"
+                    style="font-size:18px"
+                    [style.color]="'rgba(255,255,255,0.4)'">
+                {{ book.pdfFilename ? 'picture_as_pdf' : 'menu_book' }}
               </span>
             </div>
           </div>
         }
       </div>
+    </section>
+  }
+
+  <!-- ── Chapter list (shown after selecting a folder-type book) ── -->
+  @if (selectedBook()) {
+    <section class="space-y-4">
+      <!-- Back + title row -->
+      <div class="flex items-center gap-3">
+        <button (click)="backToBooks()"
+                class="inline-flex items-center gap-1 text-[#e6bdb8]/60 hover:text-white
+                       transition-colors text-sm font-semibold group border-0 bg-transparent cursor-pointer">
+          <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
+                style="font-size:16px">arrow_back</span>
+          Books
+        </button>
+        <span class="text-[#e6bdb8]/30">›</span>
+        <h2 class="hud-display text-xl text-white truncate">{{ selectedBook()!.title }}</h2>
+      </div>
+
+      @if (loadingChapters()) {
+        <div class="space-y-3">
+          @for (_ of [1,2,3,4]; track $index) {
+            <div class="hud-card-flat h-14 relative overflow-hidden">
+              <div class="skeleton-sweep"></div>
+            </div>
+          }
+        </div>
+      } @else if (chapterPdfs().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (chapter of chapterPdfs(); track chapter.id; let i = $index) {
+            <div class="book-card">
+              <div class="book-card__stripe" [style.background]="getBookColor(chapter.subject)"></div>
+              <button type="button"
+                      (click)="openChapterPdf(chapter)"
+                      class="flex-1 text-left px-5 py-4 min-w-0 bg-transparent border-0 outline-none cursor-pointer">
+                <p class="hud-caps text-[10px] mb-1" [style.color]="getBookColor(chapter.subject)">
+                  CHAPTER {{ i + 1 }}
+                </p>
+                <h3 class="text-white font-bold text-sm leading-tight">{{ chapter.title }}</h3>
+              </button>
+              <span class="material-symbols-outlined fill pr-4 shrink-0"
+                    style="color:rgba(255,255,255,0.4);font-size:18px">picture_as_pdf</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="hud-card-flat flex flex-col items-center gap-4 py-12 text-center">
+          <span class="material-symbols-outlined text-4xl" style="color:#ac8884">folder_off</span>
+          <p class="text-[#e6bdb8]/70 text-sm">No chapters found in this book.</p>
+        </div>
+      }
     </section>
   }
 

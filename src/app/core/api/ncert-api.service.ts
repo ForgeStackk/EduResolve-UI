@@ -105,6 +105,19 @@ export class NcertApiService {
   }
 
   /**
+   * Get chapter PDFs inside a folder-type book (pdfFilename="").
+   * Returns the individual chapter NcertBook entries auto-saved by the backend.
+   */
+  getChapterPdfs(bookId: number): Observable<NCERTBook[]> {
+    return this.http.get<NCERTBook[]>(`${this.base}/books/${bookId}/chapter-pdfs`).pipe(
+      catchError(err => {
+        console.error('[NcertApi] Failed to fetch chapter PDFs for book', bookId, err);
+        return of([] as NCERTBook[]);
+      })
+    );
+  }
+
+  /**
    * Get chapters for a specific book
    */
   getChapters(bookId: number): Observable<NCERTChapter[]> {

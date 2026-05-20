@@ -34,10 +34,15 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
   selectedSubject = '';
   readonly studentId = this.auth.currentStudentId() ?? MOCK_STUDENT_PROFILE.id;
 
-  books         = signal<NCERTBook[]>([]);
-  loading       = signal(false);
-  booksError    = signal(false);
-  bookmarkedIds = signal<Set<number>>(new Set());
+  books            = signal<NCERTBook[]>([]);
+  loading          = signal(false);
+  booksError       = signal(false);
+  bookmarkedIds    = signal<Set<number>>(new Set());
+
+  // Chapter-level state (for folder-type books with sub-PDFs)
+  selectedBook     = signal<NCERTBook | null>(null);
+  chapterPdfs      = signal<NCERTBook[]>([]);
+  loadingChapters  = signal(false);
 
   private destroy$ = new Subject<void>();
 
@@ -69,9 +74,34 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
   goBack(): void { this.location.back(); }
 
   selectBook(book: NCERTBook): void {
+    if (!book.pdfFilename) {
+      // Folder-type book: load its chapter PDFs inline
+      this.selectedBook.set(book);
+      this.chapterPdfs.set([]);
+      this.loadingChapters.set(true);
+      this.ncertApi.getChapterPdfs(book.id).subscribe({
+        next: chapters => {
+          this.chapterPdfs.set(chapters);
+          this.loadingChapters.set(false);
+        },
+        error: () => this.loadingChapters.set(false),
+      });
+    } else {
+      this.router.navigate(['/learn/pdf-viewer'], {
+        queryParams: { bookId: book.id, title: book.title },
+      });
+    }
+  }
+
+  openChapterPdf(chapter: NCERTBook): void {
     this.router.navigate(['/learn/pdf-viewer'], {
-      queryParams: { bookId: book.id, title: book.title },
+      queryParams: { bookId: chapter.id, title: chapter.title },
     });
+  }
+
+  backToBooks(): void {
+    this.selectedBook.set(null);
+    this.chapterPdfs.set([]);
   }
 
   isBookmarked(bookId: number): boolean {
@@ -118,6 +148,8 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
     this.books.set([]);
     this.booksError.set(false);
     this.loading.set(false);
+    this.selectedBook.set(null);
+    this.chapterPdfs.set([]);
   }
 
   private _fetchBooks(subject: string): void {
@@ -126,7 +158,8 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
       next: books => {
         this.books.set(books);
         this.loading.set(false);
-        if (books.length === 1) this.selectBook(books[0]);
+        // Only auto-open when there's a single direct-PDF book (not a folder-type book)
+        if (books.length === 1 && books[0].pdfFilename) this.selectBook(books[0]);
       },
       error: () => {
         this.booksError.set(true);
