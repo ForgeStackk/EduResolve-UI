@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, inject, signal, effect, untracked } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { NcertApiService, NCERTBook, NCERTChapter } from '../../../core/api/ncert-api.service';
 import { BookmarkApiService } from '../../../core/api/bookmark-api.service';
@@ -34,7 +34,6 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
   selectedSubject = '';
   readonly studentId = this.auth.currentStudentId() ?? MOCK_STUDENT_PROFILE.id;
 
-  allBooks        = signal<NCERTBook[]>([]);
   books           = signal<NCERTBook[]>([]);
   loading         = signal(false);
   booksError      = signal(false);
@@ -43,35 +42,21 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
   selectedBook      = signal<NCERTBook | null>(null);
   chapters          = signal<NCERTChapter[]>([]);
   loadingChapters   = signal(false);
-  // true when each chapter is its own separate PDF (folder-type books)
   chapterOwnPdf     = signal(false);
 
-  private _booksLoaded = false;
   private destroy$ = new Subject<void>();
-
-  constructor() {
-    // Watch subjects signal; once loaded, fetch books for every subject in parallel
-    effect(() => {
-      const subjects = this.catalog.subjects();
-      if (subjects.length > 0 && !this._booksLoaded) {
-        this._booksLoaded = true;
-        untracked(() => this._fetchAllBooks(subjects));
-      }
-    });
-  }
 
   ngOnInit(): void {
     this.catalog.load();
     this._loadBookmarks();
 
-    // Read subject filter from query param (client-side filter only)
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.selectedSubject = (params['subject'] ?? '').trim();
-      // Reset selection before filtering so auto-select can re-trigger
+      const subject = (params['subject'] ?? '').trim();
+      this.selectedSubject = subject;
       this.selectedBook.set(null);
       this.chapters.set([]);
       this.chapterOwnPdf.set(false);
-      this._applyFilter();
+      this._fetchBooksFor(subject);
     });
   }
 
@@ -85,12 +70,12 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
     this.selectedBook.set(null);
     this.chapters.set([]);
     this.chapterOwnPdf.set(false);
-    this._applyFilter();
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: subject ? { classGrade: this.selectedClass, subject } : {},
       queryParamsHandling: 'replace',
     });
+    // route.queryParams subscription fires automatically and calls _fetchBooksFor
   }
 
   goBack(): void { this.location.back(); }
@@ -101,45 +86,50 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
     this.chapterOwnPdf.set(false);
     this.loadingChapters.set(true);
 
-    this.ncertApi.getChapters(book.id).subscribe({
-      next: chapters => {
-        if (chapters.length > 0) {
-          // Regular NCERT book — chapters share one PDF, use startPage
-          this.chapters.set(chapters);
+    // Decide path by book type, not by chapters count.
+    // Folder-type books (pdfFilename blank) each have their chapters as separate PDF files.
+    // Checking pdfFilename here prevents placeholder DB chapters from misdirecting the flow.
+    const isFolderType = !book.pdfFilename;
+
+    if (isFolderType) {
+      // Each chapter is its own PDF — fetch the chapter-PDF records for this book folder.
+      this.ncertApi.getChapterPdfs(book.id).subscribe({
+        next: chPdfs => {
+          const asChapters: NCERTChapter[] = chPdfs.map((b, i) => ({
+            id: b.id, bookId: book.id, title: b.title,
+            chapterNumber: i + 1, orderIndex: i + 1, summary: '',
+            startPage: 1, endPage: b.totalPages ?? 0,
+          }));
+          this.chapters.set(this._sortChapters(asChapters));
+          this.chapterOwnPdf.set(true);
           this.loadingChapters.set(false);
-        } else if (!book.pdfFilename) {
-          // Folder-type book — each chapter is its own separate PDF
-          this.ncertApi.getChapterPdfs(book.id).subscribe({
-            next: chPdfs => {
-              const asChapters: NCERTChapter[] = chPdfs.map((b, i) => ({
-                id: b.id, bookId: book.id, title: b.title,
-                chapterNumber: i + 1, orderIndex: i + 1, summary: '',
-                startPage: 1, endPage: b.totalPages ?? 0,
-              }));
-              this.chapters.set(asChapters);
-              this.chapterOwnPdf.set(true);
-              this.loadingChapters.set(false);
-            },
-            error: () => this.loadingChapters.set(false),
-          });
-        } else {
-          // Single-PDF book with no chapters — open directly
-          this.loadingChapters.set(false);
-          this.selectedBook.set(null);
-          this.router.navigate(['/learn/pdf-viewer'], {
-            queryParams: { bookId: book.id, title: book.title },
-          });
-        }
-      },
-      error: () => this.loadingChapters.set(false),
-    });
+        },
+        error: () => this.loadingChapters.set(false),
+      });
+    } else {
+      // Single-PDF book — chapters share one PDF file via startPage offsets.
+      this.ncertApi.getChapters(book.id).subscribe({
+        next: chapters => {
+          if (chapters.length > 0) {
+            this.chapters.set(this._sortChapters(chapters));
+            this.loadingChapters.set(false);
+          } else {
+            // No chapters extracted yet — open the whole PDF directly.
+            this.loadingChapters.set(false);
+            this.selectedBook.set(null);
+            this.router.navigate(['/learn/pdf-viewer'], {
+              queryParams: { bookId: book.id, title: book.title },
+            });
+          }
+        },
+        error: () => this.loadingChapters.set(false),
+      });
+    }
   }
 
   openChapter(chapter: NCERTChapter): void {
     const book = this.selectedBook();
     if (!book) return;
-    // Folder-type chapters each have their own PDF (use chapter.id as bookId)
-    // Regular chapters share the parent book's PDF (use book.id + startPage)
     const bookId = this.chapterOwnPdf() ? chapter.id : book.id;
     this.router.navigate(['/learn/pdf-viewer'], {
       queryParams: { bookId, title: chapter.title, startPage: chapter.startPage },
@@ -182,13 +172,22 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
     return map[subject] ?? '#dc2626';
   }
 
-  private _fetchAllBooks(subjects: string[]): void {
+  private _fetchBooksFor(subject: string): void {
     this.loading.set(true);
-    forkJoin(subjects.map(s => this.ncertApi.getBooks(this.selectedClass, s))).subscribe({
-      next: booksPerSubject => {
-        this.allBooks.set(booksPerSubject.flat());
-        this._applyFilter();
+    this.booksError.set(false);
+    this.books.set([]);
+
+    if (!subject) {
+      // No subject filter — nothing to show; catalog dropdown will guide the user
+      this.loading.set(false);
+      return;
+    }
+
+    this.ncertApi.getBooks(this.selectedClass, subject).subscribe({
+      next: books => {
+        this.books.set(books);
         this.loading.set(false);
+        this._autoSelectIfSingle();
       },
       error: () => {
         this.booksError.set(true);
@@ -197,22 +196,20 @@ export class BookBrowserComponent implements OnInit, OnDestroy {
     });
   }
 
-  private _applyFilter(): void {
-    const all = this.allBooks();
-    this.books.set(this.selectedSubject
-      ? all.filter(b => b.subject === this.selectedSubject)
-      : all);
-    // Skip the book-card step when the subject has exactly one book
-    this._autoSelectIfSingle();
-  }
-
   private _autoSelectIfSingle(): void {
-    if (!this.selectedSubject) return;        // Only when a subject is active
-    if (this.selectedBook()) return;          // Already selected
+    if (!this.selectedSubject) return;
+    if (this.selectedBook()) return;
     const filtered = this.books();
     if (filtered.length === 1) {
       this.selectBook(filtered[0]);
     }
+  }
+
+  /** Sort chapters numerically by chapterNumber, falling back to orderIndex. */
+  private _sortChapters(chapters: NCERTChapter[]): NCERTChapter[] {
+    return [...chapters].sort(
+      (a, b) => (a.chapterNumber ?? a.orderIndex ?? 0) - (b.chapterNumber ?? b.orderIndex ?? 0)
+    );
   }
 
   private _loadBookmarks(): void {

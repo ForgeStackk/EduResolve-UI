@@ -46,6 +46,10 @@ export class SubjectCatalogService {
    */
   getSubjects(grade?: string): Observable<string[]> {
     const g = grade ?? this.classCtx.grade();
+    // Return cached signal value if already loaded for this grade — avoids duplicate HTTP calls
+    if (this._grade() === g && this._subjects().length > 0) {
+      return of(this._subjects());
+    }
     return this.learningApi.listNcertSubjects(g).pipe(
       tap(list => {
         if (g === (this.classCtx.grade())) {

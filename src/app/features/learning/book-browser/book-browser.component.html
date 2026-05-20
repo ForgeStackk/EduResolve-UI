@@ -188,7 +188,7 @@
   }
 
   <!-- ── No books found state ── -->
-  @if (!loading() && !booksError() && !selectedBook() && allBooks().length > 0 && books().length === 0) {
+  @if (!loading() && !booksError() && !selectedBook() && selectedSubject && books().length === 0) {
     <div class="hud-card-flat flex flex-col items-center gap-4 py-14 text-center">
       <span class="material-symbols-outlined text-5xl text-ink-300">search_off</span>
       <h3 class="hud-display text-xl text-ink-900">No Books for {{ selectedSubject }}</h3>

@@ -324,8 +324,6 @@ export class StudentDashboardComponent implements OnInit {
    * haven't loaded yet.
    */
   chapterNameHint(subject: string, index: number): string {
-    const first = this.chapters().find(c => c.subjectId === index + 1);
-    if (first) return first.name;
     const hints: Record<string, string> = {
       Physics:     'Physical World',
       Mathematics: 'Sets',
@@ -338,6 +336,12 @@ export class StudentDashboardComponent implements OnInit {
       Computer:    'Computer Systems',
       Science:     'Matter in Our Surroundings',
     };
+    const first = this.chapters().find(c => c.subjectId === index + 1);
+    if (first) {
+      const name = (first.name ?? '').trim();
+      // Skip raw NCERT file codes like 'jehp109', 'iehdd101'
+      if (name && !/^[a-zA-Z][a-zA-Z0-9]{3,15}$/.test(name)) return name;
+    }
     return hints[subject] ?? 'Introduction';
   }
 }
