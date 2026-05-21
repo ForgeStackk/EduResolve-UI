@@ -13,9 +13,10 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { StreakEngineService } from '../streak-engine.service';
 import { AiDoubtCenterComponent } from '../ai-doubt-center/ai-doubt-center.component';
 import { StudentInboxApiService, StudentInboxItem } from '../../../core/api/student-inbox-api.service';
-import { LearningHeatmapComponent } from '../learning-heatmap/learning-heatmap.component';
+import { MyDocumentsComponent } from '../../learning/my-documents/my-documents.component';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 import { StreakGardenComponent } from '../streak-garden/streak-garden.component';
+import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
 
 interface ReadingProgress {
   id: number; studentId: number;
@@ -60,8 +61,9 @@ const RANK_TIERS = [
     RouterLink,
     TranslateModule,
     AiDoubtCenterComponent,
-    LearningHeatmapComponent,
+    MyDocumentsComponent,
     StreakGardenComponent,
+    LeaderboardComponent,
   ],
   templateUrl: './student-dashboard.component.html',
   styleUrl:    './student-dashboard.component.css'
@@ -229,6 +231,7 @@ export class StudentDashboardComponent implements OnInit {
   }
 
   private applyProfile(me: StudentProfile): void {
+    this.studentId.set(me.id);
     this.studentName.set(me.name ?? '');
     this.className.set(me.className ?? '');
     this.initials.set(me.initials ?? '');
@@ -257,7 +260,7 @@ export class StudentDashboardComponent implements OnInit {
     }).subscribe({
       next: ({ subjects, chapters, weak, progress }) => {
         this.subjectNames.set(subjects);
-        this.chapters.set(chapters);
+        this.chapters.set([...chapters].sort((a, b) => (a.orderIndex ?? a.id) - (b.orderIndex ?? b.id)));
         this.weakTopicsRaw.set(weak);
         this.readingProgress.set(progress);
       },

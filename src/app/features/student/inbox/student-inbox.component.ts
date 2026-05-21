@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { RouterLink } from '@angular/router';
 import { StudentInboxApiService, StudentInboxItem, AttendanceDayDto } from '../../../core/api/student-inbox-api.service';
 import { InboxWebSocketService } from '../../../core/inbox/inbox-websocket.service';
 import { MessageAttachmentsComponent } from '../../../shared/message-attachments/message-attachments.component';
@@ -15,7 +16,7 @@ const MONTH_NAMES = [
 @Component({
   selector: 'app-student-inbox',
   standalone: true,
-  imports: [CommonModule, TranslateModule, MessageAttachmentsComponent],
+  imports: [CommonModule, TranslateModule, MessageAttachmentsComponent, RouterLink],
   templateUrl: './student-inbox.component.html',
   styleUrl: './student-inbox.component.css'
 })

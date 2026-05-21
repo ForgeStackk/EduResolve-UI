@@ -7,6 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LanguageToggleComponent } from '../i18n/language-toggle/language-toggle.component';
 import { AuthService, MOCK_STUDENT_PROFILE } from '../auth/auth.service';
 import { StudentApiService, StudentProfile } from '../api/student-api.service';
+import { InboxWebSocketService } from '../inbox/inbox-websocket.service';
 
 export type HudRole = 'student' | 'teacher' | 'admin' | 'parent';
 
@@ -29,11 +30,11 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
     brand: 'ACADEMY_HUD',
     homeLink: '/student/dashboard',
     nav: [
-      { icon: 'home',          labelKey: 'nav.home',      link: '/student/dashboard', exact: true },
-      { icon: 'local_library', labelKey: 'nav.subjects',  link: '/learn/subjects' },
-      { icon: 'quiz',          labelKey: 'nav.quiz',      link: '/learn/quiz' },
-      { icon: 'forum',         labelKey: 'nav.doubt',     link: '/learn/doubt' },
-      { icon: 'bookmark',      labelKey: 'nav.bookmarks', link: '/learn/bookmarks' }
+      { icon: 'home',          labelKey: 'nav.home',     link: '/student/dashboard', exact: true },
+      { icon: 'inbox',         labelKey: 'nav.inbox',    link: '/student/inbox' },
+      { icon: 'local_library', labelKey: 'nav.subjects', link: '/learn/subjects' },
+      { icon: 'forum',         labelKey: 'nav.doubts',   link: '/student/doubts' },
+      { icon: 'psychology_alt',labelKey: 'nav.ai',       link: '/learn/doubt' }
     ]
   },
   teacher: {
@@ -65,6 +66,8 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
 /** Root-level paths that never show the back button. */
 const ROOT_PATHS = new Set([
   '/student/dashboard',
+  '/student/inbox',
+  '/student/doubts',
   '/learn/subjects',
   '/learn/quiz',
   '/learn/doubt',
@@ -87,10 +90,14 @@ export class HudShellComponent implements OnInit {
   private studentApi = inject(StudentApiService);
   private auth       = inject(AuthService);
   private location   = inject(Location);
+  private ws         = inject(InboxWebSocketService);
   protected router   = inject(Router);
 
   role       = signal<HudRole>(this.roleFromUrl(this.router.url));
   currentUrl = signal<string>(this.router.url.split('?')[0]);
+
+  /** Unread inbox badge — shown on the Inbox nav item. */
+  inboxBadge = computed(() => this.ws.unreadCount());
 
   theme = computed(() => HUD_ROLE_THEMES[this.role()]);
 
@@ -114,8 +121,10 @@ export class HudShellComponent implements OnInit {
       takeUntilDestroyed(inject(DestroyRef))
     ).subscribe(e => {
       const nav = e as NavigationEnd;
-      this.role.set(this.roleFromUrl(nav.urlAfterRedirects));
-      this.currentUrl.set(nav.urlAfterRedirects.split('?')[0]);
+      const path = nav.urlAfterRedirects.split('?')[0];
+      this.role.set(this.roleFromUrl(path));
+      this.currentUrl.set(path);
+      if (path === '/student/inbox') this.ws.clearBadge();
     });
   }
 

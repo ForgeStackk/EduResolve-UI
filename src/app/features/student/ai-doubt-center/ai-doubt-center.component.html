@@ -174,7 +174,8 @@
         </div>
 
         <div class="response-body">
-          <p class="response-text">{{ ans.answer }}</p>
+          <div class="response-text prose prose-invert prose-sm max-w-none"
+               [innerHTML]="ans.answer | markdown"></div>
         </div>
 
         <!-- AI-returned educational images -->

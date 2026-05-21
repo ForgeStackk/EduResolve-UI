@@ -106,19 +106,14 @@
   </section>
 
   <!-- =============================================================
-       LEARNING HEATMAP + SMART SYLLABUS
+       MY LIBRARY + SMART SYLLABUS
        ============================================================= -->
   <section class="space-y-4">
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <!-- Learning Heatmap (auto-pilot) spans 2 cols -->
+      <!-- My Library spans 2 cols -->
       <div class="xl:col-span-2">
-        <app-learning-heatmap
-          [weakTopics]="weakTopicsRaw()"
-          [subjects]="subjectNames()"
-          [grade]="grade() || '9'"
-          [activeBookId]="readingProgress()?.bookId ?? null">
-        </app-learning-heatmap>
+        <app-my-documents></app-my-documents>
       </div>
 
       <!-- Smart Syllabus Quick-Nav -->
@@ -178,33 +173,11 @@
   </section>
 
   <!-- =============================================================
-       COMMUNITY: Streak Garden + My Documents
+       COMMUNITY: Streak Garden + Leaderboard
        ============================================================= -->
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     <app-streak-garden [studentId]="studentId()!"></app-streak-garden>
-
-    <!-- My Documents Card -->
-    <a routerLink="/learn/my-documents"
-       class="hud-card hover:border-brand-200 transition-all group cursor-pointer flex flex-col gap-4"
-       style="text-decoration:none;color:inherit">
-      <div class="hud-accent" style="background:#6366F1"></div>
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-50">
-          <span class="material-symbols-outlined fill text-indigo-600">folder_open</span>
-        </div>
-        <div>
-          <p class="hud-caps text-indigo-500" style="font-size:10px">MY LIBRARY</p>
-          <h3 class="hud-display text-lg text-ink-900">My Documents</h3>
-        </div>
-      </div>
-      <p class="text-sm text-ink-500 leading-relaxed">
-        Upload and access your personal study materials — notes, summaries, and PDF resources — all saved to your profile.
-      </p>
-      <div class="hud-btn-ghost w-full justify-center mt-auto group-hover:bg-brand-50 group-hover:border-brand-200 transition-colors">
-        <span class="material-symbols-outlined" style="font-size:16px">upload_file</span>
-        Upload &amp; Browse PDFs
-      </div>
-    </a>
+    <app-leaderboard [classGrade]="grade()"></app-leaderboard>
   </section>
 
   <!-- =============================================================
@@ -239,8 +212,8 @@
                     hud-caps text-[10px] text-amber-300 border border-amber-300/30">{{ 'dashboard.soon' | translate }}</div>
       </div>
 
-      <!-- Ask a Doubt card (links to full page) -->
-      <a routerLink="/learn/doubt"
+      <!-- Ask Teacher card (links to teacher doubt threads) -->
+      <a routerLink="/student/doubts"
          class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
          style="text-decoration:none;color:inherit">
         <div class="hud-accent" style="background:#2DD4BF"></div>
@@ -248,11 +221,29 @@
                     flex items-center justify-center relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-transparent"></div>
           <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
-                style="font-size:56px;color:#2DD4BF;filter:drop-shadow(0 0 15px rgba(45,212,191,.6))">psychology_alt</span>
+                style="font-size:56px;color:#2DD4BF;filter:drop-shadow(0 0 15px rgba(45,212,191,.6))">forum</span>
+        </div>
+        <div>
+          <span class="hud-caps text-ink-500 mb-1 block">{{ 'dashboard.askTeacher' | translate }}</span>
+          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.askDoubt' | translate }}</h4>
+          <p class="text-sm text-ink-500 mt-2">{{ 'dashboard.askTeacherDesc' | translate }}</p>
+        </div>
+      </a>
+
+      <!-- Ask AI card -->
+      <a routerLink="/learn/doubt"
+         class="hud-card-flat hover:border-white/30 transition-all group cursor-pointer flex flex-col gap-3"
+         style="text-decoration:none;color:inherit">
+        <div class="hud-accent" style="background:#8b5cf6"></div>
+        <div class="w-full aspect-video rounded-lg bg-black/40 border border-surface-3
+                    flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-violet-500/20 to-transparent"></div>
+          <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                style="font-size:56px;color:#a78bfa;filter:drop-shadow(0 0 15px rgba(139,92,246,.6))">psychology_alt</span>
         </div>
         <div>
           <span class="hud-caps text-ink-500 mb-1 block">{{ 'dashboard.aiCenter' | translate }}</span>
-          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.askDoubt' | translate }}</h4>
+          <h4 class="text-ink-900 font-bold leading-tight">{{ 'dashboard.askAI' | translate }}</h4>
           <p class="text-sm text-ink-500 mt-2">{{ 'dashboard.aiDesc' | translate }}</p>
         </div>
       </a>

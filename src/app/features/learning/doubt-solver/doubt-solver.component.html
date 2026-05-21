@@ -68,7 +68,8 @@
         </span>
       </div>
 
-      <p class="text-[15px] text-ink-700 whitespace-pre-line leading-relaxed">{{ a.answer }}</p>
+      <div class="text-[15px] text-ink-700 leading-relaxed prose prose-sm max-w-none"
+           [innerHTML]="a.answer | markdown"></div>
 
       <!-- Images Gallery -->
       @if (a.images && a.images.length > 0) {

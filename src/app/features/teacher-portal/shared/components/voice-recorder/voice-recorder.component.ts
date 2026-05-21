@@ -33,6 +33,10 @@ export class VoiceRecorderComponent implements OnDestroy {
   elapsed      = signal(0);
   audioUrl     = signal<string | null>(null);
   permError    = signal<string | null>(null);
+  playing      = signal(false);
+
+  /** Static bar heights (px) used as a visual waveform stand-in in the preview row. */
+  readonly waveHeights = [6, 14, 10, 18, 8, 20, 12, 16, 6, 22, 10, 14, 8, 18, 12];
 
   readonly MAX_SECONDS  = 300;
   readonly WARN_SECONDS = 240;
@@ -73,6 +77,7 @@ export class VoiceRecorderComponent implements OnDestroy {
       this.recorder.start(100);
       this.state.set('RECORDING');
       this.elapsed.set(0);
+      this.playing.set(false);
 
       this.timer = setInterval(() => {
         this.elapsed.update(s => {
@@ -96,9 +101,20 @@ export class VoiceRecorderComponent implements OnDestroy {
     if (this.recorder?.state === 'recording') this.recorder.stop();
   }
 
+  togglePlay(el: HTMLAudioElement): void {
+    if (el.paused) {
+      el.play();
+      this.playing.set(true);
+    } else {
+      el.pause();
+      this.playing.set(false);
+    }
+  }
+
   deleteRecording(): void {
     if (this.audioUrl()) URL.revokeObjectURL(this.audioUrl()!);
     this.audioUrl.set(null);
+    this.playing.set(false);
     this.state.set('IDLE');
     this.voiceRecorded.emit(null);
   }

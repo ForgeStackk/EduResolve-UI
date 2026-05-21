@@ -17,6 +17,7 @@ export interface AttachmentInfo {
 export interface StudentInboxItem {
   inboxId: string;
   messageId: string;
+  msgNum: number | null;
   senderName: string;
   category: MessageCategory;
   targetSubjectId: number | null;

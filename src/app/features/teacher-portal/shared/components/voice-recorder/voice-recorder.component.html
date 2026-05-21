@@ -55,15 +55,52 @@
 
   <!-- ── RECORDED ───────────────────────────────────────────────────────── -->
   @case ('RECORDED') {
-    <div class="flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3">
-      <audio [src]="audioUrl()!" controls class="flex-1 min-w-0"></audio>
-      <button
-        type="button"
-        (click)="deleteRecording()"
-        title="Delete recording"
-        class="flex-shrink-0 text-gray-500 hover:text-red-400 transition-colors text-lg leading-none">
-        🗑
-      </button>
+    <div class="space-y-2">
+
+      <!-- Label -->
+      <p class="text-[11px] font-semibold text-green-400 uppercase tracking-widest flex items-center gap-1">
+        <span>✅</span> Voice note recorded — preview before sending
+      </p>
+
+      <!-- Player row -->
+      <div class="flex items-center gap-3 bg-gray-900 border border-green-700/40 rounded-xl px-4 py-3">
+
+        <!-- Play/Pause uses the native element but hidden; custom button triggers it -->
+        <audio #audioEl [src]="audioUrl()!" class="sr-only" (ended)="playing.set(false)"></audio>
+
+        <button type="button"
+                (click)="togglePlay(audioEl)"
+                class="w-9 h-9 rounded-full flex items-center justify-center shrink-0
+                       bg-green-600 hover:bg-green-500 text-white transition-colors"
+                [attr.aria-label]="playing() ? 'Pause' : 'Play'">
+          <span class="material-symbols-outlined fill" style="font-size:18px">
+            {{ playing() ? 'pause' : 'play_arrow' }}
+          </span>
+        </button>
+
+        <!-- Fake waveform (static bars — visually signals it's audio) -->
+        <div class="flex items-center gap-0.5 flex-1">
+          @for (h of waveHeights; track $index) {
+            <span class="inline-block w-1 rounded-full bg-green-500/60"
+                  [style.height.px]="h"></span>
+          }
+        </div>
+
+        <!-- Duration -->
+        <span class="font-mono text-xs text-gray-400 tabular-nums shrink-0">
+          {{ formatTime(elapsed()) }}
+        </span>
+
+        <!-- Delete -->
+        <button type="button"
+                (click)="deleteRecording()"
+                title="Delete and re-record"
+                class="shrink-0 text-gray-500 hover:text-red-400 transition-colors">
+          <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+        </button>
+      </div>
+
+      <p class="text-[10px] text-gray-500">Tap ▶ to hear it. When happy, hit <strong class="text-white">Send</strong> above.</p>
     </div>
   }
 

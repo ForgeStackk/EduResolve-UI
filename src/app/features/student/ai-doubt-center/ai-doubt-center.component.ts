@@ -7,13 +7,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DoubtSolverApiService, DoubtAnswer } from '../../../core/api/doubt-solver-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
+import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 
 export type InputMode = 'text' | 'image' | 'voice';
 
 @Component({
   selector: 'app-ai-doubt-center',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MarkdownPipe],
   templateUrl: './ai-doubt-center.component.html',
   styleUrl: './ai-doubt-center.component.css'
 })

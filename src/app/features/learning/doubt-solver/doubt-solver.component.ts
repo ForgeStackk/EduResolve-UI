@@ -6,11 +6,12 @@ import { DoubtAnswer, DoubtSolverApiService } from '../../../core/api/doubt-solv
 import { LanguageService } from '../../../core/i18n/language.service';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 import { ClassContextService } from '../../../core/class-context.service';
+import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 
 @Component({
   selector: 'app-doubt-solver',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MarkdownPipe],
   templateUrl: './doubt-solver.component.html',
   styleUrl: './doubt-solver.component.css'
 })

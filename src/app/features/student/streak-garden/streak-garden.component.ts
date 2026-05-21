@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 export interface StreakInfo {
   currentStreak: number;
   missionsCompleted: number;
+  loginDays: number;
   gardenState: string;
 }
 
@@ -18,7 +19,6 @@ export interface StreakInfo {
     <div class="flex flex-col items-center justify-center p-4">
       @if (streak()?.gardenState === 'TREE') {
         <div class="w-32 h-32 mb-2 flex items-center justify-center" [ngClass]="animateGrowth() ? 'growth-pulse' : ''">
-          <!-- Lottie Web Player for the Tree -->
           <lottie-player
             src="https://assets3.lottiefiles.com/packages/lf20_e3q0wtsq.json"
             background="transparent"
@@ -33,9 +33,10 @@ export interface StreakInfo {
           {{ getGardenEmoji() }}
         </div>
       }
-      <h3 (click)="triggerConfetti()" class="text-white font-bold text-lg mt-2 cursor-pointer hover:text-green-400 transition-colors" title="Click to test Confetti!">Streak Garden</h3>
+      <h3 (click)="triggerConfetti()" class="text-white font-bold text-lg mt-2 cursor-pointer hover:text-green-400 transition-colors" title="Click to celebrate!">Streak Garden</h3>
       <p class="text-red-400 font-bold text-2xl">🔥 {{ streak()?.currentStreak || 0 }} Days</p>
-      <p class="text-[#e6bdb8]/60 text-xs mt-1 uppercase tracking-widest">{{ streak()?.gardenState || 'WILTED' }}</p>
+      <p class="text-[#e6bdb8]/60 text-xs mt-1 uppercase tracking-widest">{{ streak()?.gardenState || 'SEED' }}</p>
+      <p class="text-green-400/70 text-xs mt-0.5">{{ streak()?.loginDays || 0 }} total login days</p>
     </div>
   `,
   styles: [`
@@ -59,11 +60,12 @@ export class StreakGardenComponent implements OnInit {
     this.loadExternalScripts();
 
     if (this.studentId) {
-      this.http.get<StreakInfo>(`${environment.apiBaseUrl}/streaks/${this.studentId}`)
+      // POST records today's login (idempotent: one increment per IST calendar day)
+      // and returns the same payload as GET — one round-trip only.
+      this.http.post<StreakInfo>(`${environment.apiBaseUrl}/streaks/${this.studentId}/login`, {})
         .subscribe(data => {
-          // Trigger confetti automatically if state upgrades to FLOWER or TREE
           if (this.previousState && this.previousState !== data.gardenState) {
-            if (data.gardenState === 'FLOWER' || data.gardenState === 'TREE') {
+            if (data.gardenState === 'BLOOM' || data.gardenState === 'TREE') {
               this.triggerConfetti();
               this.triggerGrowthAnimation();
             }
@@ -111,13 +113,14 @@ export class StreakGardenComponent implements OnInit {
   }
 
   getGardenEmoji(): string {
-    const state = this.streak()?.gardenState || 'WILTED';
+    const state = this.streak()?.gardenState || 'SEED';
     switch (state) {
-      case 'SEEDLING': return '🌱';
-      case 'SPROUT': return '🌿';
-      case 'FLOWER': return '🌷';
-      case 'TREE': return '🌳';
-      case 'WILTED': default: return '🥀';
+      case 'SPROUT':   return '🌱';
+      case 'SEEDLING': return '🌿';
+      case 'BLOOM':    return '🌸';
+      case 'TREE':     return '🌳';
+      case 'SEED':
+      default:         return '🌰';
     }
   }
 }

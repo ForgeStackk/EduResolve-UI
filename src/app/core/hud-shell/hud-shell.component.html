@@ -100,9 +100,18 @@
         <a [routerLink]="item.link"
            routerLinkActive="hud-nav-active"
            [routerLinkActiveOptions]="{ exact: !!item.exact }"
-           class="hud-nav-link flex flex-col items-center gap-0.5"
+           class="hud-nav-link flex flex-col items-center gap-0.5 relative"
            [attr.aria-label]="item.labelKey | translate">
-          <span class="material-symbols-outlined">{{ item.icon }}</span>
+          <span class="relative">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            @if (role() === 'student' && item.link === '/student/inbox' && inboxBadge() > 0) {
+              <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5
+                           bg-red-600 text-white text-[9px] font-bold rounded-full
+                           flex items-center justify-center leading-none">
+                {{ inboxBadge() > 99 ? '99+' : inboxBadge() }}
+              </span>
+            }
+          </span>
           <span class="text-[10px] font-medium">{{ item.labelKey | translate }}</span>
         </a>
       }
