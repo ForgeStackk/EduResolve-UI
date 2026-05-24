@@ -4,51 +4,62 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import {
   StudentSubmissionApiService,
-  DoubtThread
+  DoubtThread,
+  TeacherPickerItem
 } from '../../../core/api/student-submission-api.service';
 import { StudentActivityService } from '../../../core/student-activity.service';
 import { StudentComposerComponent } from '../../../shared/student-composer/student-composer.component';
+import { TeacherPickerComponent } from '../teacher-picker/teacher-picker.component';
 import { LearningApiService } from '../../../core/api/learning-api.service';
 import { ClassContextService } from '../../../core/class-context.service';
 
 @Component({
   selector: 'app-student-doubts',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, StudentComposerComponent],
+  imports: [CommonModule, RouterLink, TranslateModule, StudentComposerComponent, TeacherPickerComponent],
   template: `
+    <!-- ── Teacher picker (full-screen overlay) ───────────────────────── -->
+    @if (showPicker()) {
+      <div class="fixed inset-0 z-50 bg-gray-950 flex flex-col">
+        <app-teacher-picker
+          (picked)="onTeacherPicked($event)"
+          (cancelled)="showPicker.set(false)"
+          class="flex flex-col flex-1 min-h-0">
+        </app-teacher-picker>
+      </div>
+    }
+
     <div class="max-w-2xl mx-auto p-4 space-y-4">
 
       <!-- Header -->
       <div class="flex items-center justify-between">
         <h1 class="text-white font-bold text-xl">Ask Teacher</h1>
-        <button class="hud-btn-ghost text-sm" (click)="showComposer.set(!showComposer())">
+        <button class="hud-btn-ghost text-sm" (click)="openPicker()">
           <span class="material-symbols-outlined" style="font-size:16px">add</span>
           New Doubt
         </button>
       </div>
 
-      <!-- New doubt composer -->
-      @if (showComposer()) {
+      <!-- Composer (shown after teacher is picked) -->
+      @if (showComposer() && selectedTeacher()) {
         <div class="hud-card p-4 space-y-3">
-          <h2 class="text-sm font-bold text-white/70 uppercase tracking-widest">Ask a Doubt</h2>
-
-          <!-- Subject picker -->
-          @if (subjects().length > 0) {
-            <div class="flex flex-wrap gap-2">
-              @for (s of subjects(); track s.id) {
-                <button type="button"
-                        class="px-3 py-1 rounded-full text-xs border transition-colors"
-                        [class.border-red-500]="selectedSubjectId() === s.id"
-                        [class.text-red-400]="selectedSubjectId() === s.id"
-                        [class.bg-red-500\/10]="selectedSubjectId() === s.id"
-                        [class.border-white\/20]="selectedSubjectId() !== s.id"
-                        [class.text-white\/60]="selectedSubjectId() !== s.id"
-                        (click)="selectedSubjectId.set(s.id)">
-                  {{ s.name }}
-                </button>
-              }
+          <!-- Selected teacher banner -->
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-red-700/30 flex items-center justify-center
+                        text-red-300 font-bold text-xs shrink-0">
+              {{ initials(selectedTeacher()!.name) }}
             </div>
-          }
+            <div class="flex-1 min-w-0">
+              <p class="text-white text-sm font-semibold truncate">{{ selectedTeacher()!.name }}</p>
+              <p class="text-white/40 text-xs truncate">{{ selectedTeacher()!.subjects.join(' • ') }}</p>
+            </div>
+            <button type="button" class="text-white/40 hover:text-white"
+                    (click)="showPicker.set(true)">
+              <span class="material-symbols-outlined" style="font-size:16px">swap_horiz</span>
+            </button>
+          </div>
+
+          <h2 class="text-sm font-bold text-white/70 uppercase tracking-widest">Ask a Doubt</h2>
 
           <app-student-composer
             placeholder="Describe your doubt, or attach a photo of the problem…"
@@ -73,7 +84,7 @@ import { ClassContextService } from '../../../core/class-context.service';
         <div class="hud-card p-10 text-center">
           <span class="material-symbols-outlined text-white/20" style="font-size:56px">help_outline</span>
           <p class="text-white/50 mt-3 text-sm">No doubts yet.</p>
-          <p class="text-white/30 text-xs mt-1">Tap "New Doubt" to ask your teacher a question.</p>
+          <p class="text-white/30 text-xs mt-1">Tap "New Doubt" to ask a teacher a question.</p>
         </div>
       } @else {
         <div class="space-y-2">
@@ -90,8 +101,10 @@ import { ClassContextService } from '../../../core/class-context.service';
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <p class="text-sm font-bold text-white truncate">{{ t.teacherName }}</p>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300
+                               font-bold uppercase shrink-0">Teacher</span>
                   @if (t.subjectName) {
-                    <span class="text-xs text-white/40">· {{ t.subjectName }}</span>
+                    <span class="text-xs text-white/40 truncate">· {{ t.subjectName }}</span>
                   }
                 </div>
                 <p class="text-xs text-white/50 truncate mt-0.5">
@@ -117,45 +130,61 @@ import { ClassContextService } from '../../../core/class-context.service';
   `
 })
 export class StudentDoubtsComponent implements OnInit {
-  private api        = inject(StudentSubmissionApiService);
-  private activity   = inject(StudentActivityService);
-  private router     = inject(Router);
-  private learningApi = inject(LearningApiService);
-  private classCtx   = inject(ClassContextService);
+  private api      = inject(StudentSubmissionApiService);
+  private activity = inject(StudentActivityService);
+  private router   = inject(Router);
 
-  threads            = signal<DoubtThread[]>([]);
-  loading            = signal(true);
-  showComposer       = signal(false);
-  asking             = signal(false);
-  askError           = signal<string | null>(null);
-  selectedSubjectId  = signal<number | null>(null);
-
-  subjects = signal<{ id: number; name: string }[]>([]);
+  threads         = signal<DoubtThread[]>([]);
+  loading         = signal(true);
+  showPicker      = signal(false);
+  showComposer    = signal(false);
+  selectedTeacher = signal<TeacherPickerItem | null>(null);
+  asking          = signal(false);
+  askError        = signal<string | null>(null);
 
   ngOnInit(): void {
     this.api.listDoubtThreads().subscribe({
       next: t => { this.threads.set(t); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
-    const grade = this.classCtx.grade();
-    if (grade) {
-      this.learningApi.listSubjects(grade).subscribe({
-        next: subs => this.subjects.set(subs.map(s => ({ id: s.id, name: s.name }))),
-        error: () => {}
-      });
+  }
+
+  openPicker(): void {
+    this.showComposer.set(false);
+    this.showPicker.set(true);
+  }
+
+  onTeacherPicked(teacher: TeacherPickerItem): void {
+    this.showPicker.set(false);
+
+    // If an OPEN thread with this teacher already exists, navigate directly to it
+    const existing = this.threads().find(
+      t => t.teacherId === teacher.teacherUserId && t.status === 'OPEN'
+    );
+    if (existing) {
+      this.router.navigate(['/student/doubts', existing.threadId]);
+      return;
     }
+
+    this.selectedTeacher.set(teacher);
+    this.showComposer.set(true);
+    this.askError.set(null);
   }
 
   onAsk(fd: FormData): void {
+    const teacher = this.selectedTeacher();
+    if (!teacher) return;
+
     this.asking.set(true);
     this.askError.set(null);
 
-    this.api.openDoubtThread(fd, this.selectedSubjectId() ?? undefined).subscribe({
+    this.api.openDoubtThread(fd, teacher.teacherUserId).subscribe({
       next: thread => {
         this.threads.update(t => [thread, ...t]);
         this.asking.set(false);
         this.showComposer.set(false);
-        this.activity.record('DOUBT_ASKED', { subjectId: this.selectedSubjectId() ?? undefined });
+        this.selectedTeacher.set(null);
+        this.activity.record('DOUBT_ASKED', { teacherUserId: teacher.teacherUserId });
         this.router.navigate(['/student/doubts', thread.threadId]);
       },
       error: () => {
@@ -169,5 +198,9 @@ export class StudentDoubtsComponent implements OnInit {
     const last = t.messages.at(-1);
     if (!last) return 'No messages yet';
     return last.textBody || (last.attachments.length > 0 ? '📎 Attachment' : '…');
+  }
+
+  initials(name: string): string {
+    return name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
   }
 }

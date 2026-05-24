@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, output, signal } from '@angular/core';
+import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TeacherPortalService } from '../../services/teacher-portal.service';
@@ -13,6 +13,9 @@ import { TeacherClass, TeacherSubject } from '../../models/teacher-portal.models
 export class ClassSubjectDropdownComponent implements OnInit {
   private portal = inject(TeacherPortalService);
 
+  /** When true, loads every class in the school instead of only the teacher's own. */
+  allClasses = input<boolean>(false);
+
   classChanged = output<string>();
   subjectChanged = output<number | null>();
 
@@ -22,8 +25,19 @@ export class ClassSubjectDropdownComponent implements OnInit {
   selectedSubjectId = signal<number | null>(null);
 
   ngOnInit(): void {
+    if (this.allClasses()) {
+      this.portal.getAllClasses().subscribe({
+        next: c => this.classes.set(c),
+        error: () => this.loadOwn()
+      });
+    } else {
+      this.loadOwn();
+    }
+  }
+
+  private loadOwn(): void {
     const cached = this.portal.myClasses();
-    if (cached) {
+    if (cached?.length) {
       this.classes.set(cached);
     } else {
       this.portal.loadMyClasses().subscribe(c => this.classes.set(c));

@@ -52,6 +52,17 @@ export interface DoubtThread {
   createdAt: string;
   resolvedAt: string | null;
   messages: DoubtMessageItem[];
+  studentName: string | null;
+  studentClass: string | null;
+  studentSection: string | null;
+}
+
+export interface TeacherPickerItem {
+  teacherUserId: number;
+  name: string;
+  subjects: string[];
+  classNames: string[];
+  teachesMyClass: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -69,10 +80,15 @@ export class StudentSubmissionApiService {
     return this.http.get<HomeworkSubmission>(`${this.base}/submissions/status`, { params });
   }
 
-  openDoubtThread(fd: FormData, subjectId?: number, chapterId?: number): Observable<DoubtThread> {
+  listTeachersForSchool(): Observable<TeacherPickerItem[]> {
+    return this.http.get<TeacherPickerItem[]>(`${this.base}/teachers`);
+  }
+
+  openDoubtThread(fd: FormData, teacherUserId?: number, subjectId?: number, chapterId?: number): Observable<DoubtThread> {
     let params = new HttpParams();
-    if (subjectId != null) params = params.set('subjectId', subjectId.toString());
-    if (chapterId != null) params = params.set('chapterId', chapterId.toString());
+    if (teacherUserId != null) params = params.set('teacherUserId', teacherUserId.toString());
+    if (subjectId != null)     params = params.set('subjectId', subjectId.toString());
+    if (chapterId != null)     params = params.set('chapterId', chapterId.toString());
     return this.http.post<DoubtThread>(`${this.base}/doubts`, fd, { params });
   }
 

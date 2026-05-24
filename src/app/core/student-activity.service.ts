@@ -12,6 +12,7 @@ export interface ActivityEvent {
   type: ActivityType;
   subjectId?: number;
   chapterId?: number;
+  teacherUserId?: number;
   timestamp: Date;
 }
 

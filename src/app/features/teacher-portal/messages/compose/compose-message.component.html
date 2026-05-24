@@ -2,13 +2,14 @@
 
   <div class="flex items-center justify-between">
     <h2 class="text-xl font-bold text-white hud-caps tracking-wider">Compose Message</h2>
-    <a routerLink="../sent" class="text-sm text-red-400 hover:text-red-300 transition-colors">
+    <a routerLink="/teacher/messages/sent" class="text-sm text-red-400 hover:text-red-300 transition-colors">
       View Sent →
     </a>
   </div>
 
   <!-- Class + Subject selector -->
   <app-class-subject-dropdown
+    [allClasses]="true"
     (classChanged)="selectedClassId.set($event)"
     (subjectChanged)="selectedSubjectId.set($any($event))" />
 

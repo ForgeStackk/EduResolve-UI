@@ -50,6 +50,23 @@ export const TEACHER_PORTAL_ROUTES: Routes = [
         ]
       },
 
+      // Student Doubt Inbox
+      {
+        path: 'doubts',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./doubts/teacher-doubt-inbox.component').then(m => m.TeacherDoubtInboxComponent)
+          },
+          {
+            path: ':threadId',
+            loadComponent: () =>
+              import('./doubts/teacher-doubt-thread.component').then(m => m.TeacherDoubtThreadComponent)
+          }
+        ]
+      },
+
       // Report Archive — read-only, visible to all teachers (incl. reassigned ones)
       {
         path: 'archive',

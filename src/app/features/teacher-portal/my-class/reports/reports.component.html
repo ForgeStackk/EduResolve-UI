@@ -32,7 +32,7 @@
         class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
                focus:outline-none focus:border-red-500 transition-colors min-w-32">
         @for (m of months; track m.value) {
-          <option [value]="m.value">{{ m.label }}</option>
+          <option [value]="m.value" [selected]="m.value === selectedMonth()">{{ m.label }}</option>
         }
       </select>
     </div>
@@ -45,7 +45,7 @@
         class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
                focus:outline-none focus:border-red-500 transition-colors">
         @for (y of years; track y) {
-          <option [value]="y">{{ y }}</option>
+          <option [value]="y" [selected]="y === selectedYear()">{{ y }}</option>
         }
       </select>
     </div>
@@ -156,7 +156,7 @@
                 <td class="px-4 py-3 text-gray-500 font-mono text-xs">
                   {{ row.rollNumber ?? (i + 1).toString().padStart(2, '0') }}
                 </td>
-                <td class="px-4 py-3 text-white font-medium">{{ row.fullName }}</td>
+                <td class="px-4 py-3 text-gray-900 font-medium">{{ row.fullName }}</td>
                 <td class="px-4 py-3 text-center text-green-400 font-semibold tabular-nums">
                   {{ row.present }}
                 </td>
