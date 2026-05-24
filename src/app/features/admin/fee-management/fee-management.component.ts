@@ -2,14 +2,14 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StudentFilterPipe } from '../student-filter.pipe';
-import { FeeApiService, Fee } from '../../../core/api/fee-api.service';
+import { FeeApiService, Fee, FeeStatus } from '../../../core/api/fee-api.service';
 
 /** UI shape consumed by the template (and by `studentFilter` pipe). */
 export interface Student {
   id: string;
   name: string;
   class: string;
-  feeStatus: 'Paid' | 'Unpaid';
+  feeStatus: FeeStatus;
   phone: string;
 }
 

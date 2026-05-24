@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { forkJoin } from 'rxjs';
 import { AdminApiService, type FeeSummary, type PagedResponse } from '../../../core/api/admin-api.service';
 
 interface PaymentLinkData {
@@ -30,12 +31,27 @@ export class AdminFeesComponent implements OnInit, OnDestroy {
   search     = signal('');
   status     = signal('');
 
+  // Bulk selection
+  selectedIds  = signal<Set<number>>(new Set());
+  bulkSending  = signal(false);
+  bulkDone     = signal(0);
+
+  // Payment link
   linkData    = signal<PaymentLinkData | null>(null);
   linkLoading = signal(false);
   actionMsg   = signal('');
 
   readonly pageSize = 20;
   readonly statuses = ['', 'Paid', 'Unpaid', 'Partial', 'Overdue', 'Waived'];
+
+  selectableIds = computed(() =>
+    this.fees().filter(f => !this.isPaidOrWaived(f)).map(f => f.id)
+  );
+
+  isAllSelected = computed(() => {
+    const sel = this.selectableIds();
+    return sel.length > 0 && sel.every(id => this.selectedIds().has(id));
+  });
 
   ngOnInit(): void { this.load(); }
 
@@ -48,6 +64,7 @@ export class AdminFeesComponent implements OnInit, OnDestroy {
 
   load(): void {
     this.loading.set(true);
+    this.selectedIds.set(new Set());
     this.adminApi.getFees(this.page(), this.pageSize, this.search(), this.status())
       .subscribe({
         next: (r: PagedResponse<FeeSummary>) => {
@@ -62,6 +79,49 @@ export class AdminFeesComponent implements OnInit, OnDestroy {
 
   prevPage(): void { if (this.page() > 0) { this.page.update(p => p - 1); this.load(); } }
   nextPage(): void { if (this.page() < this.totalPages() - 1) { this.page.update(p => p + 1); this.load(); } }
+
+  isPaidOrWaived(f: FeeSummary): boolean {
+    return f.status === 'Paid' || f.status === 'Waived';
+  }
+
+  isSelected(id: number): boolean { return this.selectedIds().has(id); }
+
+  toggleSelect(id: number): void {
+    const next = new Set(this.selectedIds());
+    next.has(id) ? next.delete(id) : next.add(id);
+    this.selectedIds.set(next);
+  }
+
+  toggleSelectAll(): void {
+    if (this.isAllSelected()) {
+      this.selectedIds.set(new Set());
+    } else {
+      this.selectedIds.set(new Set(this.selectableIds()));
+    }
+  }
+
+  clearSelection(): void { this.selectedIds.set(new Set()); }
+
+  bulkRemind(): void {
+    const ids = [...this.selectedIds()];
+    if (!ids.length) return;
+    this.bulkSending.set(true);
+    this.bulkDone.set(0);
+    forkJoin(ids.map(id => this.adminApi.sendFeeReminder(id))).subscribe({
+      next: () => {
+        this.bulkSending.set(false);
+        this.bulkDone.set(ids.length);
+        this.actionMsg.set(`Reminder sent to ${ids.length} students`);
+        this.selectedIds.set(new Set());
+        setTimeout(() => { this.actionMsg.set(''); this.bulkDone.set(0); }, 4000);
+      },
+      error: () => {
+        this.bulkSending.set(false);
+        this.actionMsg.set('Some reminders failed. Please try again.');
+        setTimeout(() => this.actionMsg.set(''), 4000);
+      },
+    });
+  }
 
   openPaymentLink(id: number): void {
     this.linkData.set(null);

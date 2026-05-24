@@ -11,7 +11,7 @@
     }
   </header>
 
-  <!-- Filters — live search, no button needed -->
+  <!-- Filters -->
   <div class="flex flex-col sm:flex-row gap-3">
     <div class="relative flex-1">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" style="font-size:18px">search</span>
@@ -26,11 +26,47 @@
     </select>
   </div>
 
+  <!-- Bulk action bar — visible when items are selected -->
+  @if (selectedIds().size > 0) {
+    <div class="flex items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-amber-600">checklist</span>
+        <p class="text-sm font-medium text-amber-900">
+          {{ selectedIds().size }} {{ 'admin.fees.studentsSelected' | translate }}
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="clearSelection()" class="hud-btn-ghost text-xs px-3 py-1.5">
+          {{ 'admin.fees.clearSelection' | translate }}
+        </button>
+        <button (click)="bulkRemind()" [disabled]="bulkSending()"
+                class="hud-btn-primary text-xs px-3 py-1.5">
+          @if (bulkSending()) {
+            <span class="material-symbols-outlined animate-spin" style="font-size:16px">progress_activity</span>
+            {{ 'admin.fees.sending' | translate }}…
+          } @else {
+            <span class="material-symbols-outlined fill" style="font-size:16px">notifications_active</span>
+            {{ 'admin.fees.sendBulkReminder' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- Table -->
   <section class="hud-card overflow-x-auto p-0">
     <table class="w-full text-sm">
       <thead class="border-b border-surface-3">
         <tr class="text-left">
+          <!-- Select-all checkbox -->
+          <th class="px-4 py-3 w-10">
+            <input type="checkbox"
+                   [checked]="isAllSelected()"
+                   [indeterminate]="selectedIds().size > 0 && !isAllSelected()"
+                   (change)="toggleSelectAll()"
+                   [disabled]="selectableIds().length === 0"
+                   class="accent-brand-600 w-4 h-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"/>
+          </th>
           <th class="hud-caps px-4 py-3">{{ 'admin.fees.colStudent' | translate }}</th>
           <th class="hud-caps px-4 py-3">{{ 'admin.fees.colClass'   | translate }}</th>
           <th class="hud-caps px-4 py-3 text-right">{{ 'admin.fees.colAmount'  | translate }}</th>
@@ -42,10 +78,20 @@
       </thead>
       <tbody class="divide-y divide-surface-3">
         @if (loading()) {
-          <tr><td colspan="7" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
+          <tr><td colspan="8" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
         } @else {
           @for (f of fees(); track f.id) {
-            <tr class="hover:bg-surface-2 transition-colors">
+            <tr class="transition-colors"
+                [class.hover:bg-surface-2]="!isSelected(f.id)"
+                [class.bg-amber-50]="isSelected(f.id)">
+              <!-- Row checkbox -->
+              <td class="px-4 py-3">
+                <input type="checkbox"
+                       [checked]="isSelected(f.id)"
+                       (change)="toggleSelect(f.id)"
+                       [disabled]="isPaidOrWaived(f)"
+                       class="accent-brand-600 w-4 h-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"/>
+              </td>
               <td class="px-4 py-3 font-medium text-ink-900">{{ f.studentName }}</td>
               <td class="px-4 py-3 text-ink-600">{{ f.className || '—' }}</td>
               <td class="px-4 py-3 text-right tabular-nums text-ink-900">₹{{ f.amount | number:'1.0-0' }}</td>
@@ -64,19 +110,21 @@
                 }
               </td>
               <td class="px-4 py-3 flex items-center gap-2">
-                @if (f.status !== 'Paid' && f.status !== 'Waived') {
-                  <button (click)="openPaymentLink(f.id)" class="hud-btn-ghost text-xs px-2 py-1" title="{{ 'admin.fees.sendPaymentLink' | translate }}">
+                @if (!isPaidOrWaived(f)) {
+                  <button (click)="openPaymentLink(f.id)" class="hud-btn-ghost text-xs px-2 py-1"
+                          title="{{ 'admin.fees.sendPaymentLink' | translate }}">
                     <span class="material-symbols-outlined fill" style="font-size:15px">currency_rupee</span>
                     {{ 'admin.fees.sendPaymentLink' | translate }}
                   </button>
                 }
-                <button (click)="remind(f.id)" class="hud-btn-ghost text-xs px-2 py-1" title="{{ 'admin.fees.remind' | translate }}">
+                <button (click)="remind(f.id)" class="hud-btn-ghost text-xs px-2 py-1"
+                        title="{{ 'admin.fees.remind' | translate }}">
                   <span class="material-symbols-outlined" style="font-size:15px">notifications</span>
                 </button>
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="7" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
+            <tr><td colspan="8" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
           }
         }
       </tbody>
@@ -105,7 +153,6 @@
           <p class="text-ink-500 text-center py-4">{{ 'common.loading' | translate }}</p>
         } @else {
           @let d = linkData()!;
-          <!-- Header -->
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="hud-caps">{{ 'admin.fees.paymentLink' | translate }}</p>
@@ -119,7 +166,6 @@
             </button>
           </div>
 
-          <!-- UPI link box -->
           <div class="rounded-lg border border-surface-3 bg-surface-2 p-3 space-y-2">
             <p class="hud-caps text-xs">{{ 'admin.fees.upiLink' | translate }}</p>
             <p class="text-xs font-mono text-ink-600 break-all leading-relaxed">{{ d.upiLink }}</p>
@@ -129,19 +175,14 @@
             </button>
           </div>
 
-          <!-- Action buttons -->
           <div class="space-y-2">
-            <!-- WhatsApp send -->
             <a [href]="d.waLink" target="_blank" rel="noopener"
                class="hud-btn-primary w-full justify-center no-underline">
               <span class="material-symbols-outlined fill">chat</span>
               {{ 'admin.fees.sendViaWhatsApp' | translate }}
               @if (d.phone) { <span class="text-xs opacity-75 ml-1">· {{ d.phone }}</span> }
             </a>
-
-            <!-- Direct UPI (mobile only) -->
-            <a [href]="d.upiLink"
-               class="hud-btn-ghost w-full justify-center no-underline">
+            <a [href]="d.upiLink" class="hud-btn-ghost w-full justify-center no-underline">
               <span class="material-symbols-outlined fill">currency_rupee</span>
               {{ 'admin.fees.openUpiApp' | translate }}
             </a>

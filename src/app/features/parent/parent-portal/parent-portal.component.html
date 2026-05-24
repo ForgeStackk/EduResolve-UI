@@ -1,28 +1,89 @@
 <div class="space-y-8">
 
-  <!-- Welcome briefing -->
-  <header class="space-y-2">
-    <p class="hud-caps">Parent portal</p>
-    <h1 class="hud-display text-4xl sm:text-5xl text-ink-900 tracking-tight leading-none">
-      Welcome back,
-      <span class="text-emerald-600">{{ parentFirstName() }}</span>
-    </h1>
+  <!-- Welcome header -->
+  <header class="space-y-3">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="hud-caps">{{ 'parent.portal.subtitle' | translate }}</p>
+        <h1 class="hud-display text-4xl sm:text-5xl text-ink-900 tracking-tight leading-none">
+          {{ 'parent.portal.welcomeBack' | translate }},
+          <span class="text-emerald-600">{{ parentFirstName() }}</span>
+        </h1>
+      </div>
+      <!-- P9: Notification bell -->
+      <button (click)="openNotifications()"
+              class="relative hud-btn-ghost p-2 shrink-0 mt-1">
+        <span class="material-symbols-outlined text-ink-500">notifications</span>
+        @if (unreadCount() > 0) {
+          <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center px-1">
+            {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+          </span>
+        }
+      </button>
+    </div>
+
     <p class="text-base sm:text-lg text-ink-500 max-w-2xl">
-      Real-time visibility into your child&rsquo;s academic progress,
-      school updates, and open support tickets.
+      {{ 'parent.portal.tagline' | translate }}
       @if (childClassLabel()) {
         <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-brand-200 bg-brand-soft">
-          <span class="material-symbols-outlined fill" style="font-size:12px" class="text-brand-500">school</span>
+          <span class="material-symbols-outlined fill text-brand-500" style="font-size:12px">school</span>
           <span class="hud-caps text-brand-600" style="font-size:10px">{{ childClassLabel() }}</span>
         </span>
       }
     </p>
+
+    <!-- P10: Child selector (only shown if multiple children) -->
+    @if (children().length > 1) {
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="hud-caps text-ink-500">{{ 'parent.portal.viewingChild' | translate }}:</span>
+        @for (child of children(); track child.id) {
+          <button (click)="switchChild(child)"
+                  class="hud-chip cursor-pointer transition-all"
+                  [class.hud-chip-active]="selectedChild()?.id === child.id"
+                  [class.bg-surface-2]="selectedChild()?.id !== child.id">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                  [style.background]="child.color || '#6366f1'" style="color:white">
+              {{ child.initials || child.studentName[0] }}
+            </span>
+            {{ child.studentName }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (actionMsg()) {
+      <p class="hud-chip bg-emerald-50 text-emerald-700 border-emerald-200 w-fit">{{ actionMsg() }}</p>
+    }
   </header>
 
+  <!-- Portal tab navigation -->
+  <nav class="flex gap-1 flex-wrap">
+    @for (tab of [
+      {id:'overview',   icon:'home',       label:'parent.portal.tabOverview'},
+      {id:'attendance', icon:'calendar_month', label:'parent.portal.tabAttendance'},
+      {id:'leave',      icon:'event_busy',  label:'parent.portal.tabLeave'},
+      {id:'messages',   icon:'forum',       label:'parent.portal.tabMessages'}
+    ]; track tab.id) {
+      <button (click)="activeTab.set($any(tab.id))"
+              class="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-lg transition-all border"
+              [class.bg-brand-soft]="activeTab() === tab.id"
+              [class.text-brand-600]="activeTab() === tab.id"
+              [class.border-brand-200]="activeTab() === tab.id"
+              [class.text-ink-500]="activeTab() !== tab.id"
+              [class.border-transparent]="activeTab() !== tab.id"
+              [class.hover:bg-surface-2]="activeTab() !== tab.id">
+        <span class="material-symbols-outlined" style="font-size:18px">{{ tab.icon }}</span>
+        {{ tab.label | translate }}
+      </button>
+    }
+  </nav>
+
+  <!-- Overview tab -->
+  @if (activeTab() === 'overview') {
   <!-- Body grid -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    <!-- ===== LEFT COLUMN =========================================== -->
+    <!-- ===== LEFT COLUMN ===== -->
     <div class="space-y-6">
 
       <!-- School Updates -->
@@ -30,89 +91,110 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-emerald-600">campaign</span>
-            <h2 class="hud-display text-xl text-ink-900">School updates</h2>
+            <h2 class="hud-display text-xl text-ink-900">{{ 'parent.portal.schoolUpdates' | translate }}</h2>
           </div>
-          <span class="hud-chip hud-chip-active">3 new</span>
+          @if (updatesBadge() > 0) {
+            <span class="hud-chip hud-chip-active">{{ updatesBadge() }} {{ 'parent.portal.pending' | translate }}</span>
+          }
         </div>
 
-        <!-- Homework card -->
-        <article class="hud-card-flat">
-          <div class="hud-accent" style="background:#f59e0b"></div>
-          <div class="flex items-start gap-3 pl-2">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
-              <span class="material-symbols-outlined text-amber-600">assignment</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="hud-display text-base text-ink-900">Advanced Physics HW</h3>
-                <span class="hud-chip hud-chip-active">Due tomorrow</span>
+        <!-- Homework cards -->
+        @for (hw of homework(); track hw.id) {
+          <article class="hud-card-flat">
+            <div class="hud-accent" style="background:#f59e0b"></div>
+            <div class="flex items-start gap-3 pl-2">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
+                <span class="material-symbols-outlined text-amber-600">assignment</span>
               </div>
-              <p class="text-sm text-ink-700 mt-2 leading-relaxed">
-                Module 4: Quantum Mechanics Foundations.
-                <strong class="text-ink-900">Alex has completed 2/5 tasks.</strong>
-              </p>
-              <div class="hud-meter mt-3">
-                <div style="width:40%"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="hud-display text-base text-ink-900">{{ hw.title }}</h3>
+                  @if (hw.dueDate) {
+                    <span class="hud-chip text-xs" [class]="dueBadgeClass(hw.dueDate)">{{ dueBadge(hw.dueDate) }}</span>
+                  }
+                </div>
+                @if (hw.subject) { <p class="hud-caps text-ink-500 mt-1">{{ hw.subject }}</p> }
+                @if (hw.description) {
+                  <p class="text-sm text-ink-700 mt-1 leading-relaxed line-clamp-2">{{ hw.description }}</p>
+                }
               </div>
             </div>
+          </article>
+        } @empty {
+          <div class="hud-card-flat text-center py-6">
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">assignment_turned_in</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noHomework' | translate }}</p>
           </div>
-        </article>
+        }
 
-        <!-- Payment card -->
-        <article class="hud-card-flat">
-          <div class="hud-accent"></div>
-          <div class="flex items-start gap-3 pl-2">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-red-50">
-              <span class="material-symbols-outlined text-red-600">credit_card</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="hud-display text-base text-ink-900">Q3 Tuition Installment</h3>
-                <span class="hud-chip bg-red-50 text-red-600 border-red-200">
-                  Action required
-                </span>
+        <!-- Fee cards -->
+        @for (fee of fees(); track fee.id) {
+          <article class="hud-card-flat">
+            <div class="hud-accent"></div>
+            <div class="flex items-start gap-3 pl-2">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-red-50">
+                <span class="material-symbols-outlined text-red-600">credit_card</span>
               </div>
-              <p class="text-sm text-ink-700 mt-2 leading-relaxed">
-                Final deadline for the third-quarter installment is
-                <strong class="text-ink-900">Friday, Oct 27</strong>.
-              </p>
-              <button class="hud-btn-primary mt-4">
-                <span class="material-symbols-outlined fill">paid</span>
-                Pay Now
-              </button>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="hud-display text-base text-ink-900">₹{{ fee.amount | number:'1.0-0' }}</h3>
+                  <span class="hud-chip text-xs" [class]="feeStatusClass(fee.status)">{{ fee.status }}</span>
+                </div>
+                @if (fee.dueDate) {
+                  <p class="text-sm text-ink-700 mt-1">
+                    {{ 'parent.portal.due' | translate }}:
+                    <strong class="text-ink-900">{{ fee.dueDate | date:'d MMM yyyy' }}</strong>
+                  </p>
+                }
+                <button (click)="openPaymentLink(fee.id!)" class="hud-btn-primary mt-3">
+                  <span class="material-symbols-outlined fill">paid</span>
+                  {{ 'parent.portal.payNow' | translate }}
+                </button>
+              </div>
             </div>
+          </article>
+        } @empty {
+          <div class="hud-card-flat text-center py-6">
+            <span class="material-symbols-outlined text-emerald-400" style="font-size:40px">check_circle</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noFees' | translate }}</p>
           </div>
-        </article>
+        }
+        <button (click)="openFeeHistory()" class="hud-btn-ghost text-xs w-full justify-center py-2">
+          <span class="material-symbols-outlined" style="font-size:15px">receipt_long</span>
+          {{ 'parent.portal.viewFeeHistory' | translate }}
+        </button>
       </section>
 
-      <!-- Academic Performance -->
+      <!-- Academic Performance (P6) -->
       <section class="hud-card">
         <div class="hud-accent"></div>
         <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
           <div>
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-emerald-600">trending_up</span>
-              <h3 class="hud-display text-xl text-ink-900">Academic performance</h3>
+              <h3 class="hud-display text-xl text-ink-900">{{ 'parent.portal.academicPerformance' | translate }}</h3>
             </div>
             <p class="hud-caps mt-1">
-              Average score <span class="text-emerald-600 font-semibold">{{ averageScore }}%</span>
+              {{ 'parent.portal.avgScore' | translate }}
+              <span class="text-emerald-600 font-semibold">{{ avgScore() }}%</span>
+              @if (!perfLoaded()) {
+                <span class="text-ink-400 font-normal ml-1">({{ 'parent.portal.sampleData' | translate }})</span>
+              }
             </p>
           </div>
           <div class="flex items-center gap-3 text-xs">
             <span class="flex items-center gap-1 text-ink-700">
               <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span>
-              Current
+              {{ 'parent.portal.current' | translate }}
             </span>
             <span class="flex items-center gap-1 text-ink-500">
               <span class="w-2.5 h-2.5 rounded-sm bg-ink-300"></span>
-              Class avg
+              {{ 'parent.portal.classAvg' | translate }}
             </span>
           </div>
         </div>
-
-        <!-- Bar chart -->
-        <div class="grid grid-cols-5 gap-4 h-56 items-end">
-          @for (p of performance; track p.subject) {
+        <div class="grid gap-4 h-56 items-end" [style.grid-template-columns]="'repeat(' + performanceBars().length + ', 1fr)'">
+          @for (p of performanceBars(); track p.subject) {
             <div class="flex flex-col items-center gap-2 h-full">
               <div class="flex items-end gap-1.5 h-full w-full">
                 <div class="flex-1 rounded-t-md relative transition-all duration-500"
@@ -125,13 +207,13 @@
                 <div class="flex-1 rounded-t-md bg-ink-300/40 transition-all duration-500"
                      [style.height.%]="p.classAvg"></div>
               </div>
-              <span class="hud-caps">{{ p.subject }}</span>
+              <span class="hud-caps text-center truncate w-full">{{ p.subject }}</span>
             </div>
           }
         </div>
       </section>
 
-      <!-- AI Assistant -->
+      <!-- AI Assistant (P8) -->
       <section class="hud-card">
         <div class="hud-accent" style="background:#6366F1"></div>
         <div class="flex items-start gap-3 mb-4">
@@ -139,26 +221,65 @@
             <span class="material-symbols-outlined fill text-brand-600">smart_toy</span>
           </div>
           <div>
-            <h3 class="hud-display text-xl text-ink-900">AI Assistant</h3>
-            <p class="text-xs text-ink-500">Instant assistance.</p>
+            <h3 class="hud-display text-xl text-ink-900">{{ 'parent.portal.aiAssistant' | translate }}</h3>
+            <p class="text-xs text-ink-500">{{ 'parent.portal.aiSubtitle' | translate }}</p>
           </div>
         </div>
-        <p class="text-sm text-ink-700 italic mb-3">
-          &ldquo;Describe your concern. I&rsquo;ll route it to the right department immediately.&rdquo;
-        </p>
-        <input type="text"
-               [(ngModel)]="concern"
-               placeholder="I have a concern about…"
-               class="hud-input mb-4"/>
-        <button class="hud-btn-primary w-full"
-                [disabled]="!concern.trim()">
-          <span class="material-symbols-outlined fill">send</span>
-          Submit Concern
-        </button>
+
+        @if (!aiResponse()) {
+          <p class="text-sm text-ink-700 italic mb-3">
+            &ldquo;{{ 'parent.portal.aiPrompt' | translate }}&rdquo;
+          </p>
+          <textarea [ngModel]="concern()" (ngModelChange)="concern.set($event)"
+                    [placeholder]="'parent.portal.aiPlaceholder' | translate"
+                    rows="3"
+                    class="hud-input w-full resize-none mb-4"></textarea>
+          <button (click)="submitConcern()"
+                  class="hud-btn-primary w-full"
+                  [disabled]="!concern().trim() || aiLoading()">
+            @if (aiLoading()) {
+              <span class="material-symbols-outlined animate-spin" style="font-size:16px">progress_activity</span>
+              {{ 'parent.portal.thinking' | translate }}
+            } @else {
+              <span class="material-symbols-outlined fill">send</span>
+              {{ 'parent.portal.submitConcern' | translate }}
+            }
+          </button>
+        } @else {
+          @let r = aiResponse()!;
+          <!-- AI response bubble -->
+          <div class="rounded-lg bg-brand-soft border border-brand-200 p-4 space-y-2 mb-3">
+            <p class="text-sm text-ink-800 leading-relaxed">{{ r.message }}</p>
+            @if (r.ticketCreated) {
+              <div class="flex items-center gap-2 pt-2 border-t border-brand-200">
+                <span class="material-symbols-outlined fill text-emerald-600" style="font-size:16px">confirmation_number</span>
+                <p class="text-xs text-emerald-700 font-medium">
+                  {{ 'parent.portal.autoTicketCreated' | translate }}
+                  @if (r.ticketId) { <span class="opacity-60 ml-1">#{{ r.ticketId }}</span> }
+                </p>
+              </div>
+            }
+            @if (r.route === 'urgent') {
+              <div class="flex items-center gap-2 pt-2 border-t border-red-200">
+                <span class="material-symbols-outlined fill text-red-600" style="font-size:16px">priority_high</span>
+                <p class="text-xs text-red-700 font-medium">{{ 'parent.portal.urgentFlagged' | translate }}</p>
+              </div>
+            }
+          </div>
+          <!-- User's original concern -->
+          <div class="rounded-lg bg-surface-2 border border-surface-3 px-3 py-2 mb-4">
+            <p class="hud-caps text-ink-400 mb-1">{{ 'parent.portal.yourConcern' | translate }}</p>
+            <p class="text-sm text-ink-600 line-clamp-2">{{ concern() }}</p>
+          </div>
+          <button (click)="clearConcern()" class="hud-btn-ghost w-full">
+            <span class="material-symbols-outlined" style="font-size:16px">refresh</span>
+            {{ 'parent.portal.newConcern' | translate }}
+          </button>
+        }
       </section>
     </div>
 
-    <!-- ===== RIGHT COLUMN ========================================== -->
+    <!-- ===== RIGHT COLUMN ===== -->
     <div class="space-y-6">
 
       <!-- Absence Alerts -->
@@ -166,11 +287,11 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-red-600">warning</span>
-            <h2 class="hud-display text-xl text-ink-900">Absence alerts</h2>
+            <h2 class="hud-display text-xl text-ink-900">{{ 'parent.portal.absenceAlerts' | translate }}</h2>
           </div>
           @if (absenceAlerts().length > 0) {
             <span class="hud-chip bg-red-50 text-red-600 border-red-200">
-              {{ absenceAlerts().length }} alert{{ absenceAlerts().length > 1 ? 's' : '' }}
+              {{ absenceAlerts().length }} {{ 'parent.portal.alerts' | translate }}
             </span>
           }
         </div>
@@ -191,86 +312,643 @@
                 @if (alert.textBody) {
                   <p class="text-xs text-ink-700 mt-1 leading-relaxed line-clamp-2">{{ alert.textBody }}</p>
                 }
-                <p class="hud-caps text-ink-500 mt-1" style="font-size:10px">
-                  From {{ alert.senderName }}
-                </p>
+                <p class="hud-caps text-ink-500 mt-1" style="font-size:10px">{{ alert.senderName }}</p>
               </div>
             </article>
           } @empty {
             <div class="hud-card-flat text-center py-8">
               <span class="material-symbols-outlined text-ink-300" style="font-size:40px">check_circle</span>
-              <p class="text-sm text-ink-500 mt-2">No absence alerts. Great attendance!</p>
+              <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noAbsence' | translate }}</p>
             </div>
           }
         </div>
       </section>
 
-      <!-- Active Tickets -->
+      <!-- Active Tickets (P5) -->
       <section class="space-y-4">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-ink-500">confirmation_number</span>
-          <h2 class="hud-display text-xl text-ink-900">Active tickets</h2>
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-ink-500">confirmation_number</span>
+            <h2 class="hud-display text-xl text-ink-900">{{ 'parent.portal.activeTickets' | translate }}</h2>
+          </div>
+          <button (click)="showCreateTicket.set(true)"
+                  class="hud-btn-ghost text-xs px-3 py-1.5">
+            <span class="material-symbols-outlined" style="font-size:16px">add</span>
+            {{ 'parent.portal.newTicket' | translate }}
+          </button>
         </div>
         <div class="space-y-3">
           @for (ticket of tickets(); track ticket.id; let i = $index) {
-            <a class="hud-card-flat flex items-center gap-3 hover:border-brand-200 transition-all cursor-pointer">
-              <div class="hud-accent"
-                   [style.background]="i % 2 === 0 ? '#dc2626' : '#f59e0b'"></div>
+            <button (click)="openTicketDetail(ticket)"
+                    class="hud-card-flat flex items-center gap-3 hover:border-brand-200 transition-all cursor-pointer w-full text-left">
+              <div class="hud-accent" [style.background]="i % 2 === 0 ? '#dc2626' : '#f59e0b'"></div>
               <div class="flex-1 min-w-0 pl-2">
                 <h4 class="hud-display text-base text-ink-900 truncate">{{ ticket.title }}</h4>
-                <p class="hud-caps text-ink-500 mt-1">{{ ticket.meta }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <p class="hud-caps text-ink-500">{{ ticket.meta }}</p>
+                  <span class="hud-chip text-xs" [class]="ticketStatusClass(ticket.status)">{{ ticket.status }}</span>
+                </div>
               </div>
-              <span class="material-symbols-outlined text-ink-300">chevron_right</span>
-            </a>
+              <span class="material-symbols-outlined text-ink-300 shrink-0">chevron_right</span>
+            </button>
           } @empty {
             <div class="hud-card-flat text-center py-8">
               <span class="material-symbols-outlined text-ink-300" style="font-size:40px">task_alt</span>
-              <p class="text-sm text-ink-500 mt-2">No active tickets.</p>
+              <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noTickets' | translate }}</p>
+              <button (click)="showCreateTicket.set(true)" class="hud-btn-ghost text-xs mt-3 px-3 py-1.5">
+                {{ 'parent.portal.raiseTicket' | translate }}
+              </button>
             </div>
           }
         </div>
       </section>
 
-      <!-- Upcoming Events -->
+      <!-- Upcoming Events (P7 RSVP) -->
       <section class="space-y-4">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-ink-500">event</span>
-          <h2 class="hud-display text-xl text-ink-900">Upcoming events</h2>
+          <h2 class="hud-display text-xl text-ink-900">{{ 'parent.portal.upcomingEvents' | translate }}</h2>
         </div>
         <div class="space-y-3">
           @for (event of events(); track event.id) {
             <article class="hud-card-flat flex items-center gap-4">
               <div class="hud-accent"></div>
-              <!-- Date block -->
               <div class="w-16 text-center shrink-0 rounded-lg border border-surface-3 bg-surface-2 py-2">
                 <p class="hud-caps text-ink-500">{{ event.month }}</p>
                 <p class="hud-display text-2xl text-ink-900 leading-none mt-1">{{ event.day }}</p>
               </div>
               <div class="flex-1 min-w-0">
                 <h4 class="hud-display text-base text-ink-900 truncate">{{ event.title }}</h4>
-                <p class="text-xs text-ink-500 mt-1">
+                <p class="text-xs text-ink-500 mt-0.5">
                   {{ event.location }}@if (event.time) { · {{ event.time }} }
                 </p>
-                @if (event.attendees) {
-                  <div class="mt-2 flex items-center gap-1">
-                    <span class="material-symbols-outlined text-ink-300" style="font-size:14px">group</span>
-                    <span class="text-xs text-ink-500">{{ event.attendees }} attending</span>
-                  </div>
-                } @else {
-                  <a class="text-sm text-brand-600 hover:text-brand-700 transition-colors mt-2 inline-block cursor-pointer font-medium">
-                    Details →
-                  </a>
-                }
+                <button (click)="toggleRsvp(+event.id)"
+                        class="hud-btn-ghost text-xs px-2 py-1 mt-2"
+                        [class.bg-emerald-50]="rsvpedIds().has(+event.id)"
+                        [class.text-emerald-700]="rsvpedIds().has(+event.id)"
+                        [class.border-emerald-200]="rsvpedIds().has(+event.id)">
+                  <span class="material-symbols-outlined" style="font-size:14px">
+                    {{ rsvpedIds().has(+event.id) ? 'event_available' : 'event' }}
+                  </span>
+                  {{ rsvpedIds().has(+event.id) ? ('parent.portal.rsvped' | translate) : ('parent.portal.rsvp' | translate) }}
+                </button>
               </div>
             </article>
           } @empty {
             <div class="hud-card-flat text-center py-8">
               <span class="material-symbols-outlined text-ink-300" style="font-size:40px">event_busy</span>
-              <p class="text-sm text-ink-500 mt-2">No upcoming events.</p>
+              <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noEvents' | translate }}</p>
             </div>
           }
         </div>
       </section>
     </div>
   </div>
+  } <!-- /overview tab -->
+
+  <!-- ===== ATTENDANCE TAB (P11) ===== -->
+  @if (activeTab() === 'attendance') {
+  <section class="space-y-5">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div>
+        <p class="hud-caps">{{ 'parent.portal.attendance' | translate }}</p>
+        <h2 class="hud-display text-2xl text-ink-900 mt-0.5">{{ attendanceMonthLabel() }}</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="prevMonth()" class="hud-btn-ghost p-2">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button (click)="nextMonth()" class="hud-btn-ghost p-2">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-3 gap-3">
+      <div class="hud-card-flat text-center py-4">
+        <p class="hud-display text-3xl text-emerald-600">{{ attendanceStats().present }}</p>
+        <p class="hud-caps text-ink-500 mt-1">{{ 'parent.portal.attPresent' | translate }}</p>
+      </div>
+      <div class="hud-card-flat text-center py-4">
+        <p class="hud-display text-3xl text-red-600">{{ attendanceStats().absent }}</p>
+        <p class="hud-caps text-ink-500 mt-1">{{ 'parent.portal.attAbsent' | translate }}</p>
+      </div>
+      <div class="hud-card-flat text-center py-4">
+        <p class="hud-display text-3xl text-brand-600">{{ attendancePct() }}</p>
+        <p class="hud-caps text-ink-500 mt-1">{{ 'parent.portal.attRate' | translate }}</p>
+      </div>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="hud-card p-4">
+      <!-- Weekday headers -->
+      <div class="grid grid-cols-7 mb-2">
+        @for (d of ['S','M','T','W','T','F','S']; track $index) {
+          <div class="text-center hud-caps text-ink-400 py-1">{{ d }}</div>
+        }
+      </div>
+
+      @if (attendanceLoading()) {
+        <div class="flex items-center justify-center py-12">
+          <span class="material-symbols-outlined animate-spin text-ink-300" style="font-size:32px">progress_activity</span>
+        </div>
+      } @else {
+        <div class="grid grid-cols-7 gap-1">
+          @for (cell of calendarGrid(); track $index) {
+            @if (cell === null) {
+              <div></div>
+            } @else {
+              <div class="aspect-square rounded-md flex items-center justify-center text-xs font-medium cursor-default transition-colors"
+                   [class]="attendanceCellClass(cell.status)"
+                   [title]="cell.status ?? 'No data'">
+                {{ cell.date | date:'d' }}
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <!-- Legend -->
+      <div class="flex items-center gap-3 flex-wrap mt-4 pt-3 border-t border-surface-3">
+        @for (leg of [
+          {color:'bg-emerald-500',label:'present'},
+          {color:'bg-red-500',   label:'absent'},
+          {color:'bg-amber-400', label:'late'},
+          {color:'bg-surface-3', label:'holiday'}
+        ]; track leg.label) {
+          <span class="flex items-center gap-1.5 text-xs text-ink-600">
+            <span class="w-3 h-3 rounded-sm" [class]="leg.color"></span>
+            {{ leg.label | titlecase }}
+          </span>
+        }
+      </div>
+    </div>
+  </section>
+  } <!-- /attendance tab -->
+
+  <!-- ===== LEAVE TAB (P12) ===== -->
+  @if (activeTab() === 'leave') {
+  <section class="space-y-5">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <p class="hud-caps">{{ 'parent.portal.leave' | translate }}</p>
+        <h2 class="hud-display text-2xl text-ink-900 mt-0.5">{{ 'parent.portal.leaveTitle' | translate }}</h2>
+      </div>
+      <button (click)="openLeaveForm()" class="hud-btn-primary px-4 py-2">
+        <span class="material-symbols-outlined fill" style="font-size:18px">add</span>
+        {{ 'parent.portal.applyLeave' | translate }}
+      </button>
+    </div>
+
+    <div class="space-y-3">
+      @for (leave of leaveApplications(); track leave.id) {
+        <article class="hud-card-flat">
+          <div class="hud-accent"
+               [style.background]="leave.status === 'Approved' ? '#10b981' : leave.status === 'Rejected' ? '#dc2626' : '#f59e0b'">
+          </div>
+          <div class="pl-2 flex items-start gap-4 flex-wrap">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="hud-display text-base text-ink-900">{{ leave.studentName }}</h4>
+                <span class="hud-chip text-xs" [class]="leaveStatusClass(leave.status)">{{ leave.status }}</span>
+              </div>
+              <p class="text-sm text-ink-700 mt-0.5">{{ leave.reason }}</p>
+              <p class="hud-caps text-ink-500 mt-1">
+                {{ leave.fromDate | date:'d MMM' }} – {{ leave.toDate | date:'d MMM yyyy' }}
+              </p>
+            </div>
+            @if (leave.createdAt) {
+              <p class="hud-caps text-ink-400 shrink-0">{{ leave.createdAt | date:'d MMM' }}</p>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="hud-card-flat text-center py-12">
+          <span class="material-symbols-outlined text-ink-300" style="font-size:48px">event_busy</span>
+          <p class="text-sm text-ink-500 mt-3">{{ 'parent.portal.noLeave' | translate }}</p>
+          <button (click)="openLeaveForm()" class="hud-btn-ghost text-xs mt-3 px-3 py-1.5">
+            {{ 'parent.portal.applyLeave' | translate }}
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+  } <!-- /leave tab -->
+
+  <!-- ===== MESSAGES TAB (P14) ===== -->
+  @if (activeTab() === 'messages') {
+  <section class="space-y-4 flex flex-col" style="height:calc(100vh - 320px); min-height:400px">
+    <div>
+      <p class="hud-caps">{{ 'parent.portal.messages' | translate }}</p>
+      <h2 class="hud-display text-2xl text-ink-900 mt-0.5">{{ 'parent.portal.messagesTitle' | translate }}</h2>
+      <p class="text-sm text-ink-500">{{ childClassLabel() }}</p>
+    </div>
+
+    <!-- Thread -->
+    <div class="flex-1 overflow-y-auto space-y-3 hud-card p-4">
+      @if (teacherMessages().length === 0) {
+        <div class="flex flex-col items-center justify-center h-full py-8 text-center">
+          <span class="material-symbols-outlined text-ink-300" style="font-size:48px">forum</span>
+          <p class="text-sm text-ink-500 mt-3">{{ 'parent.portal.noMessages' | translate }}</p>
+        </div>
+      }
+      @for (msg of teacherMessages(); track msg.id) {
+        <div class="flex gap-3" [class.flex-row-reverse]="msg.senderRole === 'parent'">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+               [class.bg-brand-soft]="msg.senderRole === 'teacher'"
+               [class.text-brand-600]="msg.senderRole === 'teacher'"
+               [class.bg-amber-100]="msg.senderRole === 'parent'"
+               [class.text-amber-700]="msg.senderRole === 'parent'">
+            {{ msg.senderName[0].toUpperCase() }}
+          </div>
+          <div class="max-w-[75%] rounded-lg px-4 py-2.5"
+               [class.bg-surface-2]="msg.senderRole === 'teacher'"
+               [class.bg-brand-soft]="msg.senderRole === 'parent'">
+            <p class="text-xs font-semibold mb-1"
+               [class.text-brand-600]="msg.senderRole === 'teacher'"
+               [class.text-amber-700]="msg.senderRole === 'parent'">
+              {{ msg.senderRole === 'teacher' ? ('parent.portal.teacher' | translate) : ('parent.portal.you' | translate) }}
+            </p>
+            <p class="text-sm text-ink-800 leading-relaxed">{{ msg.body }}</p>
+            @if (msg.createdAt) {
+              <p class="text-xs text-ink-400 mt-1">{{ msg.createdAt | date:'d MMM, h:mm a' }}</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Input -->
+    <div class="flex gap-2">
+      <textarea [ngModel]="msgText()" (ngModelChange)="msgText.set($event)"
+                [placeholder]="'parent.portal.messagePlaceholder' | translate"
+                rows="2"
+                (keydown.enter)="onMsgEnter($any($event))"
+                class="hud-input flex-1 resize-none"></textarea>
+      <button (click)="sendTeacherMessage()"
+              [disabled]="!msgText().trim() || msgLoading()"
+              class="hud-btn-primary px-4 self-end">
+        @if (msgLoading()) {
+          <span class="material-symbols-outlined animate-spin" style="font-size:18px">progress_activity</span>
+        } @else {
+          <span class="material-symbols-outlined fill" style="font-size:18px">send</span>
+        }
+      </button>
+    </div>
+  </section>
+  } <!-- /messages tab -->
+
+  <!-- ===== NOTIFICATION PANEL (P9) ===== -->
+  @if (notifOpen()) {
+    <!-- Backdrop -->
+    <div class="fixed inset-0 z-40 bg-black/30" (click)="closeNotifications()"></div>
+    <!-- Slide-in panel -->
+    <div class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm flex flex-col bg-white shadow-2xl border-l border-surface-3">
+      <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-surface-3 shrink-0">
+        <div>
+          <h3 class="hud-display text-xl text-ink-900">{{ 'parent.portal.notifications' | translate }}</h3>
+          @if (unreadCount() > 0) {
+            <p class="hud-caps text-ink-500">{{ unreadCount() }} {{ 'parent.portal.unread' | translate }}</p>
+          }
+        </div>
+        <div class="flex items-center gap-2">
+          @if (unreadCount() > 0) {
+            <button (click)="markAllRead()" class="hud-btn-ghost text-xs px-2 py-1">
+              {{ 'parent.portal.markAllRead' | translate }}
+            </button>
+          }
+          <button (click)="closeNotifications()" class="hud-btn-ghost p-1">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto">
+        @if (notifLoading()) {
+          <div class="flex items-center justify-center py-12">
+            <span class="material-symbols-outlined animate-spin text-ink-300" style="font-size:32px">progress_activity</span>
+          </div>
+        } @else {
+          @for (item of notifItems(); track item.inboxId) {
+            <div class="px-5 py-4 border-b border-surface-3 flex items-start gap-3"
+                 [class.bg-brand-soft]="item.readStatus === 'UNREAD'">
+              <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                   [class.bg-red-100]="item.category === 'ABSENCE_NOTIFICATION'"
+                   [class.bg-amber-100]="item.category !== 'ABSENCE_NOTIFICATION'">
+                <span class="material-symbols-outlined"
+                      [class.text-red-600]="item.category === 'ABSENCE_NOTIFICATION'"
+                      [class.text-amber-600]="item.category !== 'ABSENCE_NOTIFICATION'"
+                      style="font-size:18px">
+                  {{ item.category === 'ABSENCE_NOTIFICATION' ? 'person_off' : 'notifications' }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                @if (item.textBody) {
+                  <p class="text-sm text-ink-700 leading-relaxed line-clamp-2">{{ item.textBody }}</p>
+                }
+                <div class="flex items-center gap-2 mt-1">
+                  <p class="hud-caps text-ink-400" style="font-size:10px">{{ alertDate(item.sentAt) }}</p>
+                  @if (item.readStatus === 'UNREAD') {
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                  }
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="flex flex-col items-center justify-center py-16 px-8 text-center">
+              <span class="material-symbols-outlined text-ink-300" style="font-size:48px">notifications_none</span>
+              <p class="text-sm text-ink-500 mt-3">{{ 'parent.portal.noNotifications' | translate }}</p>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="px-5 py-4 border-t border-surface-3 shrink-0">
+        <a routerLink="/parent/inbox" (click)="closeNotifications()"
+           class="hud-btn-ghost w-full justify-center no-underline text-sm">
+          {{ 'parent.portal.viewFullInbox' | translate }}
+          <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODALS ===== -->
+
+  <!-- UPI Payment modal (P1) -->
+  @if (linkData() || linkLoading()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="hud-card w-full max-w-md space-y-5">
+        @if (linkLoading()) {
+          <p class="text-ink-500 text-center py-4">{{ 'common.loading' | translate }}</p>
+        } @else {
+          @let d = linkData()!;
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="hud-caps">{{ 'parent.portal.paymentLink' | translate }}</p>
+              <h3 class="hud-display text-xl text-ink-900 mt-1">{{ d.studentName }}</h3>
+              <p class="text-sm text-ink-500 mt-0.5">
+                {{ 'parent.portal.dueAmount' | translate }}:
+                <span class="font-semibold text-red-600">₹{{ d.balance | number:'1.0-0' }}</span>
+              </p>
+            </div>
+            <button (click)="closeLink()" class="hud-btn-ghost p-1 shrink-0">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="rounded-lg border border-surface-3 bg-surface-2 p-3 space-y-2">
+            <p class="hud-caps text-xs">{{ 'parent.portal.upiLink' | translate }}</p>
+            <p class="text-xs font-mono text-ink-600 break-all leading-relaxed">{{ d.upiLink }}</p>
+            <button (click)="copyLink(d.upiLink)" class="hud-btn-ghost text-xs px-2 py-1 w-full justify-center">
+              <span class="material-symbols-outlined" style="font-size:15px">content_copy</span>
+              {{ 'parent.portal.copyLink' | translate }}
+            </button>
+          </div>
+          <div class="space-y-2">
+            <a [href]="d.waLink" target="_blank" rel="noopener"
+               class="hud-btn-primary w-full justify-center no-underline">
+              <span class="material-symbols-outlined fill">chat</span>
+              {{ 'parent.portal.shareWhatsApp' | translate }}
+              @if (d.phone) { <span class="text-xs opacity-75 ml-1">· {{ d.phone }}</span> }
+            </a>
+            <a [href]="d.upiLink" class="hud-btn-ghost w-full justify-center no-underline">
+              <span class="material-symbols-outlined fill">currency_rupee</span>
+              {{ 'parent.portal.openUpiApp' | translate }}
+            </a>
+          </div>
+          <p class="text-xs text-ink-400 text-center">{{ 'parent.portal.upiNote' | translate }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Create Ticket modal (P5) -->
+  @if (showCreateTicket()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="hud-card w-full max-w-md space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="hud-caps">{{ 'parent.portal.support' | translate }}</p>
+            <h3 class="hud-display text-xl text-ink-900 mt-0.5">{{ 'parent.portal.newTicket' | translate }}</h3>
+          </div>
+          <button (click)="showCreateTicket.set(false)" class="hud-btn-ghost p-1 shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <select [ngModel]="createCategory()" (ngModelChange)="createCategory.set($event)"
+                class="hud-input w-full cursor-pointer">
+          <option value="">{{ 'parent.portal.selectCategory' | translate }}</option>
+          <option value="Fee">{{ 'parent.portal.catFee' | translate }}</option>
+          <option value="Teacher">{{ 'parent.portal.catTeacher' | translate }}</option>
+          <option value="Homework">{{ 'parent.portal.catHomework' | translate }}</option>
+          <option value="General">{{ 'parent.portal.catGeneral' | translate }}</option>
+        </select>
+
+        <input [ngModel]="createSubject()" (ngModelChange)="createSubject.set($event)"
+               [placeholder]="'parent.portal.ticketSubject' | translate"
+               class="hud-input w-full"/>
+
+        <textarea [ngModel]="createDescription()" (ngModelChange)="createDescription.set($event)"
+                  [placeholder]="'parent.portal.ticketDescription' | translate"
+                  rows="4"
+                  class="hud-input w-full resize-none"></textarea>
+
+        <div class="flex gap-2">
+          <button (click)="showCreateTicket.set(false)" class="hud-btn-ghost flex-1">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button (click)="submitNewTicket()"
+                  [disabled]="!createCategory() || !createSubject() || !createDescription() || createLoading()"
+                  class="hud-btn-primary flex-1">
+            @if (createLoading()) {
+              <span class="material-symbols-outlined animate-spin" style="font-size:16px">progress_activity</span>
+            }
+            {{ 'common.submit' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Ticket Detail modal (P5) -->
+  @if (selectedComplaint()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="hud-card w-full max-w-lg flex flex-col" style="max-height:85vh">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-3 mb-3 shrink-0">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="hud-caps">{{ selectedComplaint()!.category }}</p>
+              <span class="hud-chip text-xs" [class]="ticketStatusClass(selectedComplaint()!.status ?? 'Pending')">
+                {{ selectedComplaint()!.status }}
+              </span>
+            </div>
+            <h3 class="hud-display text-xl text-ink-900 mt-0.5">{{ selectedComplaint()!.subject }}</h3>
+          </div>
+          <button (click)="closeTicketDetail()" class="hud-btn-ghost p-1 shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm text-ink-600 leading-relaxed mb-4 shrink-0">{{ selectedComplaint()!.description }}</p>
+
+        <!-- Thread -->
+        <div class="flex-1 overflow-y-auto space-y-3 border-t border-surface-3 pt-4 min-h-0">
+          @if (replyLoading() && ticketReplies().length === 0) {
+            <p class="text-sm text-ink-400 text-center py-4">{{ 'common.loading' | translate }}</p>
+          }
+          @for (reply of ticketReplies(); track reply.id) {
+            <div class="flex gap-3" [class.flex-row-reverse]="reply.authorRole === 'parent'">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                   [class.bg-brand-soft]="reply.authorRole !== 'parent'"
+                   [class.text-brand-600]="reply.authorRole !== 'parent'"
+                   [class.bg-amber-100]="reply.authorRole === 'parent'"
+                   [class.text-amber-700]="reply.authorRole === 'parent'">
+                {{ (reply.authorName ?? 'A')[0].toUpperCase() }}
+              </div>
+              <div class="max-w-[75%] rounded-lg px-3 py-2"
+                   [class.bg-surface-2]="reply.authorRole !== 'parent'"
+                   [class.bg-amber-50]="reply.authorRole === 'parent'">
+                <p class="text-xs font-medium mb-1"
+                   [class.text-brand-600]="reply.authorRole !== 'parent'"
+                   [class.text-amber-700]="reply.authorRole === 'parent'">
+                  {{ reply.authorName ?? 'Staff' }}
+                </p>
+                <p class="text-sm text-ink-700 leading-relaxed">{{ reply.body }}</p>
+                @if (reply.createdAt) {
+                  <p class="text-xs text-ink-400 mt-1">{{ reply.createdAt | date:'d MMM, h:mm a' }}</p>
+                }
+              </div>
+            </div>
+          } @empty {
+            @if (!replyLoading()) {
+              <p class="text-sm text-ink-400 text-center py-4">{{ 'parent.portal.noReplies' | translate }}</p>
+            }
+          }
+        </div>
+
+        <!-- Reply input -->
+        <div class="flex gap-2 mt-4 border-t border-surface-3 pt-4 shrink-0">
+          <input [ngModel]="replyText()" (ngModelChange)="replyText.set($event)"
+                 [placeholder]="'parent.portal.replyPlaceholder' | translate"
+                 (keyup.enter)="sendReply()"
+                 class="hud-input flex-1"/>
+          <button (click)="sendReply()"
+                  [disabled]="!replyText().trim() || replyLoading()"
+                  class="hud-btn-primary px-3">
+            <span class="material-symbols-outlined fill" style="font-size:18px">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Fee History modal (P13) -->
+  @if (showFeeHistory()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="hud-card w-full max-w-lg flex flex-col" style="max-height:85vh">
+        <div class="flex items-center justify-between gap-3 mb-4 shrink-0">
+          <div>
+            <p class="hud-caps">{{ 'parent.portal.allFees' | translate }}</p>
+            <h3 class="hud-display text-xl text-ink-900 mt-0.5">{{ 'parent.portal.feeHistory' | translate }}</h3>
+          </div>
+          <button (click)="showFeeHistory.set(false)" class="hud-btn-ghost p-1 shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-3 min-h-0">
+          @if (feeHistoryLoading()) {
+            <p class="text-center text-ink-400 py-8">{{ 'common.loading' | translate }}</p>
+          }
+          @for (fee of feeHistory(); track fee.id) {
+            <div class="hud-card-flat flex items-center gap-4">
+              <div class="hud-accent" [style.background]="fee.status === 'Paid' ? '#10b981' : fee.status === 'Waived' ? '#6366f1' : '#dc2626'"></div>
+              <div class="flex-1 min-w-0 pl-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="hud-display text-base text-ink-900">₹{{ fee.amount | number:'1.0-0' }}</span>
+                  <span class="hud-chip text-xs" [class]="feeStatusClass(fee.status)">{{ fee.status }}</span>
+                </div>
+                @if (fee.dueDate) {
+                  <p class="text-xs text-ink-500 mt-0.5">{{ 'parent.portal.due' | translate }}: {{ fee.dueDate | date:'d MMM yyyy' }}</p>
+                }
+                @if (fee.paidAmount && fee.paidAmount > 0) {
+                  <p class="text-xs text-emerald-700 mt-0.5">{{ 'parent.portal.paid' | translate }}: ₹{{ fee.paidAmount | number:'1.0-0' }}</p>
+                }
+              </div>
+              @if (fee.status !== 'Paid' && fee.status !== 'Waived') {
+                <button (click)="openPaymentLink(fee.id!); showFeeHistory.set(false)" class="hud-btn-ghost text-xs px-2 py-1 shrink-0">
+                  {{ 'parent.portal.payNow' | translate }}
+                </button>
+              }
+            </div>
+          } @empty {
+            @if (!feeHistoryLoading()) {
+              <div class="text-center py-8">
+                <span class="material-symbols-outlined text-ink-300" style="font-size:40px">receipt_long</span>
+                <p class="text-sm text-ink-500 mt-2">{{ 'parent.portal.noFeeHistory' | translate }}</p>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Leave Application form modal (P12) -->
+  @if (showLeaveForm()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="hud-card w-full max-w-md space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="hud-caps">{{ 'parent.portal.leave' | translate }}</p>
+            <h3 class="hud-display text-xl text-ink-900 mt-0.5">{{ 'parent.portal.applyLeave' | translate }}</h3>
+          </div>
+          <button (click)="showLeaveForm.set(false)" class="hud-btn-ghost p-1 shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <input [ngModel]="leaveStudentName()" (ngModelChange)="leaveStudentName.set($event)"
+               [placeholder]="'parent.portal.studentName' | translate"
+               class="hud-input w-full"/>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="hud-caps text-ink-500 block mb-1">{{ 'parent.portal.fromDate' | translate }}</label>
+            <input type="date" [ngModel]="leaveFromDate()" (ngModelChange)="leaveFromDate.set($event)"
+                   class="hud-input w-full"/>
+          </div>
+          <div>
+            <label class="hud-caps text-ink-500 block mb-1">{{ 'parent.portal.toDate' | translate }}</label>
+            <input type="date" [ngModel]="leaveToDate()" (ngModelChange)="leaveToDate.set($event)"
+                   class="hud-input w-full"/>
+          </div>
+        </div>
+
+        <textarea [ngModel]="leaveReason()" (ngModelChange)="leaveReason.set($event)"
+                  [placeholder]="'parent.portal.leaveReason' | translate"
+                  rows="3"
+                  class="hud-input w-full resize-none"></textarea>
+
+        <div class="flex gap-2">
+          <button (click)="showLeaveForm.set(false)" class="hud-btn-ghost flex-1">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button (click)="submitLeave()"
+                  [disabled]="!leaveStudentName().trim() || !leaveFromDate() || !leaveToDate() || !leaveReason().trim() || leaveLoading()"
+                  class="hud-btn-primary flex-1">
+            @if (leaveLoading()) {
+              <span class="material-symbols-outlined animate-spin" style="font-size:16px">progress_activity</span>
+            }
+            {{ 'common.submit' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
 </div>

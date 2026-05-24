@@ -20,4 +20,14 @@ export class EventApiService {
   list(): Observable<SchoolEvent[]> {
     return this.http.get<SchoolEvent[]>(this.base);
   }
+
+  rsvp(id: number, userId: number): Observable<{ rsvped: boolean; totalRsvps: number }> {
+    return this.http.post<{ rsvped: boolean; totalRsvps: number }>(
+      `${this.base}/${id}/rsvp`, {}, { params: { userId: String(userId) } }
+    );
+  }
+
+  getMyRsvps(userId: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.base}/my-rsvps`, { params: { userId: String(userId) } });
+  }
 }

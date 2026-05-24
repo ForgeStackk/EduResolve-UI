@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export type FeeStatus = 'Paid' | 'Unpaid';
+export type FeeStatus = 'Paid' | 'Unpaid' | 'Partial' | 'Overdue' | 'Waived';
 
 export interface Fee {
   id?: number;
@@ -14,7 +14,16 @@ export interface Fee {
   amount: number;
   dueDate?: string;
   status: FeeStatus;
+  paidAmount?: number;
   lastReminderAt?: string;
+}
+
+export interface FeePaymentLink {
+  upiLink: string;
+  waLink: string;
+  studentName: string;
+  balance: number;
+  phone: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,9 +31,10 @@ export class FeeApiService {
   private http = inject(HttpClient);
   private base = `${environment.apiBaseUrl}/fees`;
 
-  list(status?: FeeStatus): Observable<Fee[]> {
+  list(status?: FeeStatus, studentId?: number): Observable<Fee[]> {
     const params: Record<string, string> = {};
     if (status) params['status'] = status;
+    if (studentId !== undefined) params['studentId'] = String(studentId);
     return this.http.get<Fee[]>(this.base, { params });
   }
 
@@ -34,6 +44,10 @@ export class FeeApiService {
 
   remind(id: number): Observable<{ success: boolean; message: string; sentAt: string }> {
     return this.http.post<{ success: boolean; message: string; sentAt: string }>(`${this.base}/${id}/remind`, {});
+  }
+
+  getPaymentLink(id: number): Observable<FeePaymentLink> {
+    return this.http.get<FeePaymentLink>(`${this.base}/${id}/payment-link`);
   }
 
   summary(): Observable<{ revenue: number; unpaidCount: number; totalRecords: number }> {
