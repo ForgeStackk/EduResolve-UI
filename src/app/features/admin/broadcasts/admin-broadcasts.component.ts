@@ -32,7 +32,7 @@ export class AdminBroadcastsComponent implements OnInit {
 
   readonly pageSize   = 10;
   readonly allChannels = ['whatsapp', 'sms', 'email'];
-  readonly gradeOptions = ['', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'];
+  readonly gradeOptions = ['', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 
   ngOnInit(): void { this.load(); }
 

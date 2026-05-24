@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { AdminApiService, type StudentSummary, type PagedResponse } from '../../../core/api/admin-api.service';
 
 @Component({
@@ -13,8 +12,7 @@ import { AdminApiService, type StudentSummary, type PagedResponse } from '../../
 })
 export class AdminStudentsComponent implements OnInit, OnDestroy {
   private adminApi = inject(AdminApiService);
-  private destroy$ = new Subject<void>();
-  private searchTrigger$ = new Subject<void>();
+  private debounce: ReturnType<typeof setTimeout> | null = null;
 
   students   = signal<StudentSummary[]>([]);
   total      = signal(0);
@@ -26,24 +24,14 @@ export class AdminStudentsComponent implements OnInit, OnDestroy {
 
   readonly pageSize = 20;
 
-  ngOnInit(): void {
-    this.searchTrigger$.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$),
-    ).subscribe(() => {
-      this.page.set(0);
-      this.load();
-    });
-    this.load();
-  }
+  ngOnInit(): void { this.load(); }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+  ngOnDestroy(): void { if (this.debounce) clearTimeout(this.debounce); }
 
-  onInput(): void { this.searchTrigger$.next(); }
+  onInput(): void {
+    if (this.debounce) clearTimeout(this.debounce);
+    this.debounce = setTimeout(() => { this.page.set(0); this.load(); }, 300);
+  }
 
   load(): void {
     this.loading.set(true);
