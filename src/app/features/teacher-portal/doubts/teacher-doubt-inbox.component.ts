@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TeacherDoubtApiService } from '../../../core/api/teacher-doubt-api.service';
 import { DoubtThread } from '../../../core/api/student-submission-api.service';
 
@@ -9,12 +10,12 @@ type FilterStatus = 'ALL' | 'OPEN' | 'RESOLVED';
 @Component({
   selector: 'app-teacher-doubt-inbox',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="p-6 max-w-2xl space-y-4">
 
       <div class="flex items-center justify-between">
-        <h2 class="text-xl font-bold text-white hud-caps tracking-widest">Student Doubts</h2>
+        <h2 class="text-xl font-bold text-white hud-caps tracking-widest">{{ 'teacher.doubt.title' | translate }}</h2>
         <div class="flex gap-2">
           @for (f of filters; track f.value) {
             <button
@@ -23,7 +24,7 @@ type FilterStatus = 'ALL' | 'OPEN' | 'RESOLVED';
               [class]="filter() === f.value
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'">
-              {{ f.label }}
+              {{ f.labelKey | translate }}
             </button>
           }
         </div>
@@ -39,9 +40,9 @@ type FilterStatus = 'ALL' | 'OPEN' | 'RESOLVED';
         <div class="hud-card p-10 text-center">
           <span class="material-symbols-outlined text-gray-400" style="font-size:56px">inbox</span>
           <p class="text-gray-500 mt-3 text-sm">
-            @if (filter() === 'OPEN') { No open doubts. }
-            @else if (filter() === 'RESOLVED') { No resolved doubts. }
-            @else { No student doubts yet. }
+            @if (filter() === 'OPEN') { {{ 'teacher.doubt.empty.open' | translate }} }
+            @else if (filter() === 'RESOLVED') { {{ 'teacher.doubt.empty.resolved' | translate }} }
+            @else { {{ 'teacher.doubt.empty.all' | translate }} }
           </p>
         </div>
       } @else {
@@ -58,7 +59,7 @@ type FilterStatus = 'ALL' | 'OPEN' | 'RESOLVED';
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <p class="text-sm font-bold text-white truncate">{{ t.studentName || 'Student' }}</p>
+                  <p class="text-sm font-bold text-white truncate">{{ t.studentName || ('teacher.doubt.studentFallback' | translate) }}</p>
                   @if (t.studentClass) {
                     <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold shrink-0">
                       {{ t.studentClass }}{{ t.studentSection ? '-' + t.studentSection : '' }}
@@ -87,17 +88,18 @@ type FilterStatus = 'ALL' | 'OPEN' | 'RESOLVED';
   `
 })
 export class TeacherDoubtInboxComponent implements OnInit {
-  private api    = inject(TeacherDoubtApiService);
-  private router = inject(Router);
+  private api       = inject(TeacherDoubtApiService);
+  private router    = inject(Router);
+  private translate = inject(TranslateService);
 
   threads = signal<DoubtThread[]>([]);
   loading = signal(true);
   filter  = signal<FilterStatus>('ALL');
 
-  readonly filters: { value: FilterStatus; label: string }[] = [
-    { value: 'ALL',      label: 'All'      },
-    { value: 'OPEN',     label: 'Open'     },
-    { value: 'RESOLVED', label: 'Resolved' },
+  readonly filters: { value: FilterStatus; labelKey: string }[] = [
+    { value: 'ALL',      labelKey: 'teacher.doubt.filter.all'      },
+    { value: 'OPEN',     labelKey: 'teacher.doubt.filter.open'     },
+    { value: 'RESOLVED', labelKey: 'teacher.doubt.filter.resolved' },
   ];
 
   visible = computed(() => {
@@ -118,7 +120,7 @@ export class TeacherDoubtInboxComponent implements OnInit {
 
   lastMsg(t: DoubtThread): string {
     const last = t.messages.at(-1);
-    if (!last) return 'No messages yet';
+    if (!last) return this.translate.instant('teacher.doubt.noMessages');
     return last.textBody || (last.attachments.length > 0 ? '📎 Attachment' : '…');
   }
 

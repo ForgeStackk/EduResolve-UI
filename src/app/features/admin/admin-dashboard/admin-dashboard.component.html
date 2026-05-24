@@ -2,30 +2,25 @@
 
   <!-- Header -->
   <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-    <div class="space-y-2">
-      <p class="hud-caps">Admin console</p>
-      <h1 class="hud-display text-4xl sm:text-5xl text-ink-900 tracking-tight leading-none">
-        Administrative<br/>
-        <span class="text-violet-600">Overview</span>
-      </h1>
-      <p class="text-base sm:text-lg text-ink-500 max-w-2xl">
-        Real-time school performance and operations dashboard.
-      </p>
+    <div>
+      <p class="hud-caps">{{ 'admin.dashboard.subtitle' | translate }}</p>
+      <h1 class="hud-display text-4xl text-ink-900">{{ 'admin.dashboard.title' | translate }}</h1>
     </div>
-    <div class="flex items-center gap-3 shrink-0">
-      <button class="hud-btn-ghost">
-        <span class="material-symbols-outlined">download</span>
-        Export PDF
-      </button>
-      <button class="hud-btn-primary">
-        <span class="material-symbols-outlined fill">campaign</span>
-        New Broadcast
-      </button>
+    <!-- Range switcher -->
+    <div class="flex items-center gap-1 bg-surface-2 rounded-lg p-1 self-start md:self-auto">
+      @for (r of ranges; track r) {
+        <button (click)="setRange(r)"
+                class="hud-chip cursor-pointer text-xs px-3 py-1.5"
+                [class.hud-chip-active]="range() === r">
+          {{ 'admin.dashboard.range.' + r | translate }}
+        </button>
+      }
     </div>
   </header>
 
-  <!-- Top metric strip -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <!-- KPI strip -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
     <!-- Revenue -->
     <section class="hud-card">
       <div class="hud-accent" style="background:#10b981"></div>
@@ -33,14 +28,28 @@
         <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50">
           <span class="material-symbols-outlined fill text-emerald-600">payments</span>
         </div>
-        <span class="hud-chip bg-emerald-50 text-emerald-700 border-emerald-200">▲ 12.5%</span>
       </div>
-      <p class="hud-caps">Total revenue</p>
+      <p class="hud-caps">{{ 'admin.dashboard.revenue' | translate }}</p>
       <p class="hud-display text-3xl text-ink-900 mt-1 tabular-nums">
-        ${{ revenue() | number:'1.0-0' }}
+        @if (loading()) { <span class="text-ink-400">—</span> } @else { {{ formatCurrency(revenue()) }} }
+      </p>
+      <div class="hud-meter mt-4"><div style="width:72%; background:#10b981"></div></div>
+    </section>
+
+    <!-- Fee collection rate -->
+    <section class="hud-card">
+      <div class="hud-accent" style="background:#f59e0b"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-50">
+          <span class="material-symbols-outlined fill text-amber-600">receipt_long</span>
+        </div>
+      </div>
+      <p class="hud-caps">{{ 'admin.dashboard.feeRate' | translate }}</p>
+      <p class="hud-display text-3xl text-ink-900 mt-1 tabular-nums">
+        @if (loading()) { <span class="text-ink-400">—</span> } @else { {{ feeCollectionRate() | number:'1.0-1' }}% }
       </p>
       <div class="hud-meter mt-4">
-        <div style="width:72%; background:#10b981"></div>
+        <div [style.width.%]="feeCollectionRate()" style="background:#f59e0b"></div>
       </div>
     </section>
 
@@ -51,251 +60,103 @@
         <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50">
           <span class="material-symbols-outlined fill text-blue-600">groups</span>
         </div>
-        <span class="hud-chip bg-emerald-50 text-emerald-700 border-emerald-200">▲ 4.0%</span>
       </div>
-      <p class="hud-caps">Enrollment</p>
+      <p class="hud-caps">{{ 'admin.dashboard.enrollment' | translate }}</p>
       <p class="hud-display text-3xl text-ink-900 mt-1 tabular-nums">
-        {{ enrollment() | number }}
+        @if (loading()) { <span class="text-ink-400">—</span> } @else { {{ enrollment() | number }} }
       </p>
-      <p class="text-xs text-ink-500 mt-1">
-        Target <span class="text-ink-900 font-semibold">{{ enrollmentTarget() | number }}</span>
-      </p>
+      <p class="text-xs text-ink-500 mt-1">/ {{ enrollmentTarget() | number }}</p>
       <div class="hud-meter mt-3">
         <div [style.width.%]="enrollmentPct()" style="background:#3b82f6"></div>
       </div>
     </section>
 
-    <!-- Active Tickets -->
+    <!-- Active tickets -->
     <section class="hud-card">
       <div class="hud-accent"></div>
       <div class="flex items-center justify-between mb-3">
         <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-red-50">
           <span class="material-symbols-outlined fill text-red-600">confirmation_number</span>
         </div>
-        <span class="hud-chip bg-red-50 text-red-600 border-red-200">Live</span>
+        <span class="hud-chip bg-red-50 text-red-600 border-red-200 text-xs">Live</span>
       </div>
-      <p class="hud-caps">Active ticket volume</p>
+      <p class="hud-caps">{{ 'admin.dashboard.activeTickets' | translate }}</p>
       <p class="hud-display text-3xl text-ink-900 mt-1 tabular-nums">
-        {{ activeTickets() }}<span class="text-sm text-ink-500 ml-1">open</span>
+        @if (loading()) { <span class="text-ink-400">—</span> } @else { {{ activeTickets() }} }
       </p>
-      <!-- sparkline -->
       <div class="flex items-end gap-1.5 h-10 mt-3">
         @for (h of ticketSpark; track $index) {
-          <div class="flex-1 rounded-t-sm bg-red-400 transition-all"
-               [style.height.%]="h"></div>
+          <div class="flex-1 rounded-t-sm bg-red-400" [style.height.%]="h"></div>
         }
-      </div>
-      <div class="flex items-center gap-4 mt-3 text-xs text-ink-500">
-        <span class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-red-500"></span> Technical
-        </span>
-        <span class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Billing
-        </span>
       </div>
     </section>
   </div>
 
-  <!-- Body grid: comm hub + fee table + ticket queue -->
+  <!-- Body: live ticket queue + quick links -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    <!-- ===== LEFT: Broadcast Center ================================ -->
-    <section class="hud-card space-y-5">
-      <div class="hud-accent"></div>
+    <!-- Live ticket queue -->
+    <section class="hud-card space-y-4">
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined fill text-violet-600">broadcast_on_home</span>
-          <h3 class="hud-display text-xl text-ink-900">Broadcast center</h3>
+          <span class="material-symbols-outlined text-ink-500">queue</span>
+          <h3 class="hud-display text-xl text-ink-900">{{ 'admin.dashboard.ticketQueue' | translate }}</h3>
         </div>
-        <button class="hud-btn-ghost text-xs px-3 py-2" aria-label="Settings">
-          <span class="material-symbols-outlined" style="font-size:18px">tune</span>
-        </button>
+        <a routerLink="/admin/tickets" class="text-sm text-brand-600 hover:text-brand-700 font-medium">
+          {{ 'common.viewAll' | translate }} →
+        </a>
       </div>
 
-      <!-- Channel selector -->
-      <div>
-        <label class="hud-caps mb-2 block">Broadcast channel</label>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button"
-                  (click)="broadcastChannel.set('whatsapp')"
-                  class="hud-chip justify-center py-3"
-                  [class.hud-chip-active]="broadcastChannel() === 'whatsapp'">
-            <span class="material-symbols-outlined" style="font-size:18px">chat</span>
-            WhatsApp
-          </button>
-          <button type="button"
-                  (click)="broadcastChannel.set('sms')"
-                  class="hud-chip justify-center py-3"
-                  [class.hud-chip-active]="broadcastChannel() === 'sms'">
-            <span class="material-symbols-outlined" style="font-size:18px">sms</span>
-            SMS Gateway
-          </button>
-        </div>
-      </div>
-
-      <!-- Recipients -->
-      <div>
-        <label class="hud-caps mb-2 block">Recipients</label>
-        <select [(ngModel)]="recipientGroup" class="hud-input cursor-pointer">
-          <option>All Parents (Grade 9-12)</option>
-          <option>Grade 9</option>
-          <option>Grade 10</option>
-          <option>Grade 11</option>
-          <option>Grade 12</option>
-        </select>
-      </div>
-
-      <!-- Message -->
-      <div>
-        <label class="hud-caps mb-2 block">Message</label>
-        <textarea [(ngModel)]="broadcastMessage"
-                  rows="4"
-                  placeholder="Type your emergency or informative broadcast here…"
-                  class="hud-input resize-none"></textarea>
-      </div>
-
-      <!-- Recipients preview + submit -->
-      <div class="flex items-center justify-between gap-3 flex-wrap">
-        <div class="flex items-center gap-2">
-          <div class="flex -space-x-2">
-            @for (a of [1,2,3,4]; track a) {
-              <div class="w-7 h-7 rounded-full border border-surface-3
-                          bg-surface-2 flex items-center justify-center text-xs text-ink-700">
-                <span class="material-symbols-outlined" style="font-size:14px">person</span>
+      @if (ticketsLoading()) {
+        <p class="text-ink-500 text-sm">{{ 'common.loading' | translate }}</p>
+      } @else {
+        <ul class="space-y-2">
+          @for (t of recentTickets(); track t.id) {
+            <li class="rounded-lg border border-surface-3 bg-surface-2 p-3 flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="hud-chip text-xs" [class]="priorityColor(t.priority)">{{ t.priority }}</span>
+                  <span class="hud-caps text-ink-500">{{ t.createdAt | date:'d MMM, HH:mm' }}</span>
+                </div>
+                <p class="text-sm text-ink-900 truncate mt-1">{{ t.subject }}</p>
+                <p class="text-xs text-ink-500 mt-1">{{ t.raisedByName }} · {{ t.category }}</p>
               </div>
-            }
-          </div>
-          <span class="hud-caps">+1,402 recipients</span>
-        </div>
-        <button class="hud-btn-primary" [disabled]="!broadcastMessage.trim()">
-          <span class="material-symbols-outlined fill">send</span>
-          Broadcast
-        </button>
-      </div>
+            </li>
+          } @empty {
+            <li class="text-center py-6">
+              <span class="material-symbols-outlined text-emerald-600" style="font-size:32px">task_alt</span>
+              <p class="text-sm text-ink-500 mt-2">{{ 'common.noData' | translate }}</p>
+            </li>
+          }
+        </ul>
+      }
     </section>
 
-    <!-- ===== RIGHT: Fee Management + Ticket Queue ======================== -->
-    <div class="space-y-6">
-
-      <!-- Fee Management Status -->
-      <section class="hud-card">
-        <div class="hud-accent" style="background:#f59e0b"></div>
-        <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-amber-600">receipt_long</span>
-            <h3 class="hud-display text-xl text-ink-900">Fee management</h3>
-          </div>
-          <a class="text-sm text-brand-600 hover:text-brand-700 transition-colors cursor-pointer font-medium">
-            View all →
-          </a>
-        </div>
-
-        <!-- Header row -->
-        <div class="grid grid-cols-[1fr_1.4fr_0.9fr] gap-3 px-1 pb-2 border-b border-surface-3">
-          <span class="hud-caps">Student ID</span>
-          <span class="hud-caps">Parent</span>
-          <span class="hud-caps text-right">Amount</span>
-        </div>
-
-        <!-- Rows -->
-        @if (loading()) {
-          <div class="text-center text-ink-500 py-6">Loading…</div>
-        } @else {
-          <ul class="divide-y divide-surface-3">
-            @for (fee of feeData(); track fee.studentId) {
-              <li class="grid grid-cols-[1fr_1.4fr_0.9fr] gap-3 py-3 px-1 items-center">
-                <span class="text-sm text-ink-500 tabular-nums">{{ fee.studentId }}</span>
-                <span class="text-sm text-ink-900 truncate">{{ fee.parentName }}</span>
-                <span class="text-sm text-red-600 tabular-nums text-right font-semibold">{{ fee.amount }}</span>
-              </li>
-            } @empty {
-              <li class="text-center py-6">
-                <span class="material-symbols-outlined text-emerald-600" style="font-size:32px">task_alt</span>
-                <p class="text-sm text-ink-500 mt-2">No outstanding fees.</p>
-              </li>
-            }
-          </ul>
-        }
-      </section>
-
-      <!-- Ticket Queue -->
-      <section class="hud-card">
-        <div class="hud-accent"></div>
-        <div class="flex items-center justify-between gap-2 mb-4">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-ink-500">queue</span>
-            <h3 class="hud-display text-xl text-ink-900">Ticket queue</h3>
-          </div>
-          <span class="hud-chip hud-chip-active">New</span>
-        </div>
-
-        <ul class="space-y-3">
-          <!-- Billing -->
-          <li class="rounded-lg border border-surface-3 bg-surface-2 p-3 flex items-start gap-3">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
-              <span class="material-symbols-outlined text-amber-600">attach_money</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h4 class="hud-display text-sm text-ink-900">Billing inquiry</h4>
-                <span class="hud-caps text-ink-500">1 min ago</span>
-              </div>
-              <p class="text-sm text-ink-700 mt-1 leading-relaxed">
-                Clarification on semester lab fees.
-              </p>
-              <p class="text-xs text-ink-500 mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined" style="font-size:12px">person</span>
-                Stacy Connor · Grade 10
-              </p>
-            </div>
-          </li>
-
-          <!-- IT -->
-          <li class="rounded-lg border border-surface-3 bg-surface-2 p-3 flex items-start gap-3">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-blue-50">
-              <span class="material-symbols-outlined text-blue-600">build</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h4 class="hud-display text-sm text-ink-900">IT support</h4>
-                <span class="hud-caps text-ink-500">11 min ago</span>
-              </div>
-              <p class="text-sm text-ink-700 mt-1 leading-relaxed">
-                Unable to access password using the automated portal.
-              </p>
-              <p class="text-xs text-ink-500 mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined" style="font-size:12px">person</span>
-                John Drake · Grade 10
-              </p>
-            </div>
-          </li>
-
-          <!-- Bus -->
-          <li class="rounded-lg border border-surface-3 bg-surface-2 p-3 flex items-start gap-3">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-purple-50">
-              <span class="material-symbols-outlined text-purple-600">directions_bus</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h4 class="hud-display text-sm text-ink-900">Bus route update</h4>
-                <span class="hud-caps text-ink-500">27 min ago</span>
-              </div>
-              <p class="text-sm text-ink-700 mt-1 leading-relaxed">
-                Bus routes have been rescheduled for next shift.
-              </p>
-              <p class="text-xs text-ink-500 mt-2 flex items-center gap-1">
-                <span class="material-symbols-outlined" style="font-size:12px">person</span>
-                Marcus Ahmed · Grade 12
-              </p>
-            </div>
-          </li>
-        </ul>
-
-        <button class="hud-btn-ghost w-full mt-4">
-          <span class="material-symbols-outlined">inbox</span>
-          Load older tickets
-        </button>
-      </section>
-    </div>
+    <!-- Quick navigation -->
+    <section class="hud-card space-y-4">
+      <h3 class="hud-display text-xl text-ink-900">{{ 'admin.dashboard.quickLinks' | translate }}</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <a routerLink="/admin/students" class="hud-card flex flex-col items-start gap-2 cursor-pointer hover:border-brand-300 transition-colors p-4">
+          <span class="material-symbols-outlined fill text-blue-600">groups</span>
+          <p class="hud-caps">{{ 'admin.students.title' | translate }}</p>
+        </a>
+        <a routerLink="/admin/fees" class="hud-card flex flex-col items-start gap-2 cursor-pointer hover:border-brand-300 transition-colors p-4">
+          <span class="material-symbols-outlined fill text-amber-600">receipt_long</span>
+          <p class="hud-caps">{{ 'admin.fees.title' | translate }}</p>
+        </a>
+        <a routerLink="/admin/tickets" class="hud-card flex flex-col items-start gap-2 cursor-pointer hover:border-brand-300 transition-colors p-4">
+          <span class="material-symbols-outlined fill text-red-600">confirmation_number</span>
+          <p class="hud-caps">{{ 'admin.tickets.title' | translate }}</p>
+        </a>
+        <a routerLink="/admin/broadcasts" class="hud-card flex flex-col items-start gap-2 cursor-pointer hover:border-brand-300 transition-colors p-4">
+          <span class="material-symbols-outlined fill text-violet-600">campaign</span>
+          <p class="hud-caps">{{ 'admin.broadcasts.title' | translate }}</p>
+        </a>
+      </div>
+      <a routerLink="/admin/audit" class="hud-btn-ghost w-full justify-center text-sm">
+        <span class="material-symbols-outlined">history</span>
+        {{ 'admin.audit.title' | translate }}
+      </a>
+    </section>
   </div>
 </div>

@@ -1,0 +1,76 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <header>
+    <p class="hud-caps">{{ 'admin.audit.subtitle' | translate }}</p>
+    <h1 class="hud-display text-3xl text-ink-900">{{ 'admin.audit.title' | translate }}</h1>
+  </header>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-3">
+    <select [ngModel]="actionFilter()" (ngModelChange)="actionFilter.set($event)" (change)="onFilter()" class="hud-input w-52 cursor-pointer">
+      @for (a of actionOptions; track a) {
+        <option [value]="a">{{ a || ('admin.audit.allActions' | translate) }}</option>
+      }
+    </select>
+    <input [ngModel]="actorIdFilter()" (ngModelChange)="actorIdFilter.set($event)" (keyup.enter)="onFilter()"
+           [placeholder]="'admin.audit.actorIdPlaceholder' | translate"
+           class="hud-input w-36"/>
+    <button (click)="onFilter()" class="hud-btn-primary shrink-0">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+    <p class="hud-caps self-center text-ink-500">{{ total() }} {{ 'admin.audit.entries' | translate }}</p>
+  </div>
+
+  <!-- Table -->
+  <section class="hud-card overflow-x-auto p-0">
+    <table class="w-full text-sm">
+      <thead class="border-b border-surface-3">
+        <tr class="text-left">
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colWhen'   | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colActor'  | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colAction' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colTarget' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colDetail' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.audit.colIp'     | translate }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-surface-3">
+        @if (loading()) {
+          <tr><td colspan="6" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
+        } @else {
+          @for (l of logs(); track l.id) {
+            <tr class="hover:bg-surface-2 transition-colors">
+              <td class="px-4 py-3 text-ink-500 whitespace-nowrap">{{ l.createdAt | date:'d MMM, HH:mm' }}</td>
+              <td class="px-4 py-3">
+                <p class="font-medium text-ink-900">{{ l.actorName }}</p>
+                <p class="text-xs text-ink-500">{{ l.actorRole }}</p>
+              </td>
+              <td class="px-4 py-3">
+                <span class="hud-chip text-xs" [class]="actionColor(l.action)">{{ l.action }}</span>
+              </td>
+              <td class="px-4 py-3 text-ink-600">{{ l.targetType }} #{{ l.targetId }}</td>
+              <td class="px-4 py-3 text-ink-700 max-w-xs truncate" [title]="l.detail">{{ l.detail }}</td>
+              <td class="px-4 py-3 text-ink-400 font-mono text-xs">{{ l.ip }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
+          }
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between gap-3">
+      <button (click)="prevPage()" [disabled]="page() === 0" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="hud-caps text-ink-500">{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button (click)="nextPage()" [disabled]="page() >= totalPages() - 1" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  }
+</div>

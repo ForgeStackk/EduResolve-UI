@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeacherDoubtApiService } from '../../../core/api/teacher-doubt-api.service';
 import { DoubtThread } from '../../../core/api/student-submission-api.service';
 import { environment } from '../../../../environments/environment';
@@ -8,7 +9,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-teacher-doubt-thread',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="max-w-2xl mx-auto p-4 space-y-4 pb-32">
 
@@ -19,7 +20,7 @@ import { environment } from '../../../../environments/environment';
         </button>
         <div class="flex-1 min-w-0">
           <h1 class="text-white font-bold text-lg truncate">
-            {{ thread()?.studentName || 'Student' }}
+            {{ thread()?.studentName || ('teacher.doubt.studentFallback' | translate) }}
           </h1>
           <p class="text-white/40 text-xs">
             {{ thread()?.studentClass }}{{ thread()?.studentSection ? '-' + thread()!.studentSection : '' }}
@@ -31,11 +32,11 @@ import { environment } from '../../../../environments/environment';
             class="px-3 py-1.5 rounded-lg border border-green-500/40 text-green-400
                    text-xs font-bold hover:bg-green-500/10 transition-colors"
             (click)="markResolved()">
-            Mark Resolved
+            {{ 'teacher.doubt.markResolved' | translate }}
           </button>
         } @else {
           <span class="px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 text-xs font-bold">
-            Resolved ✓
+            {{ 'teacher.doubt.resolved' | translate }}
           </span>
         }
       </div>
@@ -50,7 +51,7 @@ import { environment } from '../../../../environments/environment';
       } @else if ((thread()?.messages?.length ?? 0) === 0) {
         <div class="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
           <span class="material-symbols-outlined text-white/20" style="font-size:48px">forum</span>
-          <p class="text-white/40 text-sm mt-2">No messages yet.</p>
+          <p class="text-white/40 text-sm mt-2">{{ 'teacher.doubt.noMessages' | translate }}</p>
         </div>
       } @else {
         <div class="space-y-3">
@@ -92,7 +93,7 @@ import { environment } from '../../../../environments/environment';
             <textarea
               [value]="replyText()"
               (input)="replyText.set($any($event.target).value)"
-              placeholder="Reply to student…"
+              [placeholder]="'teacher.doubt.replyPlaceholder' | translate"
               rows="2"
               class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3
                      text-white text-sm placeholder-white/30 resize-none
@@ -103,7 +104,7 @@ import { environment } from '../../../../environments/environment';
               [disabled]="!replyText().trim() || replying()"
               class="px-5 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold
                      rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed self-end">
-              @if (replying()) { Sending… } @else { Send }
+              @if (replying()) { {{ 'teacher.doubt.sending' | translate }} } @else { {{ 'teacher.doubt.send' | translate }} }
             </button>
           </div>
           @if (replyError()) {

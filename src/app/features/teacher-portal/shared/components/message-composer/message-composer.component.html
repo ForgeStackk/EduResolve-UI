@@ -1,9 +1,9 @@
-﻿<div class="space-y-5">
+<div class="space-y-5">
 
   <!-- ── Recipient badge ──────────────────────────────────────────────────── -->
   @if (showRecipientBadge) {
     <div class="flex items-center gap-2">
-      <span class="text-xs hud-caps text-gray-500">To:</span>
+      <span class="text-xs hud-caps text-gray-500">{{ 'teacher.composer.to' | translate }}</span>
       <span class="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs text-white font-medium">
         {{ recipientLabel }}
       </span>
@@ -14,7 +14,7 @@
   @if (showDueDatePicker) {
     <div>
       <label class="block text-xs hud-caps text-gray-500 mb-2">
-        Due Date <span class="text-red-500">*</span>
+        {{ 'teacher.composer.dueDate' | translate }} <span class="text-red-500">{{ 'teacher.composer.required' | translate }}</span>
       </label>
       <input
         type="date"
@@ -29,7 +29,7 @@
 
   <!-- ── Text body ─────────────────────────────────────────────────────────── -->
   <div>
-    <label class="block text-xs hud-caps text-gray-500 mb-2">Instructions / Message</label>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">{{ 'teacher.composer.instructions' | translate }}</label>
     <textarea
       [value]="textBody()"
       (input)="textBody.set($any($event.target).value)"
@@ -43,7 +43,7 @@
 
   <!-- ── Voice note ────────────────────────────────────────────────────────── -->
   <div>
-    <label class="block text-xs hud-caps text-gray-500 mb-2">Voice Note</label>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">{{ 'teacher.composer.voiceNote' | translate }}</label>
     <app-voice-recorder (voiceRecorded)="onVoiceRecorded($event)" />
   </div>
 
@@ -51,13 +51,13 @@
   <div>
     <div class="flex items-center justify-between mb-2">
       <label class="text-xs hud-caps text-gray-500">
-        Photos
-        <span class="text-gray-700 normal-case">(max 5 MB each)</span>
+        {{ 'teacher.composer.photos' | translate }}
+        <span class="text-gray-700 normal-case">{{ 'teacher.composer.photoLimit' | translate }}</span>
       </label>
       <div class="flex items-center gap-3">
         @if (showCameraCapture) {
           <label class="cursor-pointer text-xs text-gray-400 hover:text-white transition-colors">
-            📷 Camera
+            {{ 'teacher.composer.camera' | translate }}
             <input
               type="file"
               accept="image/*"
@@ -67,7 +67,7 @@
           </label>
         }
         <label class="cursor-pointer text-xs text-red-400 hover:text-red-300 transition-colors">
-          + Gallery
+          {{ 'teacher.composer.gallery' | translate }}
           <input type="file" accept="image/*" multiple class="hidden" (change)="addImages($event)" />
         </label>
       </div>
@@ -85,7 +85,7 @@
 
       @if (imagePreviews().length === 0) {
         <p class="text-center text-xs text-gray-600 py-3 select-none">
-          Drag &amp; drop photos here, or use the buttons above
+          {{ 'teacher.composer.dragDrop' | translate }}
         </p>
       } @else {
         <!-- Thumbnail grid -->
@@ -134,12 +134,12 @@
   <div>
     <div class="flex items-center justify-between mb-2">
       <label class="text-xs hud-caps text-gray-500">
-        Files
-        <span class="text-gray-700 normal-case">(max 25 MB · up to {{ maxFiles }})</span>
+        {{ 'teacher.composer.files' | translate }}
+        <span class="text-gray-700 normal-case">{{ 'teacher.composer.fileLimit' | translate:{ max: maxFiles } }}</span>
       </label>
       @if (!filesAtLimit()) {
         <label class="cursor-pointer text-xs text-red-400 hover:text-red-300 transition-colors">
-          + Add Files
+          {{ 'teacher.composer.addFiles' | translate }}
           <input
             type="file"
             multiple
@@ -148,7 +148,7 @@
             (change)="addFiles($event)" />
         </label>
       } @else {
-        <span class="text-xs text-gray-600">Limit reached</span>
+        <span class="text-xs text-gray-600">{{ 'teacher.composer.limitReached' | translate }}</span>
       }
     </div>
 
@@ -178,7 +178,7 @@
     <p class="text-sm text-red-400">{{ error() }}</p>
   }
   @if (sent() !== null) {
-    <p class="text-sm text-green-400">✓ Delivered to {{ sent() }} recipient(s)</p>
+    <p class="text-sm text-green-400">{{ 'teacher.composer.delivered' | translate:{ count: sent() } }}</p>
   }
 
   <!-- ── Submit ────────────────────────────────────────────────────────────── -->
@@ -188,7 +188,7 @@
     [disabled]="!hasContent() || sending()"
     class="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-bold
            transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-    @if (sending()) { Sending… } @else { {{ submitLabel }} }
+    @if (sending()) { {{ 'teacher.composer.sending' | translate }} } @else { {{ submitLabel }} }
   </button>
 
 </div>

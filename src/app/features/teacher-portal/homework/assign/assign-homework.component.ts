@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeacherPortalService } from '../../shared/services/teacher-portal.service';
 import { SendMessageResponse } from '../../shared/models/teacher-portal.models';
 import { ClassSubjectDropdownComponent } from '../../shared/components/class-subject-dropdown/class-subject-dropdown.component';
@@ -12,7 +13,7 @@ const HW_FILE_ACCEPT = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip';
 @Component({
   selector: 'app-assign-homework',
   standalone: true,
-  imports: [CommonModule, RouterModule, ClassSubjectDropdownComponent, MessageComposerComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ClassSubjectDropdownComponent, MessageComposerComponent],
   templateUrl: './assign-homework.component.html'
 })
 export class AssignHomeworkComponent {

@@ -1,9 +1,9 @@
 <div class="p-6 max-w-2xl space-y-6">
 
   <div class="flex items-center justify-between">
-    <h2 class="text-xl font-bold text-white hud-caps tracking-wider">Compose Message</h2>
+    <h2 class="text-xl font-bold text-white hud-caps tracking-wider">{{ 'teacher.messages.title' | translate }}</h2>
     <a routerLink="/teacher/messages/sent" class="text-sm text-red-400 hover:text-red-300 transition-colors">
-      View Sent →
+      {{ 'teacher.messages.viewSent' | translate }}
     </a>
   </div>
 
@@ -15,7 +15,7 @@
 
   <!-- Recipient type -->
   <div>
-    <label class="block text-xs hud-caps text-gray-500 mb-2">Send to</label>
+    <label class="block text-xs hud-caps text-gray-500 mb-2">{{ 'teacher.messages.sendTo' | translate }}</label>
     <div class="flex flex-wrap gap-2">
       @for (opt of recipientOptions; track opt.value) {
         <button
@@ -25,7 +25,7 @@
           [class]="recipientType() === opt.value
             ? 'bg-red-600 text-white'
             : 'bg-gray-800 text-gray-400 hover:bg-gray-700'">
-          {{ opt.label }}
+          {{ opt.labelKey | translate }}
         </button>
       }
     </div>
@@ -39,13 +39,13 @@
         [subjectId]="selectedSubjectId() !== null ? selectedSubjectId()!.toString() : null"
         [recipientType]="recipientType()"
         [recipientLabel]="recipientLabel()"
-        placeholder="Type your message…"
-        submitLabel="Send Message"
+        [placeholder]="'teacher.messages.placeholder' | translate"
+        [submitLabel]="'teacher.messages.submit' | translate"
         (messageSent)="onMessageSent($event)" />
     </div>
   } @else {
     <div class="hud-card rounded-xl p-6 flex items-center justify-center">
-      <p class="text-gray-500 text-sm">Select a class above to compose a message.</p>
+      <p class="text-gray-500 text-sm">{{ 'teacher.messages.selectClass' | translate }}</p>
     </div>
   }
 

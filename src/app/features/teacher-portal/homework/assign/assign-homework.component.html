@@ -3,11 +3,11 @@
   <!-- ── Page header ──────────────────────────────────────────────────────── -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-xl font-bold text-white hud-caps tracking-widest">Assign Homework</h2>
-      <p class="text-xs text-gray-500 mt-0.5">Send homework to your class with any combination of text, voice, photos, and files</p>
+      <h2 class="text-xl font-bold text-white hud-caps tracking-widest">{{ 'teacher.homework.title' | translate }}</h2>
+      <p class="text-xs text-gray-500 mt-0.5">{{ 'teacher.homework.desc' | translate }}</p>
     </div>
     <a routerLink="/teacher/homework/sent" class="text-sm text-red-400 hover:text-red-300 transition-colors flex-shrink-0">
-      View Sent →
+      {{ 'teacher.homework.viewSent' | translate }}
     </a>
   </div>
 
@@ -32,21 +32,21 @@
         [showCameraCapture]="true"
         [fileAccept]="hwFileAccept"
         [maxFiles]="5"
-        placeholder="Describe the homework: what to study, what to submit…"
-        submitLabel="Assign Homework"
+        [placeholder]="'teacher.homework.placeholder' | translate"
+        [submitLabel]="'teacher.homework.submit' | translate"
         (messageSent)="onHomeworkSent($event)" />
     </div>
   } @else {
     <div class="hud-card rounded-b-xl px-5 py-10 flex flex-col items-center justify-center gap-2">
       <span class="text-3xl">📝</span>
-      <p class="text-gray-500 text-sm">Select a class above to start assigning homework.</p>
+      <p class="text-gray-500 text-sm">{{ 'teacher.homework.selectClass' | translate }}</p>
     </div>
   }
 
   <!-- ── Last sent banner ──────────────────────────────────────────────────── -->
   @if (lastSentCount() !== null) {
     <div class="mt-4 bg-green-900/30 border border-green-700 rounded-xl px-4 py-3 text-sm text-green-300">
-      ✓ Homework assigned to {{ lastSentCount() }} student(s).
+      {{ 'teacher.homework.sentCount' | translate:{ count: lastSentCount() } }}
     </div>
   }
 

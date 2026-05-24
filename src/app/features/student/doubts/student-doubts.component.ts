@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   StudentSubmissionApiService,
   DoubtThread,
@@ -33,10 +33,10 @@ import { ClassContextService } from '../../../core/class-context.service';
 
       <!-- Header -->
       <div class="flex items-center justify-between">
-        <h1 class="text-white font-bold text-xl">Ask Teacher</h1>
+        <h1 class="text-white font-bold text-xl">{{ 'studentDoubt.title' | translate }}</h1>
         <button class="hud-btn-ghost text-sm" (click)="openPicker()">
           <span class="material-symbols-outlined" style="font-size:16px">add</span>
-          New Doubt
+          {{ 'studentDoubt.newDoubt' | translate }}
         </button>
       </div>
 
@@ -59,11 +59,11 @@ import { ClassContextService } from '../../../core/class-context.service';
             </button>
           </div>
 
-          <h2 class="text-sm font-bold text-white/70 uppercase tracking-widest">Ask a Doubt</h2>
+          <h2 class="text-sm font-bold text-white/70 uppercase tracking-widest">{{ 'nav.doubt' | translate }}</h2>
 
           <app-student-composer
-            placeholder="Describe your doubt, or attach a photo of the problem…"
-            submitLabel="Ask Teacher"
+            [placeholder]="'studentDoubt.composerPlaceholder' | translate"
+            [submitLabel]="'studentDoubt.title' | translate"
             fileAccept="image/*"
             [maxFiles]="3"
             [isSending]="asking()"
@@ -83,8 +83,8 @@ import { ClassContextService } from '../../../core/class-context.service';
       } @else if (threads().length === 0 && !showComposer()) {
         <div class="hud-card p-10 text-center">
           <span class="material-symbols-outlined text-white/20" style="font-size:56px">help_outline</span>
-          <p class="text-white/50 mt-3 text-sm">No doubts yet.</p>
-          <p class="text-white/30 text-xs mt-1">Tap "New Doubt" to ask a teacher a question.</p>
+          <p class="text-white/50 mt-3 text-sm">{{ 'studentDoubt.empty' | translate }}</p>
+          <p class="text-white/30 text-xs mt-1">{{ 'studentDoubt.emptyHint' | translate }}</p>
         </div>
       } @else {
         <div class="space-y-2">
@@ -102,7 +102,7 @@ import { ClassContextService } from '../../../core/class-context.service';
                 <div class="flex items-center gap-2">
                   <p class="text-sm font-bold text-white truncate">{{ t.teacherName }}</p>
                   <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300
-                               font-bold uppercase shrink-0">Teacher</span>
+                               font-bold uppercase shrink-0">{{ 'studentDoubt.teacherBadge' | translate }}</span>
                   @if (t.subjectName) {
                     <span class="text-xs text-white/40 truncate">· {{ t.subjectName }}</span>
                   }
@@ -130,9 +130,10 @@ import { ClassContextService } from '../../../core/class-context.service';
   `
 })
 export class StudentDoubtsComponent implements OnInit {
-  private api      = inject(StudentSubmissionApiService);
-  private activity = inject(StudentActivityService);
-  private router   = inject(Router);
+  private api       = inject(StudentSubmissionApiService);
+  private activity  = inject(StudentActivityService);
+  private router    = inject(Router);
+  private translate = inject(TranslateService);
 
   threads         = signal<DoubtThread[]>([]);
   loading         = signal(true);
@@ -189,14 +190,14 @@ export class StudentDoubtsComponent implements OnInit {
       },
       error: () => {
         this.asking.set(false);
-        this.askError.set('Could not send your doubt. Please try again.');
+        this.askError.set(this.translate.instant('studentDoubt.sendError'));
       }
     });
   }
 
   lastMessage(t: DoubtThread): string {
     const last = t.messages.at(-1);
-    if (!last) return 'No messages yet';
+    if (!last) return this.translate.instant('studentDoubt.noMessages');
     return last.textBody || (last.attachments.length > 0 ? '📎 Attachment' : '…');
   }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   StudentSubmissionApiService,
   DoubtThread,
@@ -26,7 +26,7 @@ import { environment } from '../../../../environments/environment';
         </button>
         <div class="flex-1 min-w-0">
           <h1 class="text-white font-bold text-lg truncate">
-            {{ thread()?.teacherName || 'Teacher' }}
+            {{ thread()?.teacherName || ('studentDoubt.teacherBadge' | translate) }}
           </h1>
           @if (thread()?.subjectName) {
             <p class="text-white/40 text-xs">{{ thread()!.subjectName }}</p>
@@ -36,11 +36,11 @@ import { environment } from '../../../../environments/environment';
           <button class="px-3 py-1.5 rounded-lg border border-green-500/40 text-green-400
                          text-xs font-bold hover:bg-green-500/10 transition-colors"
                   (click)="markResolved()">
-            Mark Resolved
+            {{ 'studentDoubt.markResolved' | translate }}
           </button>
         } @else {
           <span class="px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 text-xs font-bold">
-            Resolved ✓
+            {{ 'studentDoubt.resolved' | translate }}
           </span>
         }
       </div>
@@ -55,7 +55,7 @@ import { environment } from '../../../../environments/environment';
       } @else if (thread()?.messages?.length === 0) {
         <div class="hud-card p-8 text-center">
           <span class="material-symbols-outlined text-white/20" style="font-size:48px">forum</span>
-          <p class="text-white/40 text-sm mt-2">No messages yet.</p>
+          <p class="text-white/40 text-sm mt-2">{{ 'studentDoubt.noMessages' | translate }}</p>
         </div>
       } @else {
         <div class="space-y-3">
@@ -94,8 +94,8 @@ import { environment } from '../../../../environments/environment';
       @if (showAiFallback()) {
         <div class="hud-card p-3 flex items-center gap-3 border-amber-500/30">
           <span class="material-symbols-outlined text-amber-400">schedule</span>
-          <p class="text-xs text-white/70 flex-1">Teacher hasn't replied yet.
-            <a routerLink="/learn/doubt" class="text-teal-400 underline ml-1">Ask the AI tutor instead</a>
+          <p class="text-xs text-white/70 flex-1">{{ 'studentDoubt.aiPrompt' | translate }}
+            <a routerLink="/learn/doubt" class="text-teal-400 underline ml-1">{{ 'studentDoubt.askAi' | translate }}</a>
           </p>
         </div>
       }
@@ -105,8 +105,8 @@ import { environment } from '../../../../environments/environment';
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-sm border-t border-white/10">
           <div class="max-w-2xl mx-auto">
             <app-student-composer
-              placeholder="Reply to teacher…"
-              submitLabel="Send"
+              [placeholder]="'studentDoubt.replyPlaceholder' | translate"
+              [submitLabel]="'studentDoubt.send' | translate"
               [isSending]="replying()"
               [serverError]="replyError()"
               (submitted)="onReply($event)">
@@ -119,11 +119,12 @@ import { environment } from '../../../../environments/environment';
   `
 })
 export class DoubtThreadComponent implements OnInit {
-  private route    = inject(ActivatedRoute);
-  private router   = inject(Router);
-  private api      = inject(StudentSubmissionApiService);
-  private activity = inject(StudentActivityService);
-  private auth     = inject(AuthService);
+  private route     = inject(ActivatedRoute);
+  private router    = inject(Router);
+  private api       = inject(StudentSubmissionApiService);
+  private activity  = inject(StudentActivityService);
+  private auth      = inject(AuthService);
+  private translate = inject(TranslateService);
 
   thread     = signal<DoubtThread | null>(null);
   loading    = signal(true);
@@ -171,7 +172,7 @@ export class DoubtThreadComponent implements OnInit {
       },
       error: () => {
         this.replying.set(false);
-        this.replyError.set('Failed to send reply. Please try again.');
+        this.replyError.set(this.translate.instant('studentDoubt.replyError'));
       }
     });
   }

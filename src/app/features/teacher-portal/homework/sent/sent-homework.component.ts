@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { HomeworkService } from '../homework.service';
 import { MessageSummary } from '../../shared/models/teacher-portal.models';
 
 @Component({
   selector: 'app-sent-homework',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterModule],
+  imports: [CommonModule, DatePipe, RouterModule, TranslateModule],
   templateUrl: './sent-homework.component.html'
 })
 export class SentHomeworkComponent implements OnInit {

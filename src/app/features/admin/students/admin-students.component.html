@@ -1,0 +1,69 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <p class="hud-caps">{{ 'admin.students.subtitle' | translate }}</p>
+      <h1 class="hud-display text-3xl text-ink-900">{{ 'admin.students.title' | translate }}</h1>
+    </div>
+    <p class="hud-caps text-ink-500">{{ total() }} {{ 'admin.students.total' | translate }}</p>
+  </header>
+
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" style="font-size:18px">search</span>
+      <input [ngModel]="search()" (ngModelChange)="search.set($event); onInput()"
+             [placeholder]="'admin.students.searchPlaceholder' | translate"
+             class="hud-input w-full pl-9"/>
+    </div>
+    <input [ngModel]="className()" (ngModelChange)="className.set($event); onInput()"
+           [placeholder]="'admin.students.filterClass' | translate"
+           class="hud-input w-40"/>
+  </div>
+
+  <!-- Table -->
+  <section class="hud-card overflow-x-auto p-0">
+    <table class="w-full text-sm">
+      <thead class="border-b border-surface-3">
+        <tr class="text-left">
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colName'  | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colClass' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colEmail' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colPhone' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colSchool'| translate }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-surface-3">
+        @if (loading()) {
+          <tr><td colspan="5" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
+        } @else {
+          @for (s of students(); track s.id) {
+            <tr class="hover:bg-surface-2 transition-colors">
+              <td class="px-4 py-3 font-medium text-ink-900">{{ s.name }}</td>
+              <td class="px-4 py-3 text-ink-600">{{ s.className || '—' }}</td>
+              <td class="px-4 py-3 text-ink-600">{{ s.email }}</td>
+              <td class="px-4 py-3 text-ink-600">{{ s.phoneNumber || '—' }}</td>
+              <td class="px-4 py-3 text-ink-600 truncate max-w-[180px]">{{ s.schoolName || '—' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
+          }
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between gap-3">
+      <button (click)="prevPage()" [disabled]="page() === 0" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="hud-caps text-ink-500">{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button (click)="nextPage()" [disabled]="page() >= totalPages() - 1" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  }
+</div>

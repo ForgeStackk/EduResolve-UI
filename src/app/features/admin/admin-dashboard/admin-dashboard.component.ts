@@ -1,70 +1,80 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { AdminApiService } from '../../../core/api/admin-api.service';
+import { RouterModule } from '@angular/router';
+import { AdminApiService, type AdminDashboardData, type TicketSummary } from '../../../core/api/admin-api.service';
 
-interface FeeRecord {
-  studentId: string;
-  parentName: string;
-  amount: string;
-}
+type Range = 'today' | '7d' | '30d';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, RouterModule],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.css'
+  styleUrl: './admin-dashboard.component.css',
 })
 export class AdminDashboardComponent implements OnInit {
   private adminApi = inject(AdminApiService);
 
-  revenue = signal(0);
-  enrollment = signal(0);
-  enrollmentTarget = signal(1300);
+  range          = signal<Range>('7d');
+  loading        = signal(true);
+  ticketsLoading = signal(true);
 
-  activeTickets = signal(0);
+  revenue           = signal(0);
+  enrollment        = signal(0);
+  enrollmentTarget  = signal(1300);
+  activeTickets     = signal(0);
+  feeCollectionRate = signal(0);
 
-  feeData = signal<FeeRecord[]>([]);
-  loading = signal(true);
+  recentTickets = signal<TicketSummary[]>([]);
 
-  /** Broadcast composer state. */
-  broadcastChannel = signal<'whatsapp' | 'sms'>('whatsapp');
-  broadcastMessage = '';
-  recipientGroup = 'All Parents (Grade 9-12)';
+  readonly ticketSpark = [65, 85, 45, 72, 58, 78, 90];
+  readonly ranges: Range[] = ['today', '7d', '30d'];
 
-  /** Enrollment fill percentage toward target. */
   enrollmentPct = computed(() => {
     const t = this.enrollmentTarget() || 1;
     return Math.max(0, Math.min(100, Math.round((this.enrollment() / t) * 100)));
   });
 
-  /** Static ticket-volume sparkline heights (backend doesn't expose history yet). */
-  readonly ticketSpark = [65, 85, 45, 72, 58, 78, 90];
-
   ngOnInit(): void {
-    this.adminApi.dashboard().subscribe({
-      next: d => {
+    this.loadDashboard();
+    this.loadTickets();
+  }
+
+  setRange(r: Range): void {
+    this.range.set(r);
+    this.loadDashboard();
+  }
+
+  private loadDashboard(): void {
+    this.loading.set(true);
+    this.adminApi.dashboard(this.range()).subscribe({
+      next: (d: AdminDashboardData) => {
         this.revenue.set(d.revenue);
         this.enrollment.set(d.enrollment);
         this.enrollmentTarget.set(d.enrollmentTarget);
         this.activeTickets.set(d.activeTickets);
-        this.feeData.set((d.recentUnpaidFees || []).map(f => ({
-          studentId: `#FS-${f.id ?? ''}`,
-          parentName: f.studentName,
-          amount: this.formatCurrency(f.amount)
-        })));
+        this.feeCollectionRate.set(d.feeCollectionRate ?? 0);
         this.loading.set(false);
       },
-      error: err => {
-        console.error('Admin dashboard load failed', err);
-        this.loading.set(false);
-      }
+      error: () => this.loading.set(false),
     });
   }
 
-  private formatCurrency(n: number): string {
-    return `$${(n ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  private loadTickets(): void {
+    this.ticketsLoading.set(true);
+    this.adminApi.getTickets(0, 5, 'Pending').subscribe({
+      next: r => { this.recentTickets.set(r.data); this.ticketsLoading.set(false); },
+      error: () => this.ticketsLoading.set(false),
+    });
+  }
+
+  priorityColor(p: string): string {
+    return { critical: 'bg-red-100 text-red-800', high: 'bg-orange-50 text-orange-700',
+             medium: 'bg-amber-50 text-amber-700', low: 'bg-surface-2 text-ink-500' }[p] ?? '';
+  }
+
+  formatCurrency(n: number): string {
+    return `₹${(n ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
   }
 }

@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeacherPortalService } from '../../services/teacher-portal.service';
 import { TeacherClass, TeacherSubject } from '../../models/teacher-portal.models';
 
 @Component({
   selector: 'app-class-subject-dropdown',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './class-subject-dropdown.component.html'
 })
 export class ClassSubjectDropdownComponent implements OnInit {

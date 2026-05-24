@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { MessagesService } from '../messages.service';
 import { MessageSummary } from '../../shared/models/teacher-portal.models';
 
 @Component({
   selector: 'app-sent-messages',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterModule],
+  imports: [CommonModule, DatePipe, RouterModule, TranslateModule],
   templateUrl: './sent-messages.component.html'
 })
 export class SentMessagesComponent implements OnInit {

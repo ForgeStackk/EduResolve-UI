@@ -1,0 +1,112 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <header>
+    <p class="hud-caps">{{ 'admin.broadcasts.subtitle' | translate }}</p>
+    <h1 class="hud-display text-3xl text-ink-900">{{ 'admin.broadcasts.title' | translate }}</h1>
+  </header>
+
+  <!-- Compose card -->
+  <section class="hud-card space-y-4">
+    <p class="hud-caps">{{ 'admin.broadcasts.compose' | translate }}</p>
+
+    <!-- Channels -->
+    <div>
+      <p class="text-xs text-ink-500 mb-2">{{ 'admin.broadcasts.channels' | translate }}</p>
+      <div class="flex flex-wrap gap-2">
+        @for (ch of allChannels; track ch) {
+          <button (click)="toggleChannel(ch)"
+                  class="hud-chip cursor-pointer"
+                  [class.hud-chip-active]="channels().includes(ch)">
+            {{ ch }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Audience grade filter -->
+    <div>
+      <label class="hud-caps mb-1 block">{{ 'admin.broadcasts.audience' | translate }}</label>
+      <select [ngModel]="audienceGrades()" (ngModelChange)="audienceGrades.set($event)" class="hud-input w-56 cursor-pointer">
+        @for (g of gradeOptions; track g) {
+          <option [value]="g">{{ g || ('admin.broadcasts.allGrades' | translate) }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Emergency toggle -->
+    <label class="flex items-center gap-2 cursor-pointer w-fit">
+      <input type="checkbox" [checked]="isEmergency()" (change)="isEmergency.set(!isEmergency())"
+             class="accent-brand-600 w-4 h-4"/>
+      <span class="text-sm text-ink-700">{{ 'admin.broadcasts.emergency' | translate }}</span>
+    </label>
+
+    <!-- Message -->
+    <div>
+      <label class="hud-caps mb-1 block">{{ 'admin.broadcasts.message' | translate }}</label>
+      <textarea [ngModel]="message()" (ngModelChange)="message.set($event)" rows="4" [placeholder]="'admin.broadcasts.messagePlaceholder' | translate"
+                class="hud-input w-full resize-none"></textarea>
+    </div>
+
+    @if (errorMsg()) {
+      <p class="text-sm text-red-600">{{ errorMsg() }}</p>
+    }
+    @if (successMsg()) {
+      <p class="text-sm text-emerald-600">{{ successMsg() }}</p>
+    }
+
+    <button (click)="send()" [disabled]="sending() || !message().trim() || !channels().length"
+            class="hud-btn-primary">
+      <span class="material-symbols-outlined fill">send</span>
+      {{ sending() ? ('common.sending' | translate) : ('admin.broadcasts.send' | translate) }}
+    </button>
+  </section>
+
+  <!-- History -->
+  <section class="space-y-3">
+    <p class="hud-caps">{{ 'admin.broadcasts.history' | translate }}</p>
+
+    @if (loading()) {
+      <div class="hud-card text-center text-ink-500 py-8">{{ 'common.loading' | translate }}</div>
+    } @else {
+      @for (b of broadcasts(); track b.id) {
+        <div class="hud-card space-y-2">
+          <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2 flex-wrap">
+              @if (b.isEmergency) {
+                <span class="hud-chip text-xs bg-red-100 text-red-800">&#9888; Emergency</span>
+              }
+              @for (ch of b.channels.split(','); track ch) {
+                <span class="hud-chip text-xs bg-surface-2 text-ink-600">{{ ch.trim() }}</span>
+              }
+              @if (b.audienceGrades) {
+                <span class="hud-chip text-xs bg-blue-50 text-blue-700">{{ b.audienceGrades }}</span>
+              }
+            </div>
+            <p class="text-xs text-ink-400 shrink-0">{{ b.createdAt | date:'d MMM, HH:mm' }}</p>
+          </div>
+          <p class="text-sm text-ink-900 leading-relaxed">{{ b.message }}</p>
+          <p class="text-xs text-ink-500">
+            {{ 'admin.broadcasts.sentBy' | translate }} {{ b.sentByName }}
+            · {{ b.recipientCount }} {{ 'admin.broadcasts.recipients' | translate }}
+          </p>
+        </div>
+      } @empty {
+        <div class="hud-card text-center text-ink-500 py-8">{{ 'common.noData' | translate }}</div>
+      }
+    }
+  </section>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between gap-3">
+      <button (click)="prevPage()" [disabled]="page() === 0" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="hud-caps text-ink-500">{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button (click)="nextPage()" [disabled]="page() >= totalPages() - 1" class="hud-btn-ghost">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  }
+</div>

@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { TeacherPortalService } from '../../shared/services/teacher-portal.service';
 import { RecipientType, SendMessageResponse } from '../../shared/models/teacher-portal.models';
 import { ClassSubjectDropdownComponent } from '../../shared/components/class-subject-dropdown/class-subject-dropdown.component';
@@ -9,7 +10,7 @@ import { MessageComposerComponent } from '../../shared/components/message-compos
 @Component({
   selector: 'app-compose-message',
   standalone: true,
-  imports: [CommonModule, RouterModule, ClassSubjectDropdownComponent, MessageComposerComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ClassSubjectDropdownComponent, MessageComposerComponent],
   templateUrl: './compose-message.component.html'
 })
 export class ComposeMessageComponent {
@@ -20,9 +21,9 @@ export class ComposeMessageComponent {
   recipientType     = signal<RecipientType>('CLASS');
   lastSentCount     = signal<number | null>(null);
 
-  readonly recipientOptions: { value: RecipientType; label: string }[] = [
-    { value: 'CLASS',             label: 'Entire class' },
-    { value: 'ABSENT_GUARDIANS',  label: "Absent students' guardians" },
+  readonly recipientOptions: { value: RecipientType; labelKey: string }[] = [
+    { value: 'CLASS',            labelKey: 'teacher.messages.entireClass'     },
+    { value: 'ABSENT_GUARDIANS', labelKey: 'teacher.messages.absentGuardians' },
   ];
 
   recipientLabel = computed(() => {

@@ -37,35 +37,51 @@
       @if (currentUser.role === 'teacher') {
         <a routerLink="/teacher/dashboard" routerLinkActive="nav-link-active" class="nav-link">
           <span class="hidden sm:inline mr-2">🏫</span>
-          <span class="text-xs sm:text-sm">Dashboard</span>
+          <span class="text-xs sm:text-sm">{{ 'teacher.nav.dashboard' | translate }}</span>
         </a>
         <a routerLink="/teacher/classes" routerLinkActive="nav-link-active" class="nav-link">
           <span class="hidden sm:inline mr-2">👥</span>
-          <span class="text-xs sm:text-sm">My Classes</span>
+          <span class="text-xs sm:text-sm">{{ 'teacher.nav.myClasses' | translate }}</span>
         </a>
         <a routerLink="/teacher/assignments" routerLinkActive="nav-link-active" class="nav-link">
           <span class="hidden sm:inline mr-2">📋</span>
-          <span class="text-xs sm:text-sm">Assignments</span>
+          <span class="text-xs sm:text-sm">{{ 'teacher.nav.assignments' | translate }}</span>
         </a>
         <a routerLink="/teacher/doubts" routerLinkActive="nav-link-active" class="nav-link">
           <span class="hidden sm:inline mr-2">❓</span>
-          <span class="text-xs sm:text-sm">Student Doubts</span>
+          <span class="text-xs sm:text-sm">{{ 'teacher.nav.studentDoubts' | translate }}</span>
         </a>
       }
       @if (currentUser.role === 'admin') {
         <a routerLink="/admin/dashboard" routerLinkActive="nav-link-active" class="nav-link">
-          <span class="hidden sm:inline mr-2">⚙️</span>
-          <span class="text-xs sm:text-sm">Admin Panel</span>
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">dashboard</span>
+          <span class="text-xs sm:text-sm">{{ 'nav.adminPanel' | translate }}</span>
         </a>
-        <a routerLink="/admin/users" routerLinkActive="nav-link-active" class="nav-link">
-          <span class="hidden sm:inline mr-2">👨‍💼</span>
-          <span class="text-xs sm:text-sm">Manage Users</span>
+        <a routerLink="/admin/students" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">groups</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.students.title' | translate }}</span>
+        </a>
+        <a routerLink="/admin/fees" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">receipt_long</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.fees.title' | translate }}</span>
+        </a>
+        <a routerLink="/admin/tickets" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">confirmation_number</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.tickets.title' | translate }}</span>
+        </a>
+        <a routerLink="/admin/broadcasts" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">campaign</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.broadcasts.title' | translate }}</span>
+        </a>
+        <a routerLink="/admin/audit" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">history</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.audit.title' | translate }}</span>
         </a>
       }
       @if (currentUser.role === 'parent') {
         <a routerLink="/parent/dashboard" routerLinkActive="nav-link-active" class="nav-link">
           <span class="hidden sm:inline mr-2">👨‍👩‍👧</span>
-          <span class="text-xs sm:text-sm">Dashboard</span>
+          <span class="text-xs sm:text-sm">{{ 'nav.dashboard' | translate }}</span>
         </a>
       }
     }

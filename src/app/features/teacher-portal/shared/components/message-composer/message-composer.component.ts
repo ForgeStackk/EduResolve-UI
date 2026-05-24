@@ -2,6 +2,7 @@ import {
   Component, Input, Output, EventEmitter, inject, signal, computed, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { retry, timer } from 'rxjs';
 import { MessagesService } from '../../../messages/messages.service';
 import { HomeworkService } from '../../../homework/homework.service';
@@ -14,12 +15,13 @@ const MAX_FILE_BYTES  = 25 * 1024 * 1024;   // 25 MB
 @Component({
   selector: 'app-message-composer',
   standalone: true,
-  imports: [CommonModule, VoiceRecorderComponent],
+  imports: [CommonModule, TranslateModule, VoiceRecorderComponent],
   templateUrl: './message-composer.component.html'
 })
 export class MessageComposerComponent implements OnDestroy {
-  private msgSvc = inject(MessagesService);
-  private hwSvc  = inject(HomeworkService);
+  private msgSvc    = inject(MessagesService);
+  private hwSvc     = inject(HomeworkService);
+  private translate = inject(TranslateService);
 
   // ── Inputs ──────────────────────────────────────────────────────────────
   @Input({ required: true }) classId!: string;
@@ -87,8 +89,8 @@ export class MessageComposerComponent implements OnDestroy {
   private ingestImages(incoming: File[]): void {
     this.error.set(null);
     for (const f of incoming) {
-      if (!f.type.startsWith('image/')) { this.error.set(`${f.name} is not an image.`); continue; }
-      if (f.size > MAX_IMAGE_BYTES)     { this.error.set(`${f.name} exceeds 5 MB.`);    continue; }
+      if (!f.type.startsWith('image/')) { this.error.set(this.translate.instant('teacher.composerError.notAnImage', { name: f.name })); continue; }
+      if (f.size > MAX_IMAGE_BYTES)     { this.error.set(this.translate.instant('teacher.composerError.imageTooLarge', { name: f.name })); continue; }
       const url = URL.createObjectURL(f);
       this.previewUrls.push(url);
       this.images.update(a => [...a, f]);
@@ -112,10 +114,10 @@ export class MessageComposerComponent implements OnDestroy {
     this.error.set(null);
     for (const f of Array.from(input.files)) {
       if (this.files().length >= this.maxFiles) {
-        this.error.set(`Maximum ${this.maxFiles} file(s) allowed.`);
+        this.error.set(this.translate.instant('teacher.composerError.maxFiles', { max: this.maxFiles }));
         break;
       }
-      if (f.size > MAX_FILE_BYTES) { this.error.set(`${f.name} exceeds 25 MB.`); continue; }
+      if (f.size > MAX_FILE_BYTES) { this.error.set(this.translate.instant('teacher.composerError.fileTooLarge', { name: f.name })); continue; }
       this.files.update(a => [...a, f]);
     }
     input.value = '';
@@ -130,7 +132,7 @@ export class MessageComposerComponent implements OnDestroy {
   send(): void {
     if (!this.hasContent()) return;
     if (this.showDueDatePicker && !this.dueDate()) {
-      this.error.set('Please select a due date before assigning.');
+      this.error.set(this.translate.instant('teacher.composerError.dueDate'));
       return;
     }
 
@@ -170,8 +172,8 @@ export class MessageComposerComponent implements OnDestroy {
         const attachmentNames = [...this.images(), ...this.files()].map(f => f.name).join(', ');
         this.error.set(
           attachmentNames
-            ? `Failed to upload attachments (${attachmentNames}). Please try again.`
-            : 'Failed to send message. Please try again.'
+            ? this.translate.instant('teacher.composerError.uploadFailed', { names: attachmentNames })
+            : this.translate.instant('teacher.composerError.sendFailed')
         );
         this.sending.set(false);
       }

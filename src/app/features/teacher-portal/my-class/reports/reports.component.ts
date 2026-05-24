@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { ReportsService } from './reports.service';
 import { TeacherPortalService } from '../../shared/services/teacher-portal.service';
 import { AttendanceReport, StudentAttendanceSummary } from '../../shared/models/teacher-portal.models';
@@ -7,7 +8,7 @@ import { AttendanceReport, StudentAttendanceSummary } from '../../shared/models/
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './reports.component.html'
 })
 export class ReportsComponent implements OnInit {

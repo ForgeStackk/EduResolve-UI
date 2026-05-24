@@ -1,13 +1,13 @@
-﻿<div class="space-y-6 pb-6">
+<div class="space-y-6 pb-6">
 
   <!-- Header -->
   <header class="space-y-1 px-1">
     <div class="flex items-center gap-2">
-      <span class="hud-caps text-red-400">TEACHER SUITE</span>
-      <span class="hud-caps text-ink-300">· ASSIGNMENTS</span>
+      <span class="hud-caps text-red-400">{{ 'teacher.suite' | translate }}</span>
+      <span class="hud-caps text-ink-300">· {{ 'teacher.assignments.title' | translate }}</span>
     </div>
     <h1 class="hud-display text-3xl text-white uppercase tracking-tight leading-none">
-      Dispatch &amp; <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">Archive</span>
+      Dispatch &amp; <span class="text-red-500 drop-shadow-[0_0_10px_rgba(220,38,38,0.5)]">{{ 'teacher.assignments.titleAccent' | translate }}</span>
     </h1>
   </header>
 
@@ -21,7 +21,7 @@
           : 'border-b-2 border-transparent text-ink-500 hover:text-ink-900'"
         class="flex items-center gap-1.5 px-4 py-2.5 text-sm hud-caps transition-colors -mb-px">
         <span class="material-symbols-outlined" style="font-size:16px">{{ tab.icon }}</span>
-        {{ tab.label }}
+        {{ tab.labelKey | translate }}
       </button>
     }
   </div>
@@ -32,7 +32,7 @@
       <div class="hud-accent" style="background:#3b82f6"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-blue-400">send</span>
-        <h3 class="hud-display text-xl text-white">HOMEWORK DISPATCH</h3>
+        <h3 class="hud-display text-xl text-white">{{ 'teacher.assignments.dispatch' | translate }}</h3>
       </div>
 
       <!-- Assign form -->
@@ -46,7 +46,7 @@
       <div class="hud-accent" style="background:#8b5cf6"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-purple-400">send</span>
-        <h3 class="hud-display text-xl text-white">COMPOSE MESSAGE</h3>
+        <h3 class="hud-display text-xl text-white">{{ 'teacher.assignments.compose' | translate }}</h3>
       </div>
       <app-compose-message />
     </section>
@@ -58,7 +58,7 @@
       <div class="hud-accent" style="background:#f59e0b"></div>
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-amber-400">inventory_2</span>
-        <h3 class="hud-display text-xl text-white">REPORT ARCHIVE</h3>
+        <h3 class="hud-display text-xl text-white">{{ 'teacher.assignments.reportArchive' | translate }}</h3>
       </div>
       <app-report-archive />
     </section>
