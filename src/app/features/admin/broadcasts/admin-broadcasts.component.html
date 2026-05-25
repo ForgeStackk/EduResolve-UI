@@ -24,14 +24,32 @@
       </div>
     </div>
 
-    <!-- Audience grade filter -->
+    <!-- Audience class filter -->
     <div>
-      <label class="hud-caps mb-1 block">{{ 'admin.broadcasts.audience' | translate }}</label>
-      <select [ngModel]="audienceGrades()" (ngModelChange)="audienceGrades.set($event)" class="hud-input w-56 cursor-pointer">
-        @for (g of gradeOptions; track g) {
-          <option [value]="g">{{ g || ('admin.broadcasts.allGrades' | translate) }}</option>
+      <label class="hud-caps mb-1 block">{{ 'admin.broadcasts.targetClass' | translate }}</label>
+      <select [ngModel]="classId()" (ngModelChange)="classId.set($event)" class="hud-input w-56 cursor-pointer">
+        <option value="">{{ 'admin.broadcasts.allClasses' | translate }}</option>
+        @for (c of classes(); track c.classId) {
+          <option [value]="c.classId">{{ c.className }}-{{ c.section }}</option>
         }
       </select>
+    </div>
+
+    <!-- Target audience checkboxes -->
+    <div>
+      <p class="text-xs text-ink-500 mb-2">{{ 'admin.broadcasts.sendTo' | translate }}</p>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" [checked]="targetStudents()" (change)="targetStudents.set(!targetStudents())"
+                 class="accent-brand-600 w-4 h-4"/>
+          <span class="text-sm text-ink-700">{{ 'admin.broadcasts.targetStudents' | translate }}</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" [checked]="targetParents()" (change)="targetParents.set(!targetParents())"
+                 class="accent-brand-600 w-4 h-4"/>
+          <span class="text-sm text-ink-700">{{ 'admin.broadcasts.targetParents' | translate }}</span>
+        </label>
+      </div>
     </div>
 
     <!-- Emergency toggle -->
@@ -79,8 +97,14 @@
               @for (ch of b.channels.split(','); track ch) {
                 <span class="hud-chip text-xs bg-surface-2 text-ink-600">{{ ch.trim() }}</span>
               }
-              @if (b.audienceGrades) {
-                <span class="hud-chip text-xs bg-blue-50 text-blue-700">{{ b.audienceGrades }}</span>
+              @if (b.classId) {
+                <span class="hud-chip text-xs bg-blue-50 text-blue-700">{{ classLabel(b.classId) }}</span>
+              }
+              @if (b.targetStudents) {
+                <span class="hud-chip text-xs bg-violet-50 text-violet-700">{{ 'admin.broadcasts.targetStudents' | translate }}</span>
+              }
+              @if (b.targetParents) {
+                <span class="hud-chip text-xs bg-amber-50 text-amber-700">{{ 'admin.broadcasts.targetParents' | translate }}</span>
               }
             </div>
             <p class="text-xs text-ink-400 shrink-0">{{ b.createdAt | date:'d MMM, HH:mm' }}</p>

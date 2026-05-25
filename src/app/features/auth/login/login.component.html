@@ -5,56 +5,24 @@
       <p>Login to continue to EduResolve</p>
     </div>
 
-    <form (ngSubmit)="login()" class="login-form">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          [(ngModel)]="username"
-          name="username"
-          required
-          placeholder="Enter your username"
-          class="form-input"
-        />
+    @if (errorMessage()) {
+      <div class="error-message">
+        {{ errorMessage() }}
       </div>
+    }
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          [(ngModel)]="password"
-          name="password"
-          required
-          placeholder="Enter your password"
-          class="form-input"
-        />
-      </div>
-
-      @if (errorMessage()) {
-        <div class="error-message">
-          {{ errorMessage() }}
-        </div>
+    <button
+      (click)="login()"
+      [disabled]="loading()"
+      class="login-button"
+    >
+      @if (loading()) {
+        <span class="loading-spinner"></span>
+        Redirecting...
+      } @else {
+        Sign in with EduResolve
       }
-
-      <button
-        type="submit"
-        [disabled]="loading()"
-        class="login-button"
-      >
-        @if (loading()) {
-          <span class="loading-spinner"></span>
-          Logging in...
-        } @else {
-          Login
-        }
-      </button>
-    </form>
-
-    <div class="forgot-password-link">
-      <a routerLink="/auth/forgot-password">Forgot Password?</a>
-    </div>
+    </button>
 
     <div class="login-footer">
       <p>Don't have an account?</p>

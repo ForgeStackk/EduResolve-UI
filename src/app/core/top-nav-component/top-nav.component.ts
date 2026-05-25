@@ -11,9 +11,10 @@ import { AuthService } from '../auth/auth.service';
 })
 export class TopNavComponent {
   private authService = inject(AuthService);
-  schoolName = computed(() => this.authService.currentUser()?.schoolName ?? '');
 
-  logout(): void {
-    this.authService.logout();
-  }
+  schoolName     = computed(() => this.authService.currentUser()?.schoolName ?? '');
+  isAuthenticated = computed(() => this.authService.isAuthenticated());
+
+  login(): void  { this.authService.login(); }
+  logout(): void { this.authService.logout(); }
 }

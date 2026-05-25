@@ -76,8 +76,9 @@
       "colName":         "Name",
       "colClass":        "Class",
       "colEmail":        "Email",
-      "colPhone":        "Phone",
-      "colSchool":       "School",
+      "colPhone":         "Phone",
+      "colGuardianPhone": "Guardian Phone",
+      "colSchool":        "School",
       "colJoined":       "Joined"
     },
     "fees": {
@@ -125,6 +126,11 @@
       "channels":          "Channels",
       "audience":          "Audience Grade",
       "allGrades":         "All Grades",
+      "targetClass":       "Target Class",
+      "allClasses":        "All Classes",
+      "sendTo":            "Send to",
+      "targetStudents":    "Students",
+      "targetParents":     "Parents",
       "emergency":         "Emergency broadcast",
       "message":           "Message",
       "messagePlaceholder":"Type your broadcast message…",
@@ -511,7 +517,8 @@
       "dashboard":     "Dashboard",
       "myClasses":     "My Classes",
       "assignments":   "Assignments",
-      "studentDoubts": "Student Doubts"
+      "studentDoubts": "Student Doubts",
+      "broadcast":     "Broadcast"
     },
     "suite": "TEACHER SUITE",
     "assignments": {

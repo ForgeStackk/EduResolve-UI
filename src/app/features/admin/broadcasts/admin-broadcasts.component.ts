@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
-import { AdminApiService, type BroadcastSummary, type PagedResponse } from '../../../core/api/admin-api.service';
+import { AdminApiService, type BroadcastSummary, type ClassSummary, type PagedResponse } from '../../../core/api/admin-api.service';
 
 @Component({
   selector: 'app-admin-broadcasts',
@@ -25,16 +25,24 @@ export class AdminBroadcastsComponent implements OnInit {
   errorMsg   = signal('');
 
   // Compose form
-  channels      = signal<string[]>(['whatsapp']);
-  audienceGrades = signal('');
-  message       = signal('');
-  isEmergency   = signal(false);
+  channels       = signal<string[]>(['whatsapp']);
+  classId        = signal<string>('');
+  targetStudents = signal(true);
+  targetParents  = signal(false);
+  message        = signal('');
+  isEmergency    = signal(false);
 
-  readonly pageSize   = 10;
+  classes = signal<ClassSummary[]>([]);
+
+  readonly pageSize    = 10;
   readonly allChannels = ['whatsapp', 'sms', 'email'];
-  readonly gradeOptions = ['', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+    this.adminApi.getClasses().subscribe({
+      next: list => this.classes.set(list),
+    });
+  }
 
   load(): void {
     this.loading.set(true);
@@ -57,17 +65,25 @@ export class AdminBroadcastsComponent implements OnInit {
     this.channels.set(cur.includes(ch) ? cur.filter(c => c !== ch) : [...cur, ch]);
   }
 
+  classLabel(classId: string | null): string {
+    if (!classId) return '';
+    const c = this.classes().find(x => x.classId === classId);
+    return c ? `${c.className}-${c.section}` : classId;
+  }
+
   send(): void {
     if (!this.message().trim() || !this.channels().length) return;
     this.sending.set(true);
     this.errorMsg.set('');
     const user = this.auth.currentUser();
     this.adminApi.createBroadcast({
-      channels:      this.channels().join(','),
-      audienceGrades: this.audienceGrades(),
-      message:       this.message(),
-      isEmergency:   this.isEmergency(),
-      sentByName:    user ? `${user.firstName} ${user.lastName}` : 'Admin',
+      channels:       this.channels().join(','),
+      classId:        this.classId() || null,
+      targetStudents: this.targetStudents(),
+      targetParents:  this.targetParents(),
+      message:        this.message(),
+      isEmergency:    this.isEmergency(),
+      sentByName:     user ? `${user.firstName} ${user.lastName}` : 'Admin',
     }).subscribe({
       next: r => {
         this.sending.set(false);

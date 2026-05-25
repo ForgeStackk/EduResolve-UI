@@ -30,13 +30,14 @@
           <th class="hud-caps px-4 py-3">{{ 'admin.students.colName'  | translate }}</th>
           <th class="hud-caps px-4 py-3">{{ 'admin.students.colClass' | translate }}</th>
           <th class="hud-caps px-4 py-3">{{ 'admin.students.colEmail' | translate }}</th>
-          <th class="hud-caps px-4 py-3">{{ 'admin.students.colPhone' | translate }}</th>
-          <th class="hud-caps px-4 py-3">{{ 'admin.students.colSchool'| translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colPhone'        | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colGuardianPhone' | translate }}</th>
+          <th class="hud-caps px-4 py-3">{{ 'admin.students.colSchool'        | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-surface-3">
         @if (loading()) {
-          <tr><td colspan="5" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
+          <tr><td colspan="6" class="py-8 text-center text-ink-500">{{ 'common.loading' | translate }}</td></tr>
         } @else {
           @for (s of students(); track s.id) {
             <tr class="hover:bg-surface-2 transition-colors">
@@ -44,10 +45,18 @@
               <td class="px-4 py-3 text-ink-600">{{ s.className || '—' }}</td>
               <td class="px-4 py-3 text-ink-600">{{ s.email }}</td>
               <td class="px-4 py-3 text-ink-600">{{ s.phoneNumber || '—' }}</td>
+              <td class="px-4 py-3">
+                @if (s.guardianPhone) {
+                  <a [href]="'tel:' + s.guardianPhone"
+                     class="text-brand-600 hover:underline font-medium">{{ s.guardianPhone }}</a>
+                } @else {
+                  <span class="text-ink-400">—</span>
+                }
+              </td>
               <td class="px-4 py-3 text-ink-600 truncate max-w-[180px]">{{ s.schoolName || '—' }}</td>
             </tr>
           } @empty {
-            <tr><td colspan="5" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
+            <tr><td colspan="6" class="py-8 text-center text-ink-500">{{ 'common.noData' | translate }}</td></tr>
           }
         }
       </tbody>

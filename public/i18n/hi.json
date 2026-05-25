@@ -76,8 +76,9 @@
       "colName":         "नाम",
       "colClass":        "कक्षा",
       "colEmail":        "ईमेल",
-      "colPhone":        "फ़ोन",
-      "colSchool":       "विद्यालय",
+      "colPhone":         "फ़ोन",
+      "colGuardianPhone": "अभिभावक फ़ोन",
+      "colSchool":        "विद्यालय",
       "colJoined":       "जुड़े"
     },
     "fees": {
@@ -125,6 +126,11 @@
       "channels":          "माध्यम",
       "audience":          "कक्षा समूह",
       "allGrades":         "सभी कक्षाएं",
+      "targetClass":       "लक्षित कक्षा",
+      "allClasses":        "सभी कक्षाएं",
+      "sendTo":            "भेजें",
+      "targetStudents":    "छात्र",
+      "targetParents":     "अभिभावक",
       "emergency":         "आपातकालीन प्रसारण",
       "message":           "संदेश",
       "messagePlaceholder":"अपना प्रसारण संदेश लिखें…",
@@ -511,7 +517,8 @@
       "dashboard":     "डैशबोर्ड",
       "myClasses":     "मेरी कक्षाएं",
       "assignments":   "असाइनमेंट",
-      "studentDoubts": "छात्र की शंकाएं"
+      "studentDoubts": "छात्र की शंकाएं",
+      "broadcast":     "प्रसारण"
     },
     "suite": "शिक्षक पोर्टल",
     "assignments": {

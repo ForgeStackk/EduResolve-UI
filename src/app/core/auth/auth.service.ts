@@ -1,5 +1,10 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Role = 'student' | 'teacher' | 'admin' | 'parent';
 
@@ -19,11 +24,6 @@ export interface User {
   grade?: string;
 }
 
-/**
- * Default mock-login profile (matches the seeded `dummy_data.sql` row for
- * Marcus Thomas, class 10A, student id 1). Used as a fallback when the
- * `/students/{id}` API is unreachable.
- */
 export const MOCK_STUDENT_PROFILE = {
   id: 1,
   userId: null,
@@ -39,41 +39,66 @@ export const MOCK_STUDENT_PROFILE = {
   topPercentage: 3
 } as const;
 
+const oidcConfig: AuthConfig = {
+  issuer: environment.keycloakIssuer,
+  clientId: environment.keycloakClientId,
+  redirectUri: typeof window !== 'undefined' ? window.location.origin : '',
+  responseType: 'code',
+  scope: 'openid profile email',
+  showDebugInformation: !environment.production,
+  clearHashAfterLogin: false,
+};
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private router = inject(Router);
+  private router    = inject(Router);
+  private http      = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
+  private oauthService = inject(OAuthService);
 
   currentUser = signal<User | null>(null);
 
-  constructor() {
-    this.loadUserFromStorage();
-  }
+  async initOidc(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  private loadUserFromStorage() {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        this.currentUser.set(user);
-      } catch (e) {
-        console.error('Failed to parse stored user:', e);
-        localStorage.removeItem('user');
-      }
+    this.oauthService.configure(oidcConfig);
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+
+    if (this.oauthService.hasValidAccessToken()) {
+      await this.loadUserProfile();
+    } else {
+      this.currentUser.set(null);
+      localStorage.removeItem('user');
     }
   }
 
-  login(user: User): void {
-    this.currentUser.set(user);
-    localStorage.setItem('user', JSON.stringify(user));
+  login(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.oauthService.initCodeFlow();
   }
 
   logout(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.currentUser.set(null);
     localStorage.removeItem('user');
-    localStorage.removeItem('access_token');
-    this.router.navigate(['/login']);
+    this.oauthService.revokeTokenAndLogout();
+  }
+
+  getToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    return this.oauthService.getAccessToken();
+  }
+
+  getRoles(): string[] {
+    if (!isPlatformBrowser(this.platformId)) return [];
+    try {
+      const claims = this.oauthService.getIdentityClaims() as any;
+      return claims?.realm_access?.roles ?? [];
+    } catch {
+      return [];
+    }
   }
 
   hasRole(allowedRoles: Role[]): boolean {
@@ -81,13 +106,51 @@ export class AuthService {
     return user ? allowedRoles.includes(user.role) : false;
   }
 
-  /** Convenience accessor for the currently logged-in student id (or null). */
+  isAuthenticated(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    return this.oauthService.hasValidAccessToken();
+  }
+
   currentStudentId(): number | null {
     return this.currentUser()?.studentId ?? null;
   }
 
-  /** Check if user is authenticated */
-  isAuthenticated(): boolean {
-    return this.currentUser() !== null;
+  redirectToDashboard(): void {
+    const roleRoutes: Record<string, string> = {
+      teacher: '/teacher/dashboard',
+      admin:   '/admin/dashboard',
+      parent:  '/parent/dashboard',
+      student: '/student/dashboard',
+    };
+    const role = this.currentUser()?.role ?? '';
+    this.router.navigate([roleRoutes[role] ?? '/student/dashboard']);
+  }
+
+  private async loadUserProfile(): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<any>(`${environment.apiBaseUrl}/auth/profile`)
+      );
+      if (response?.success) {
+        const user: User = {
+          id:          String(response.id),
+          firstName:   response.firstName,
+          lastName:    response.lastName,
+          username:    response.username,
+          name:        `${response.firstName} ${response.lastName}`,
+          email:       response.email,
+          role:        response.role as Role,
+          className:   response.className,
+          grade:       response.className,
+          phoneNumber: response.phoneNumber,
+          schoolName:  response.schoolName,
+          studentId:   response.studentId ?? undefined,
+        };
+        this.currentUser.set(user);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+    } catch (e) {
+      console.error('Failed to load user profile from backend', e);
+    }
   }
 }

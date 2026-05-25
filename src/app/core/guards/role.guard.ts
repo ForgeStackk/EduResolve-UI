@@ -1,21 +1,17 @@
-import { CanMatchFn, Route, UrlSegment, Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService, Role } from '../auth/auth.service';
 
-export const roleGuard: CanMatchFn = (route: Route, segments: UrlSegment[]) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
+/**
+ * Factory that returns a CanActivateFn guarding a single role.
+ * Usage: canActivate: [roleGuard('admin')]
+ */
+export const roleGuard = (role: Role): CanActivateFn => {
+  return () => {
+    const authService = inject(AuthService);
+    const router      = inject(Router);
 
-  // Extract expected roles from route data
-  const expectedRoles = route.data?.['roles'] as Role[];
-
-  if (!expectedRoles || expectedRoles.length === 0) {
-    return true;
-  }
-
-  if (authService.hasRole(expectedRoles)) {
-    return true;
-  }
-
-  return router.parseUrl('/unauthorized');
+    if (authService.hasRole([role])) return true;
+    return router.parseUrl('/unauthorized');
+  };
 };

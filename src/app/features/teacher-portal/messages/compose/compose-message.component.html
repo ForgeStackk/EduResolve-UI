@@ -7,9 +7,9 @@
     </a>
   </div>
 
-  <!-- Class + Subject selector -->
+  <!-- Class + Subject selector — restricted to teacher's own classes -->
   <app-class-subject-dropdown
-    [allClasses]="true"
+    [allClasses]="false"
     (classChanged)="selectedClassId.set($event)"
     (subjectChanged)="selectedSubjectId.set($any($event))" />
 

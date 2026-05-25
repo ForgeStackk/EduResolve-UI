@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { AuthService } from '../../../core/auth/auth.service';
 
 interface RegisterRequest {
   firstName: string;
@@ -52,7 +51,6 @@ interface LoginResponse {
 export class SignupComponent {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private authService = inject(AuthService);
 
   firstName = '';
   lastName = '';
@@ -220,26 +218,8 @@ export class SignupComponent {
       next: (response) => {
         this.loading.set(false);
         if (response.success) {
-          if (response.token) {
-            localStorage.setItem('access_token', response.token);
-          }
-          // Store user data in localStorage
-          const user = {
-            id: response.id.toString(),
-            firstName: response.firstName,
-            lastName: response.lastName,
-            username: response.username,
-            name: response.firstName + ' ' + response.lastName,
-            email: response.email,
-            role: response.role,
-            className: response.className,
-            phoneNumber: response.phoneNumber,
-            schoolName: response.schoolName,
-            studentId: response.studentId,
-            grade: response.className
-          };
-          this.authService.login(user as any);
-          this.redirectBasedOnRole(response.role);
+          // Account created in local DB. User must now sign in via Keycloak.
+          this.router.navigate(['/auth/login']);
         } else {
           this.errorMessage.set(response.message || 'Registration failed. Please try again.');
         }

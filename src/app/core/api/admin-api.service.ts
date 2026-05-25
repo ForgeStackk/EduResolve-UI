@@ -29,6 +29,7 @@ export interface StudentSummary {
   className: string;
   phoneNumber: string;
   schoolName: string;
+  guardianPhone: string | null;
 }
 
 export interface FeeSummary {
@@ -65,10 +66,20 @@ export interface TicketDetail extends TicketSummary {
   replies: { id: number; authorName: string; authorRole: string; body: string; createdAt: string }[];
 }
 
+export interface ClassSummary {
+  classId: string;
+  className: string;
+  section: string;
+  schoolName: string;
+}
+
 export interface BroadcastSummary {
   id: number;
   channels: string;
   audienceGrades: string;
+  classId: string | null;
+  targetStudents: boolean;
+  targetParents: boolean;
   message: string;
   isEmergency: boolean;
   status: string;
@@ -160,7 +171,19 @@ export class AdminApiService {
     return this.http.get<PagedResponse<BroadcastSummary>>(`${this.base}/broadcasts`, { params });
   }
 
-  createBroadcast(data: { channels: string; audienceGrades: string; message: string; isEmergency: boolean; sentByName: string }): Observable<{ id: number; recipientCount: number }> {
+  getClasses(): Observable<ClassSummary[]> {
+    return this.http.get<ClassSummary[]>(`${this.base}/classes`);
+  }
+
+  createBroadcast(data: {
+    channels: string;
+    classId: string | null;
+    targetStudents: boolean;
+    targetParents: boolean;
+    message: string;
+    isEmergency: boolean;
+    sentByName: string;
+  }): Observable<{ id: number; recipientCount: number }> {
     return this.http.post<{ id: number; recipientCount: number }>(`${this.base}/broadcasts`, data);
   }
 

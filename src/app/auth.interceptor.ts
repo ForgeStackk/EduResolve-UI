@@ -1,20 +1,22 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { environment } from '../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // `localStorage` only exists in the browser; skip on the SSR server pass.
-  const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  if (!isBrowser) {
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
     return next(req);
   }
 
-  const token = localStorage.getItem('access_token');
+  // Only attach the token to requests targeting our own API.
+  if (!req.url.startsWith(environment.apiBaseUrl)) {
+    return next(req);
+  }
+
+  const token = inject(OAuthService).getAccessToken();
   if (token) {
-    const authReq = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
-    });
-    return next(authReq);
+    return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
   }
 
   return next(req);

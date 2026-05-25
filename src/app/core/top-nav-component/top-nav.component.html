@@ -11,9 +11,15 @@
   <div class="flex items-center gap-4">
     <app-language-toggle></app-language-toggle>
     <span class="text-sm text-gray-600 font-medium">Profile Settings</span>
-    <button (click)="logout()" class="logout-btn">
-      <span class="logout-icon">🚪</span>
-      <span class="logout-text">Logout</span>
-    </button>
+    @if (isAuthenticated()) {
+      <button (click)="logout()" class="logout-btn">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Logout</span>
+      </button>
+    } @else {
+      <button (click)="login()" class="logout-btn">
+        <span class="logout-text">Login</span>
+      </button>
+    }
   </div>
 </header>
