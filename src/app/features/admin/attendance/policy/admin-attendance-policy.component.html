@@ -1,0 +1,126 @@
+<div class="p-6 max-w-2xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <a routerLink="/admin/attendance" class="hud-btn-ghost p-1">
+      <span class="material-symbols-outlined" style="font-size:20px">arrow_back</span>
+    </a>
+    <div>
+      <p class="hud-caps mb-0.5">{{ 'admin.attendance.subtitle' | translate }}</p>
+      <h1 class="hud-display text-xl font-bold">{{ 'admin.attendance.policy.title' | translate }}</h1>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="text-sm text-gray-400 text-center py-10">{{ 'common.loading' | translate }}</p>
+  } @else {
+    <div class="hud-card p-6 space-y-6">
+
+      <!-- Min attendance -->
+      <div>
+        <label class="hud-caps text-[11px] mb-1.5 block">
+          {{ 'admin.attendance.policy.minPct' | translate }}
+        </label>
+        <div class="flex items-center gap-3">
+          <input type="number" min="0" max="100"
+                 [ngModel]="policy().minAttendancePct"
+                 (ngModelChange)="updateField('minAttendancePct', +$event)"
+                 class="hud-input w-24 text-center text-sm">
+          <span class="text-sm text-gray-500">%</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">{{ 'admin.attendance.policy.minPctHint' | translate }}</p>
+      </div>
+
+      <!-- At-risk drop threshold -->
+      <div>
+        <label class="hud-caps text-[11px] mb-1.5 block">
+          {{ 'admin.attendance.policy.dropPct' | translate }}
+        </label>
+        <div class="flex items-center gap-3">
+          <input type="number" min="0" max="100"
+                 [ngModel]="policy().atRiskDropPct"
+                 (ngModelChange)="updateField('atRiskDropPct', +$event)"
+                 class="hud-input w-24 text-center text-sm">
+          <span class="text-sm text-gray-500">%</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">{{ 'admin.attendance.policy.dropPctHint' | translate }}</p>
+      </div>
+
+      <hr class="border-gray-100">
+
+      <!-- Auto-notify toggle -->
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-ink-900">{{ 'admin.attendance.policy.autoNotify' | translate }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ 'admin.attendance.policy.autoNotifyHint' | translate }}</p>
+        </div>
+        <button type="button" class="att-toggle" [class.att-toggle-on]="policy().autoNotifyParents"
+                (click)="updateField('autoNotifyParents', !policy().autoNotifyParents)"
+                [attr.aria-checked]="policy().autoNotifyParents">
+          <span class="att-toggle-thumb"></span>
+        </button>
+      </div>
+
+      @if (policy().autoNotifyParents) {
+        <div class="pl-4 border-l-2 border-violet-200 space-y-4">
+          <!-- Auto-notify threshold -->
+          <div>
+            <label class="hud-caps text-[11px] mb-1.5 block">
+              {{ 'admin.attendance.policy.notifyThreshold' | translate }}
+            </label>
+            <div class="flex items-center gap-3">
+              <input type="number" min="0" max="100"
+                     [ngModel]="policy().autoNotifyThresholdPct"
+                     (ngModelChange)="updateField('autoNotifyThresholdPct', +$event)"
+                     class="hud-input w-24 text-center text-sm">
+              <span class="text-sm text-gray-500">%</span>
+            </div>
+          </div>
+
+          <!-- Cooldown days -->
+          <div>
+            <label class="hud-caps text-[11px] mb-1.5 block">
+              {{ 'admin.attendance.policy.cooldownDays' | translate }}
+            </label>
+            <div class="flex items-center gap-3">
+              <input type="number" min="1" max="30"
+                     [ngModel]="policy().autoNotifyCooldownDays"
+                     (ngModelChange)="updateField('autoNotifyCooldownDays', +$event)"
+                     class="hud-input w-24 text-center text-sm">
+              <span class="text-sm text-gray-500">{{ 'admin.attendance.policy.days' | translate }}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">{{ 'admin.attendance.policy.cooldownHint' | translate }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- Last updated info -->
+      @if (policy().lastUpdatedBy) {
+        <p class="text-xs text-gray-400">
+          {{ 'admin.attendance.policy.lastUpdated' | translate }}:
+          <strong>{{ policy().lastUpdatedBy }}</strong>
+          @if (policy().lastUpdatedAt) {
+            · {{ policy().lastUpdatedAt | date:'dd MMM yyyy HH:mm' }}
+          }
+        </p>
+      }
+
+      <!-- Actions -->
+      @if (error()) {
+        <p class="text-sm text-red-500">{{ error() }}</p>
+      }
+      @if (saved()) {
+        <p class="text-sm text-green-600 font-medium">{{ 'admin.attendance.policy.saved' | translate }}</p>
+      }
+      <div class="flex gap-3 pt-2">
+        <button class="hud-btn-primary text-sm" (click)="save()" [disabled]="saving()">
+          @if (saving()) { {{ 'common.loading' | translate }} } @else { {{ 'common.save' | translate }} }
+        </button>
+        <a routerLink="/admin/attendance" class="hud-btn-ghost text-sm">
+          {{ 'common.cancel' | translate }}
+        </a>
+      </div>
+    </div>
+  }
+</div>
+

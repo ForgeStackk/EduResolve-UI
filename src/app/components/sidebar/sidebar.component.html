@@ -81,6 +81,13 @@
           <span class="material-symbols-outlined mr-2" style="font-size:18px">history</span>
           <span class="text-xs sm:text-sm">{{ 'admin.audit.title' | translate }}</span>
         </a>
+        <a routerLink="/admin/attendance" routerLinkActive="nav-link-active" class="nav-link">
+          <span class="material-symbols-outlined mr-2" style="font-size:18px">fact_check</span>
+          <span class="text-xs sm:text-sm">{{ 'admin.attendance.title' | translate }}</span>
+          @if (badge.atRiskCount() > 0) {
+            <span class="nav-badge">{{ badge.atRiskCount() }}</span>
+          }
+        </a>
       }
       @if (currentUser.role === 'parent') {
         <a routerLink="/parent/dashboard" routerLinkActive="nav-link-active" class="nav-link">

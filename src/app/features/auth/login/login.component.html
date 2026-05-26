@@ -11,18 +11,45 @@
       </div>
     }
 
-    <button
-      (click)="login()"
-      [disabled]="loading()"
-      class="login-button"
-    >
-      @if (loading()) {
-        <span class="loading-spinner"></span>
-        Redirecting...
-      } @else {
-        Sign in with EduResolve
-      }
-    </button>
+    <div class="login-form">
+      <div class="form-group">
+        <label for="identifier">Username or Email</label>
+        <input
+          id="identifier"
+          type="text"
+          class="form-input"
+          placeholder="Enter your username or email"
+          [(ngModel)]="identifier"
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="form-input"
+          placeholder="Enter your password"
+          [(ngModel)]="password"
+          [disabled]="loading()"
+          (keyup.enter)="login()"
+        />
+      </div>
+
+      <button
+        (click)="login()"
+        [disabled]="loading() || !identifier || !password"
+        class="login-button"
+      >
+        @if (loading()) {
+          <span class="loading-spinner"></span>
+          Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </div>
 
     <div class="login-footer">
       <p>Don't have an account?</p>

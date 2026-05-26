@@ -3,8 +3,10 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, tap, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+const TOKEN_KEY = 'edu_token';
 
 export type Role = 'student' | 'teacher' | 'admin' | 'parent';
 
@@ -63,8 +65,21 @@ export class AuthService {
   async initOidc(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    // Restore custom JWT session — skip Keycloak entirely if already logged in
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedUser  = localStorage.getItem('user');
+    if (storedToken && storedUser) {
+      try { this.currentUser.set(JSON.parse(storedUser)); } catch { /* ignore */ }
+      return;
+    }
+
     this.oauthService.configure(oidcConfig);
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    try {
+      await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    } catch {
+      this.currentUser.set(null);
+      return;
+    }
 
     if (this.oauthService.hasValidAccessToken()) {
       await this.loadUserProfile();
@@ -74,21 +89,47 @@ export class AuthService {
     }
   }
 
-  login(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    this.oauthService.initCodeFlow();
+  loginWithCredentials(identifier: string, password: string): Observable<void> {
+    return this.http.post<any>(`${environment.apiBaseUrl}/auth/login`, {
+      username: identifier,
+      email:    identifier,
+      password,
+    }).pipe(
+      tap(res => {
+        if (!res.success) throw new Error(res.message ?? 'Login failed');
+        localStorage.setItem(TOKEN_KEY, res.token);
+        const user: User = {
+          id:          String(res.id),
+          firstName:   res.firstName,
+          lastName:    res.lastName,
+          username:    res.username,
+          name:        `${res.firstName} ${res.lastName}`,
+          email:       res.email,
+          role:        res.role as Role,
+          className:   res.className,
+          grade:       res.className,
+          phoneNumber: res.phoneNumber,
+          schoolName:  res.schoolName,
+          studentId:   res.studentId ?? undefined,
+        };
+        this.currentUser.set(user);
+        localStorage.setItem('user', JSON.stringify(user));
+      }),
+      map(() => void 0)
+    );
   }
 
   logout(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.currentUser.set(null);
     localStorage.removeItem('user');
-    this.oauthService.revokeTokenAndLogout();
+    localStorage.removeItem(TOKEN_KEY);
+    this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
-    return this.oauthService.getAccessToken();
+    return localStorage.getItem(TOKEN_KEY) ?? this.oauthService.getAccessToken();
   }
 
   getRoles(): string[] {
@@ -108,7 +149,7 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
-    return this.oauthService.hasValidAccessToken();
+    return !!localStorage.getItem(TOKEN_KEY) || this.oauthService.hasValidAccessToken();
   }
 
   currentStudentId(): number | null {

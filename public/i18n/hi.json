@@ -131,6 +131,7 @@
       "sendTo":            "भेजें",
       "targetStudents":    "छात्र",
       "targetParents":     "अभिभावक",
+      "targetTeachers":    "शिक्षक",
       "emergency":         "आपातकालीन प्रसारण",
       "message":           "संदेश",
       "messagePlaceholder":"अपना प्रसारण संदेश लिखें…",
@@ -151,6 +152,89 @@
       "colTarget":          "लक्ष्य",
       "colDetail":          "विवरण",
       "colIp":              "IP"
+    },
+    "attendance": {
+      "subtitle":          "उपस्थिति विश्लेषण",
+      "title":             "उपस्थिति",
+      "filterClass":       "कक्षा चुनें…",
+      "allClasses":        "सभी कक्षाएं",
+      "from":              "से",
+      "to":                "तक",
+      "apply":             "लागू करें",
+      "selectClassFirst":  "डेटा लोड करने के लिए कक्षा चुनें और लागू करें पर क्लिक करें।",
+      "anomalyDetected":   "कक्षा विसंगति(याँ) पाई गईं",
+      "dismiss":           "हटाएं",
+      "runScan":           "स्कैन चलाएं",
+      "scanDone":          "स्कैन पूरा —",
+      "scanScanned":       "स्कैन किए",
+      "scanAtRisk":        "जोखिम में",
+      "scanNotified":      "सूचित किए",
+      "atRisk":            "जोखिम में",
+      "noAtRisk":          "अभी कोई जोखिम वाला छात्र नहीं।",
+      "notify":            "अभिभावक को सूचित करें",
+      "notifyMsg":         "सूचना संदेश",
+      "sendNotify":        "भेजें",
+      "notifySent":        "सूचना सफलतापूर्वक भेजी गई।",
+      "tabs": {
+        "overview":  "अवलोकन",
+        "report":    "कक्षा रिपोर्ट",
+        "atRisk":    "जोखिम में"
+      },
+      "heatmap": {
+        "title":  "उपस्थिति हीटमैप",
+        "legend": "रंग संकेत"
+      },
+      "comparison": {
+        "title": "कक्षा तुलना"
+      },
+      "dow": {
+        "title": "दिन-अनुसार विश्लेषण"
+      },
+      "report": {
+        "title":       "छात्र उपस्थिति",
+        "colName":     "नाम",
+        "colRoll":     "रोल नं.",
+        "colPresent":  "उपस्थित",
+        "colAbsent":   "अनुपस्थित",
+        "colPct":      "उपस्थिति %",
+        "colTrend":    "ट्रेंड",
+        "colRisk":     "जोखिम"
+      },
+      "atRiskCols": {
+        "class":    "कक्षा",
+        "current":  "वर्तमान %",
+        "prev":     "पिछला %",
+        "drop":     "गिरावट",
+        "severity": "गंभीरता",
+        "notified": "अंतिम सूचना"
+      },
+      "drawer": {
+        "title":        "छात्र विवरण",
+        "name":         "नाम",
+        "class":        "कक्षा",
+        "dailyRecords": "दैनिक रिकॉर्ड",
+        "date":         "तारीख",
+        "status":       "स्थिति",
+        "reason":       "कारण",
+        "remarks":      "टिप्पणी",
+        "leaves":       "छुट्टी आवेदन",
+        "audit":        "संपादन इतिहास"
+      },
+      "policy": {
+        "title":           "उपस्थिति नीति",
+        "minPct":          "न्यूनतम उपस्थिति (%)",
+        "minPctHint":      "इस सीमा से नीचे के छात्र जोखिम में चिह्नित होंगे।",
+        "dropPct":         "जोखिम गिरावट सीमा (%)",
+        "dropPctHint":     "पिछली अवधि की तुलना में इतनी गिरावट पर छात्र को चिह्नित करें।",
+        "autoNotify":      "अभिभावकों को स्वतः सूचित करें",
+        "autoNotifyHint":  "स्कैन चलने पर WhatsApp सूचनाएं स्वतः भेजें।",
+        "notifyThreshold": "उपस्थिति इस % से कम होने पर सूचित करें",
+        "cooldownDays":    "सूचना प्रतीक्षा अवधि",
+        "cooldownHint":    "एक ही छात्र के लिए दो सूचनाओं के बीच न्यूनतम दिन।",
+        "days":            "दिन",
+        "lastUpdated":     "अंतिम अपडेट",
+        "saved":           "नीति सफलतापूर्वक सहेजी गई।"
+      }
     }
   },
   "auth": {

@@ -33,7 +33,7 @@
       <p class="hud-display text-3xl text-ink-900 mt-1 tabular-nums">
         @if (loading()) { <span class="text-ink-400">—</span> } @else { {{ formatCurrency(revenue()) }} }
       </p>
-      <div class="hud-meter mt-4"><div style="width:72%; background:#10b981"></div></div>
+      <div class="hud-meter mt-4"><div [style.width.%]="0" style="background:#10b981"></div></div>
     </section>
 
     <!-- Fee collection rate -->

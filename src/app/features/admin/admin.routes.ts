@@ -28,6 +28,14 @@ export const ADMIN_ROUTES: Routes = [
         path: 'audit',
         loadComponent: () => import('./audit/admin-audit.component').then(m => m.AdminAuditComponent)
       },
+      {
+        path: 'attendance',
+        loadComponent: () => import('./attendance/admin-attendance.component').then(m => m.AdminAttendanceComponent)
+      },
+      {
+        path: 'attendance/policy',
+        loadComponent: () => import('./attendance/policy/admin-attendance-policy.component').then(m => m.AdminAttendancePolicyComponent)
+      },
       { path: 'users', redirectTo: 'students', pathMatch: 'full' },
       { path: '',      redirectTo: 'dashboard', pathMatch: 'full' }
     ]

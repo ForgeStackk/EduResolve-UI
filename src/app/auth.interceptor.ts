@@ -14,7 +14,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const token = inject(OAuthService).getAccessToken();
+  const token = localStorage.getItem('edu_token') ?? inject(OAuthService).getAccessToken();
   if (token) {
     return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
   }

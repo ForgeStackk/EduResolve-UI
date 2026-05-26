@@ -17,7 +17,7 @@
         class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm
                focus:outline-none focus:border-red-500 transition-colors min-w-36">
         @for (cls of classes(); track cls.classId) {
-          <option [value]="cls.classId">{{ cls.className }}-{{ cls.section }}</option>
+          <option [value]="cls.classId">{{ cls.section ? cls.className + '-' + cls.section : cls.className }}</option>
         }
       </select>
     </div>

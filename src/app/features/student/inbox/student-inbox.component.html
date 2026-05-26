@@ -12,32 +12,22 @@
   <nav class="flex gap-2 flex-wrap">
     <button
       class="hud-tab"
+      [class.hud-tab-active]="activeTab() === 'messages'"
+      (click)="setTab('messages')">
+      <span class="material-symbols-outlined text-sm">forum</span>
+      {{ 'inbox.messages' | translate }}
+      @if (msgBadge() > 0) {
+        <span class="hud-badge">{{ msgBadge() }}</span>
+      }
+    </button>
+    <button
+      class="hud-tab"
       [class.hud-tab-active]="activeTab() === 'notifications'"
       (click)="setTab('notifications')">
       <span class="material-symbols-outlined text-sm">notifications</span>
       {{ 'inbox.notifications' | translate }}
       @if (notifBadge() > 0) {
         <span class="hud-badge-red">{{ notifBadge() }}</span>
-      }
-    </button>
-    <button
-      class="hud-tab"
-      [class.hud-tab-active]="activeTab() === 'classNotices'"
-      (click)="setTab('classNotices')">
-      <span class="material-symbols-outlined text-sm">campaign</span>
-      {{ 'inbox.classNotices' | translate }}
-      @if (classBadge() > 0) {
-        <span class="hud-badge">{{ classBadge() }}</span>
-      }
-    </button>
-    <button
-      class="hud-tab"
-      [class.hud-tab-active]="activeTab() === 'messages'"
-      (click)="setTab('messages')">
-      <span class="material-symbols-outlined text-sm">chat</span>
-      {{ 'inbox.messages' | translate }}
-      @if (msgBadge() > 0) {
-        <span class="hud-badge">{{ msgBadge() }}</span>
       }
     </button>
     <button
@@ -63,7 +53,51 @@
     <div class="text-center py-12 text-ink-500">{{ 'common.loading' | translate }}</div>
   } @else {
 
-    <!-- NOTIFICATIONS tab -->
+    <!-- MESSAGES tab (CLASS_NOTICE + SUBJECT_MESSAGE from teachers/admins) -->
+    @if (activeTab() === 'messages') {
+      <div class="space-y-3">
+        @if (allMessages().length === 0) {
+          <div class="hud-card-flat text-center py-10">
+            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">forum</span>
+            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noMessages' | translate }}</p>
+          </div>
+        }
+        @for (item of allMessages(); track item.inboxId) {
+          <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
+                   (click)="markRead(item)">
+            <div class="hud-accent"
+                 [style.background]="item.category === 'CLASS_NOTICE' ? '#f59e0b' : '#6366f1'"></div>
+            <div class="flex items-start gap-3 pl-2">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                   [style.background]="item.category === 'CLASS_NOTICE' ? 'rgba(245,158,11,0.15)' : 'rgba(99,102,241,0.15)'">
+                <span class="material-symbols-outlined"
+                      [style.color]="item.category === 'CLASS_NOTICE' ? '#fbbf24' : '#818cf8'">
+                  {{ item.category === 'CLASS_NOTICE' ? 'campaign' : 'chat' }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
+                  @if (item.subjectName) {
+                    <span class="hud-chip text-xs bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                      {{ item.subjectName }}
+                    </span>
+                  }
+                  @if (item.readStatus === 'UNREAD') {
+                    <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
+                  }
+                  <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
+                </div>
+                <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
+                <app-message-attachments [attachments]="item.attachments" />
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- NOTIFICATIONS tab (absence alerts) -->
     @if (activeTab() === 'notifications') {
       <div class="space-y-3">
         @if (notifications().length === 0) {
@@ -95,84 +129,6 @@
               </div>
             </div>
           </article>
-        }
-      </div>
-    }
-
-    <!-- CLASS NOTICES tab -->
-    @if (activeTab() === 'classNotices') {
-      <div class="space-y-3">
-        @if (classNotices().length === 0) {
-          <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">campaign</span>
-            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noClassNotices' | translate }}</p>
-          </div>
-        }
-        @for (item of classNotices(); track item.inboxId) {
-          <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
-                   (click)="markRead(item)">
-            <div class="hud-accent" style="background:#f59e0b"></div>
-            <div class="flex items-start gap-3 pl-2">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                          bg-amber-500/20">
-                <span class="material-symbols-outlined text-amber-400">campaign</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
-                  @if (item.readStatus === 'UNREAD') {
-                    <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
-                  }
-                  <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
-                </div>
-                <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
-                <app-message-attachments [attachments]="item.attachments" />
-              </div>
-            </div>
-          </article>
-        }
-      </div>
-    }
-
-    <!-- MESSAGES tab -->
-    @if (activeTab() === 'messages') {
-      <div class="space-y-6">
-        @if (subjectMessages().length === 0) {
-          <div class="hud-card-flat text-center py-10">
-            <span class="material-symbols-outlined text-ink-300" style="font-size:40px">chat_bubble_outline</span>
-            <p class="text-sm text-ink-500 mt-2">{{ 'inbox.noMessages' | translate }}</p>
-          </div>
-        }
-        @for (group of subjectMessages(); track group.subject) {
-          <section class="space-y-3">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-red-500">menu_book</span>
-              <h2 class="hud-display text-lg text-white">{{ group.subject | uppercase }}</h2>
-            </div>
-            @for (item of group.items; track item.inboxId) {
-              <article class="hud-card-flat cursor-pointer hover:border-white/30 transition-all"
-                       (click)="markRead(item)">
-                <div class="hud-accent"></div>
-                <div class="flex items-start gap-3 pl-2">
-                  <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                              bg-red-600/20">
-                    <span class="material-symbols-outlined text-red-400">chat</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <h3 class="hud-display text-base text-white">{{ item.senderName }}</h3>
-                      @if (item.readStatus === 'UNREAD') {
-                        <span class="hud-chip hud-chip-active">{{ 'inbox.unread' | translate }}</span>
-                      }
-                      <span class="hud-caps text-ink-500 text-xs ml-auto">{{ formatDate(item.sentAt) }}</span>
-                    </div>
-                    <p class="text-sm text-ink-700 mt-1 leading-relaxed">{{ item.textBody }}</p>
-                    <app-message-attachments [attachments]="item.attachments" />
-                  </div>
-                </div>
-              </article>
-            }
-          </section>
         }
       </div>
     }

@@ -25,12 +25,13 @@ export class AdminBroadcastsComponent implements OnInit {
   errorMsg   = signal('');
 
   // Compose form
-  channels       = signal<string[]>(['whatsapp']);
-  classId        = signal<string>('');
-  targetStudents = signal(true);
-  targetParents  = signal(false);
-  message        = signal('');
-  isEmergency    = signal(false);
+  channels        = signal<string[]>(['whatsapp']);
+  classId         = signal<string>('');
+  targetStudents  = signal(true);
+  targetParents   = signal(false);
+  targetTeachers  = signal(false);
+  message         = signal('');
+  isEmergency     = signal(false);
 
   classes = signal<ClassSummary[]>([]);
 
@@ -68,7 +69,7 @@ export class AdminBroadcastsComponent implements OnInit {
   classLabel(classId: string | null): string {
     if (!classId) return '';
     const c = this.classes().find(x => x.classId === classId);
-    return c ? `${c.className}-${c.section}` : classId;
+    return c ? `${c.className}${c.section ? '-' + c.section : ''}` : classId;
   }
 
   send(): void {
@@ -81,6 +82,7 @@ export class AdminBroadcastsComponent implements OnInit {
       classId:        this.classId() || null,
       targetStudents: this.targetStudents(),
       targetParents:  this.targetParents(),
+      targetTeachers: this.targetTeachers(),
       message:        this.message(),
       isEmergency:    this.isEmergency(),
       sentByName:     user ? `${user.firstName} ${user.lastName}` : 'Admin',

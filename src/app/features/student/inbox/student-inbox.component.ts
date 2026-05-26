@@ -6,7 +6,7 @@ import { StudentInboxApiService, StudentInboxItem, AttendanceDayDto } from '../.
 import { InboxWebSocketService } from '../../../core/inbox/inbox-websocket.service';
 import { MessageAttachmentsComponent } from '../../../shared/message-attachments/message-attachments.component';
 
-type Tab = 'notifications' | 'classNotices' | 'messages' | 'homework' | 'attendance';
+type Tab = 'messages' | 'notifications' | 'homework' | 'attendance';
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -24,7 +24,7 @@ export class StudentInboxComponent implements OnInit {
   private api = inject(StudentInboxApiService);
   private ws  = inject(InboxWebSocketService);
 
-  activeTab   = signal<Tab>('notifications');
+  activeTab   = signal<Tab>('messages');
   loading     = signal(true);
   items       = signal<StudentInboxItem[]>([]);
   attendance  = signal<AttendanceDayDto[]>([]);
@@ -37,26 +37,29 @@ export class StudentInboxComponent implements OnInit {
     this.items().filter(i => i.category === 'ABSENCE_NOTIFICATION')
   );
 
-  classNotices = computed(() =>
-    this.items().filter(i => i.category === 'CLASS_NOTICE')
+  /** All communications from teachers/admins: class notices + subject messages. */
+  allMessages = computed(() =>
+    this.items().filter(i => i.category === 'CLASS_NOTICE' || i.category === 'SUBJECT_MESSAGE')
   );
 
+  /** Subject-grouped view for messages that have a subject attached. */
   subjectMessages = computed(() => {
     const msgs = this.items().filter(i => i.category === 'SUBJECT_MESSAGE');
     return this.groupBySubject(msgs);
   });
+
+  classNotices = computed(() =>
+    this.items().filter(i => i.category === 'CLASS_NOTICE')
+  );
 
   homeworkItems = computed(() => {
     const hw = this.items().filter(i => i.category === 'HOMEWORK');
     return this.groupBySubject(hw);
   });
 
-  notifBadge    = computed(() => this.notifications().filter(i => i.readStatus === 'UNREAD').length);
-  classBadge    = computed(() => this.classNotices().filter(i => i.readStatus === 'UNREAD').length);
-  msgBadge      = computed(() =>
-    this.items().filter(i => i.category === 'SUBJECT_MESSAGE' && i.readStatus === 'UNREAD').length
-  );
-  hwBadge       = computed(() =>
+  notifBadge = computed(() => this.notifications().filter(i => i.readStatus === 'UNREAD').length);
+  msgBadge   = computed(() => this.allMessages().filter(i => i.readStatus === 'UNREAD').length);
+  hwBadge    = computed(() =>
     this.items().filter(i => i.category === 'HOMEWORK' && i.readStatus === 'UNREAD').length
   );
 

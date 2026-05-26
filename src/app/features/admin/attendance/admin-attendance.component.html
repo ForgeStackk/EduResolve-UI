@@ -1,0 +1,534 @@
+<div class="att-root">
+
+  <!-- Page header -->
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <p class="hud-caps mb-1">{{ 'admin.attendance.subtitle' | translate }}</p>
+      <h1 class="hud-display text-2xl font-bold">{{ 'admin.attendance.title' | translate }}</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="hud-btn-ghost flex items-center gap-1 text-sm"
+              (click)="runScan()" [disabled]="scanning()">
+        <span class="material-symbols-outlined" style="font-size:18px">radar</span>
+        @if (scanning()) { {{ 'common.loading' | translate }} }
+        @else { {{ 'admin.attendance.runScan' | translate }} }
+      </button>
+      <a routerLink="/admin/attendance/policy" class="hud-btn-ghost flex items-center gap-1 text-sm">
+        <span class="material-symbols-outlined" style="font-size:18px">settings</span>
+        {{ 'admin.attendance.policy.title' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <!-- Scan result banner -->
+  @if (scanResult()) {
+    <div class="mb-4 px-4 py-2.5 rounded-lg bg-green-50 border border-green-200 flex items-center gap-3 text-sm">
+      <span class="material-symbols-outlined text-green-600" style="font-size:18px">check_circle</span>
+      <span class="text-green-800 font-medium">{{ 'admin.attendance.scanDone' | translate }}</span>
+      <span class="text-green-700">
+        {{ scanResult()!.scanned }} {{ 'admin.attendance.scanScanned' | translate }} ·
+        {{ scanResult()!.atRisk }} {{ 'admin.attendance.scanAtRisk' | translate }} ·
+        {{ scanResult()!.notified }} {{ 'admin.attendance.scanNotified' | translate }}
+      </span>
+    </div>
+  }
+
+  <!-- Anomaly banner -->
+  @if (anomalies().length > 0) {
+    <div class="att-anomaly-banner mb-4">
+      <span class="material-symbols-outlined mr-2 text-amber-600" style="font-size:18px">warning</span>
+      <span class="text-sm font-medium text-amber-800">
+        {{ anomalies().length }} {{ 'admin.attendance.anomalyDetected' | translate }}
+      </span>
+      <div class="ml-auto flex gap-2">
+        @for (a of anomalies(); track a.id) {
+          <span class="hud-chip text-amber-700 border-amber-300 bg-amber-50">
+            {{ a.classId }} −{{ a.dropAmount | number:'1.0-0' }}%
+          </span>
+        }
+        <button class="text-xs text-amber-700 underline" (click)="acknowledgeAnomaly(anomalies()[0].id)">
+          {{ 'admin.attendance.dismiss' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Filter bar -->
+  <div class="hud-card p-4 mb-5">
+    <div class="flex flex-wrap gap-3 items-end">
+      <div class="flex flex-col gap-1 min-w-[160px]">
+        <label class="hud-caps text-[10px]">{{ 'admin.attendance.filterClass' | translate }}</label>
+        @if (loadingClasses()) {
+          <div class="hud-input text-xs text-gray-400">{{ 'common.loading' | translate }}</div>
+        } @else {
+          <select class="hud-input text-sm" [ngModel]="selectedClassId()"
+                  (ngModelChange)="selectedClassId.set(+$event)">
+            <option [value]="0">{{ 'admin.attendance.allClasses' | translate }}</option>
+            @for (c of classes(); track c.id) {
+              <option [value]="c.id">{{ classLabel(c) }}</option>
+            }
+          </select>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="hud-caps text-[10px]">{{ 'admin.attendance.from' | translate }}</label>
+        <input type="date" class="hud-input text-sm" [ngModel]="fromDate()"
+               (ngModelChange)="fromDate.set($event)">
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="hud-caps text-[10px]">{{ 'admin.attendance.to' | translate }}</label>
+        <input type="date" class="hud-input text-sm" [ngModel]="toDate()"
+               (ngModelChange)="toDate.set($event)">
+      </div>
+
+      <button class="hud-btn-primary text-sm" (click)="applyFilters()"
+              [disabled]="!selectedClassId()">
+        {{ 'admin.attendance.apply' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="att-tabs mb-5">
+    <button class="att-tab" [class.att-tab-active]="activeTab() === 'overview'" (click)="setTab('overview')">
+      <span class="material-symbols-outlined mr-1" style="font-size:16px">calendar_month</span>
+      {{ 'admin.attendance.tabs.overview' | translate }}
+    </button>
+    <button class="att-tab" [class.att-tab-active]="activeTab() === 'report'" (click)="setTab('report')">
+      <span class="material-symbols-outlined mr-1" style="font-size:16px">table_chart</span>
+      {{ 'admin.attendance.tabs.report' | translate }}
+    </button>
+    <button class="att-tab" [class.att-tab-active]="activeTab() === 'atrisk'" (click)="setTab('atrisk')">
+      <span class="material-symbols-outlined mr-1" style="font-size:16px">warning</span>
+      {{ 'admin.attendance.tabs.atRisk' | translate }}
+      @if (atRiskCount() > 0) {
+        <span class="att-badge">{{ atRiskCount() }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- ── OVERVIEW TAB ────────────────────────────────────────────────────── -->
+  @if (activeTab() === 'overview') {
+    <div class="space-y-5">
+
+      <!-- Heatmap section -->
+      <div class="hud-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-ink-900">{{ 'admin.attendance.heatmap.title' | translate }}</h2>
+          <div class="flex items-center gap-2">
+            <button class="hud-btn-ghost text-xs px-2 py-1" (click)="prevYear()">‹</button>
+            <span class="text-sm font-semibold">{{ heatmapYear() }}</span>
+            <button class="hud-btn-ghost text-xs px-2 py-1" (click)="nextYear()">›</button>
+          </div>
+        </div>
+
+        @if (!selectedClassId()) {
+          <p class="text-sm text-gray-400 text-center py-6">{{ 'admin.attendance.selectClassFirst' | translate }}</p>
+        } @else if (loadingHeatmap()) {
+          <p class="text-sm text-gray-400 text-center py-6">{{ 'common.loading' | translate }}</p>
+        } @else {
+          <!-- Color legend -->
+          <div class="flex items-center gap-3 mb-4 flex-wrap">
+            <span class="hud-caps text-[10px]">{{ 'admin.attendance.heatmap.legend' | translate }}</span>
+            @for (leg of [
+              {label:'≥90%', cls:'att-cell-high'},
+              {label:'≥75%', cls:'att-cell-good'},
+              {label:'≥60%', cls:'att-cell-warn'},
+              {label:'≥40%', cls:'att-cell-low'},
+              {label:'<40%', cls:'att-cell-crit'},
+              {label:'No data', cls:'att-cell-empty'}
+            ]; track leg.label) {
+              <div class="flex items-center gap-1">
+                <div class="att-cell-sm" [ngClass]="leg.cls"></div>
+                <span class="text-[10px] text-gray-500">{{ leg.label }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Month grid -->
+          <div class="att-heatmap-months overflow-x-auto">
+            @for (month of heatmapGrid(); track month.label) {
+              <div class="att-heatmap-month">
+                <p class="hud-caps text-[10px] mb-1">{{ month.label }}</p>
+                <div class="att-heatmap-cells">
+                  @for (cell of month.cells; track cell.date) {
+                    <div class="att-cell" [ngClass]="heatmapColor(cell.pct)"
+                         [title]="cell.date + (cell.pct !== null ? ': ' + (cell.pct | number:'1.0-1') + '%' : ': no data')">
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Charts row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Class comparison -->
+        <div class="hud-card p-5">
+          <h2 class="font-semibold text-ink-900 mb-4">{{ 'admin.attendance.comparison.title' | translate }}</h2>
+          @if (!selectedClassId()) {
+            <p class="text-sm text-gray-400">{{ 'admin.attendance.selectClassFirst' | translate }}</p>
+          } @else if (loadingInsights()) {
+            <p class="text-sm text-gray-400">{{ 'common.loading' | translate }}</p>
+          } @else if (comparisonEntries().length === 0) {
+            <p class="text-sm text-gray-400">{{ 'common.noData' | translate }}</p>
+          } @else {
+            <div class="space-y-2">
+              @for (entry of comparisonEntries(); track entry.label) {
+                <div class="flex items-center gap-2">
+                  <span class="hud-caps text-[10px] w-8 shrink-0">{{ entry.label }}</span>
+                  <div class="att-bar-track flex-1 h-4">
+                    <div class="att-bar-fill h-full" [ngClass]="pctBarColor(entry.pct)"
+                         [style.width]="entry.pct + '%'"></div>
+                  </div>
+                  <span class="text-xs w-10 text-right font-medium">{{ entry.pct | number:'1.0-1' }}%</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Day of week breakdown -->
+        <div class="hud-card p-5">
+          <h2 class="font-semibold text-ink-900 mb-4">{{ 'admin.attendance.dow.title' | translate }}</h2>
+          @if (!selectedClassId()) {
+            <p class="text-sm text-gray-400">{{ 'admin.attendance.selectClassFirst' | translate }}</p>
+          } @else if (loadingInsights()) {
+            <p class="text-sm text-gray-400">{{ 'common.loading' | translate }}</p>
+          } @else if (dowEntries().length === 0) {
+            <p class="text-sm text-gray-400">{{ 'common.noData' | translate }}</p>
+          } @else {
+            <div class="space-y-2">
+              @for (entry of dowEntries(); track entry.day) {
+                <div class="flex items-center gap-2">
+                  <span class="hud-caps text-[10px] w-8 shrink-0">{{ entry.day }}</span>
+                  <div class="att-bar-track flex-1 h-4">
+                    <div class="att-bar-fill h-full" [ngClass]="pctBarColor(entry.pct)"
+                         [style.width]="entry.pct + '%'"></div>
+                  </div>
+                  <span class="text-xs w-10 text-right font-medium">{{ entry.pct | number:'1.0-1' }}%</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ── CLASS REPORT TAB ───────────────────────────────────────────────── -->
+  @if (activeTab() === 'report') {
+    <div class="hud-card p-0 overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h2 class="font-semibold text-ink-900">{{ 'admin.attendance.report.title' | translate }}</h2>
+        @if (selectedClassId()) {
+          <div class="flex gap-2">
+            <button class="hud-btn-ghost text-xs flex items-center gap-1" (click)="exportCsv()">
+              <span class="material-symbols-outlined" style="font-size:14px">download</span>
+              CSV
+            </button>
+            <button class="hud-btn-ghost text-xs flex items-center gap-1" (click)="exportPdf()">
+              <span class="material-symbols-outlined" style="font-size:14px">picture_as_pdf</span>
+              PDF
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (!selectedClassId()) {
+        <p class="text-sm text-gray-400 text-center py-10">{{ 'admin.attendance.selectClassFirst' | translate }}</p>
+      } @else if (loadingSummary()) {
+        <p class="text-sm text-gray-400 text-center py-10">{{ 'common.loading' | translate }}</p>
+      } @else if (sortedSummary().length === 0) {
+        <p class="text-sm text-gray-400 text-center py-10">{{ 'common.noData' | translate }}</p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="hud-caps text-left px-4 py-3">{{ 'admin.attendance.report.colName' | translate }}</th>
+                <th class="hud-caps text-left px-4 py-3 hidden sm:table-cell">{{ 'admin.attendance.report.colRoll' | translate }}</th>
+                <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.report.colPresent' | translate }}</th>
+                <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.report.colAbsent' | translate }}</th>
+                <th class="hud-caps text-left px-4 py-3 min-w-[130px]">{{ 'admin.attendance.report.colPct' | translate }}</th>
+                <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.report.colTrend' | translate }}</th>
+                <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.report.colRisk' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of sortedSummary(); track s.studentId) {
+                <tr class="border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                    (click)="openDrawer(s)">
+                  <td class="px-4 py-3 font-medium text-ink-900">{{ s.name }}</td>
+                  <td class="px-4 py-3 text-gray-500 hidden sm:table-cell">{{ s.rollNumber }}</td>
+                  <td class="px-3 py-3 text-center text-green-700">{{ s.present }}</td>
+                  <td class="px-3 py-3 text-center text-red-500">{{ s.absent }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="att-bar-track w-20 h-3 shrink-0">
+                        <div class="att-bar-fill h-full" [ngClass]="pctBarColor(s.percentage)"
+                             [style.width]="s.percentage + '%'"></div>
+                      </div>
+                      <span class="text-xs font-semibold">{{ s.percentage | number:'1.0-1' }}%</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3 text-center">
+                    <span [ngClass]="trendClass(s.trend)" class="font-bold">{{ trendIcon(s.trend) }}</span>
+                  </td>
+                  <td class="px-3 py-3 text-center">
+                    @if (s.atRisk) {
+                      <span class="hud-chip bg-red-100 text-red-700 border-red-200">
+                        {{ 'admin.attendance.atRisk' | translate }}
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── AT-RISK TAB ────────────────────────────────────────────────────── -->
+  @if (activeTab() === 'atrisk') {
+    <div class="space-y-4">
+
+      <!-- Summary chips -->
+      @if (!loadingAtRisk() && atRiskList().length > 0) {
+        <div class="flex gap-3 flex-wrap">
+          <span class="hud-chip bg-red-100 text-red-700 border-red-200 font-medium">
+            HIGH: {{ highCount() }}
+          </span>
+          <span class="hud-chip bg-amber-100 text-amber-700 border-amber-200 font-medium">
+            MEDIUM: {{ mediumCount() }}
+          </span>
+          <span class="hud-chip bg-yellow-100 text-yellow-700 border-yellow-200 font-medium">
+            LOW: {{ lowCount() }}
+          </span>
+        </div>
+      }
+
+      <div class="hud-card p-0 overflow-hidden">
+        @if (loadingAtRisk()) {
+          <p class="text-sm text-gray-400 text-center py-10">{{ 'common.loading' | translate }}</p>
+        } @else if (atRiskList().length === 0) {
+          <div class="text-center py-10">
+            <span class="material-symbols-outlined text-4xl text-green-400 mb-2 block">check_circle</span>
+            <p class="text-sm text-gray-500">{{ 'admin.attendance.noAtRisk' | translate }}</p>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="hud-caps text-left px-4 py-3">{{ 'admin.attendance.report.colName' | translate }}</th>
+                  <th class="hud-caps text-left px-4 py-3 hidden md:table-cell">{{ 'admin.attendance.atRiskCols.class' | translate }}</th>
+                  <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.atRiskCols.current' | translate }}</th>
+                  <th class="hud-caps text-center px-3 py-3 hidden sm:table-cell">{{ 'admin.attendance.atRiskCols.prev' | translate }}</th>
+                  <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.atRiskCols.drop' | translate }}</th>
+                  <th class="hud-caps text-center px-3 py-3">{{ 'admin.attendance.atRiskCols.severity' | translate }}</th>
+                  <th class="hud-caps text-center px-3 py-3 hidden md:table-cell">{{ 'admin.attendance.atRiskCols.notified' | translate }}</th>
+                  <th class="hud-caps px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of atRiskList(); track s.studentId) {
+                  <tr class="border-t border-gray-100 hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-ink-900">{{ s.name }}</td>
+                    <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ s.className }}</td>
+                    <td class="px-3 py-3 text-center font-semibold" [ngClass]="pctBarColor(s.currentPct)">
+                      {{ s.currentPct | number:'1.0-1' }}%
+                    </td>
+                    <td class="px-3 py-3 text-center text-gray-500 hidden sm:table-cell">
+                      {{ s.previousPct | number:'1.0-1' }}%
+                    </td>
+                    <td class="px-3 py-3 text-center text-red-500 font-semibold">
+                      −{{ s.drop | number:'1.0-1' }}%
+                    </td>
+                    <td class="px-3 py-3 text-center">
+                      <span [ngClass]="severityClass(s.severity)">{{ s.severity }}</span>
+                    </td>
+                    <td class="px-3 py-3 text-center text-xs text-gray-400 hidden md:table-cell">
+                      @if (s.daysSinceNotified >= 0) {
+                        {{ s.daysSinceNotified }}d ago
+                      } @else {
+                        —
+                      }
+                    </td>
+                    <td class="px-4 py-3">
+                      <button class="hud-btn-ghost text-xs whitespace-nowrap"
+                              (click)="openNotify(s); $event.stopPropagation()">
+                        <span class="material-symbols-outlined mr-1" style="font-size:13px">notifications</span>
+                        {{ 'admin.attendance.notify' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>
+
+<!-- ── STUDENT DETAIL DRAWER ───────────────────────────────────────────── -->
+@if (drawerOpen()) {
+  <div class="att-backdrop" (click)="closeDrawer()"></div>
+  <div class="att-drawer">
+    <div class="att-drawer-header">
+      <h3 class="font-semibold text-ink-900">{{ 'admin.attendance.drawer.title' | translate }}</h3>
+      <button class="hud-btn-ghost p-1" (click)="closeDrawer()">
+        <span class="material-symbols-outlined" style="font-size:20px">close</span>
+      </button>
+    </div>
+
+    @if (loadingDrawer()) {
+      <div class="p-6 text-center text-sm text-gray-400">{{ 'common.loading' | translate }}</div>
+    } @else if (drawerDetail()) {
+      <div class="att-drawer-body">
+        <div class="flex flex-wrap gap-4 mb-5">
+          <div class="flex flex-col">
+            <span class="hud-caps text-[10px]">{{ 'admin.attendance.drawer.name' | translate }}</span>
+            <span class="font-semibold">{{ drawerDetail()!.name }}</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="hud-caps text-[10px]">{{ 'admin.attendance.drawer.class' | translate }}</span>
+            <span class="font-semibold">{{ drawerDetail()!.className }}</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="grid grid-cols-4 gap-3 mb-5">
+          @for (stat of [
+            {label: 'P', val: drawerDetail()!.present, cls: 'text-green-600'},
+            {label: 'A', val: drawerDetail()!.absent, cls: 'text-red-500'},
+            {label: 'L', val: drawerDetail()!.late, cls: 'text-amber-600'},
+            {label: 'E', val: drawerDetail()!.excused, cls: 'text-blue-600'}
+          ]; track stat.label) {
+            <div class="hud-card p-3 text-center">
+              <span class="hud-caps text-[10px] block mb-1">{{ stat.label }}</span>
+              <span class="text-xl font-bold" [ngClass]="stat.cls">{{ stat.val }}</span>
+            </div>
+          }
+        </div>
+        <div class="flex items-center gap-2 mb-5">
+          <div class="att-bar-track flex-1 h-5">
+            <div class="att-bar-fill h-full" [ngClass]="pctBarColor(drawerDetail()!.percentage)"
+                 [style.width]="drawerDetail()!.percentage + '%'"></div>
+          </div>
+          <span class="font-bold text-sm w-12 text-right">{{ drawerDetail()!.percentage | number:'1.0-1' }}%</span>
+        </div>
+
+        <!-- Daily records -->
+        <h4 class="hud-caps text-[10px] mb-2">{{ 'admin.attendance.drawer.dailyRecords' | translate }}</h4>
+        <div class="overflow-x-auto mb-5">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="hud-caps text-left px-3 py-2">{{ 'admin.attendance.drawer.date' | translate }}</th>
+                <th class="hud-caps text-left px-3 py-2">{{ 'admin.attendance.drawer.status' | translate }}</th>
+                <th class="hud-caps text-left px-3 py-2">{{ 'admin.attendance.drawer.reason' | translate }}</th>
+                <th class="hud-caps text-left px-3 py-2 hidden sm:table-cell">{{ 'admin.attendance.drawer.remarks' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of drawerDetail()!.records; track r.date) {
+                <tr class="border-t border-gray-100">
+                  <td class="px-3 py-2">{{ r.date }}</td>
+                  <td class="px-3 py-2 font-medium" [ngClass]="statusClass(r.status)">{{ r.status }}</td>
+                  <td class="px-3 py-2 text-gray-500">{{ r.reasonCode ?? '—' }}</td>
+                  <td class="px-3 py-2 text-gray-400 hidden sm:table-cell">{{ r.remarks ?? '—' }}</td>
+                </tr>
+              }
+              @empty {
+                <tr><td colspan="4" class="px-3 py-4 text-center text-gray-400">{{ 'common.noData' | translate }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Leave applications -->
+        @if (drawerDetail()!.leaveApplications.length > 0) {
+          <h4 class="hud-caps text-[10px] mb-2">{{ 'admin.attendance.drawer.leaves' | translate }}</h4>
+          <div class="space-y-2 mb-5">
+            @for (l of drawerDetail()!.leaveApplications; track l.id) {
+              <div class="flex items-center gap-3 text-xs p-2 rounded border border-gray-100">
+                <span>{{ l.fromDate }} – {{ l.toDate }}</span>
+                <span class="text-gray-500 truncate flex-1">{{ l.reason }}</span>
+                <span class="hud-chip" [class.bg-green-100]="l.status === 'Approved'"
+                      [class.text-green-700]="l.status === 'Approved'">{{ l.status }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Audit history -->
+        @if (drawerDetail()!.auditHistory.length > 0) {
+          <h4 class="hud-caps text-[10px] mb-2">{{ 'admin.attendance.drawer.audit' | translate }}</h4>
+          <div class="space-y-1">
+            @for (au of drawerDetail()!.auditHistory; track au.id) {
+              <div class="text-xs text-gray-500 flex gap-2 border-b border-gray-100 pb-1">
+                <span class="shrink-0">{{ au.changedAt | date:'dd/MM HH:mm' }}</span>
+                <span>{{ au.oldStatus }} → <strong class="text-ink-900">{{ au.newStatus }}</strong></span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- ── NOTIFY PARENT MODAL ─────────────────────────────────────────────── -->
+@if (notifyTarget()) {
+  <div class="att-backdrop" (click)="closeNotify()"></div>
+  <div class="att-modal">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-ink-900">{{ 'admin.attendance.notify' | translate }}</h3>
+      <button class="hud-btn-ghost p-1" (click)="closeNotify()">
+        <span class="material-symbols-outlined" style="font-size:20px">close</span>
+      </button>
+    </div>
+
+    <p class="text-xs text-gray-500 mb-3">
+      {{ notifyTarget()!.name }} · {{ notifyTarget()!.className }} ·
+      <span [ngClass]="severityClass(notifyTarget()!.severity)">{{ notifyTarget()!.severity }}</span>
+    </p>
+
+    <label class="hud-caps text-[10px] mb-1 block">{{ 'admin.attendance.notifyMsg' | translate }}</label>
+    <textarea class="hud-input w-full text-sm resize-none h-28" [ngModel]="notifyMsg()"
+              (ngModelChange)="notifyMsg.set($event)"></textarea>
+
+    @if (notifySent()) {
+      <div class="mt-3 p-2 bg-green-50 text-green-700 rounded text-sm text-center">
+        {{ 'admin.attendance.notifySent' | translate }}
+      </div>
+    } @else {
+      <div class="flex gap-2 mt-4 justify-end">
+        <button class="hud-btn-ghost text-sm" (click)="closeNotify()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button class="hud-btn-primary text-sm" (click)="sendNotification()"
+                [disabled]="notifyLoading()">
+          @if (notifyLoading()) {
+            {{ 'common.sending' | translate }}
+          } @else {
+            <span class="material-symbols-outlined mr-1" style="font-size:15px">send</span>
+            {{ 'admin.attendance.sendNotify' | translate }}
+          }
+        </button>
+      </div>
+    }
+  </div>
+}

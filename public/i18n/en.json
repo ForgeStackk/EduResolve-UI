@@ -131,6 +131,7 @@
       "sendTo":            "Send to",
       "targetStudents":    "Students",
       "targetParents":     "Parents",
+      "targetTeachers":    "Teachers",
       "emergency":         "Emergency broadcast",
       "message":           "Message",
       "messagePlaceholder":"Type your broadcast message…",
@@ -151,6 +152,89 @@
       "colTarget":          "Target",
       "colDetail":          "Detail",
       "colIp":              "IP"
+    },
+    "attendance": {
+      "subtitle":          "ATTENDANCE INTELLIGENCE",
+      "title":             "Attendance",
+      "filterClass":       "Select class…",
+      "allClasses":        "All Classes",
+      "from":              "From",
+      "to":                "To",
+      "apply":             "Apply",
+      "selectClassFirst":  "Select a class and click Apply to load data.",
+      "anomalyDetected":   "class anomaly(ies) detected",
+      "dismiss":           "Dismiss",
+      "runScan":           "Run Scan",
+      "scanDone":          "Scan complete —",
+      "scanScanned":       "scanned",
+      "scanAtRisk":        "at-risk",
+      "scanNotified":      "notified",
+      "atRisk":            "AT RISK",
+      "noAtRisk":          "No at-risk students right now.",
+      "notify":            "Notify Parent",
+      "notifyMsg":         "Notification message",
+      "sendNotify":        "Send",
+      "notifySent":        "Notification sent successfully.",
+      "tabs": {
+        "overview":  "Overview",
+        "report":    "Class Report",
+        "atRisk":    "At-Risk"
+      },
+      "heatmap": {
+        "title":  "Attendance Heatmap",
+        "legend": "LEGEND"
+      },
+      "comparison": {
+        "title": "Class Comparison"
+      },
+      "dow": {
+        "title": "Day-of-Week Breakdown"
+      },
+      "report": {
+        "title":       "Student Attendance",
+        "colName":     "Name",
+        "colRoll":     "Roll No",
+        "colPresent":  "Present",
+        "colAbsent":   "Absent",
+        "colPct":      "Attendance %",
+        "colTrend":    "Trend",
+        "colRisk":     "Risk"
+      },
+      "atRiskCols": {
+        "class":    "Class",
+        "current":  "Current %",
+        "prev":     "Prev %",
+        "drop":     "Drop",
+        "severity": "Severity",
+        "notified": "Last Notified"
+      },
+      "drawer": {
+        "title":        "Student Detail",
+        "name":         "NAME",
+        "class":        "CLASS",
+        "dailyRecords": "DAILY RECORDS",
+        "date":         "Date",
+        "status":       "Status",
+        "reason":       "Reason",
+        "remarks":      "Remarks",
+        "leaves":       "LEAVE APPLICATIONS",
+        "audit":        "EDIT HISTORY"
+      },
+      "policy": {
+        "title":           "Attendance Policy",
+        "minPct":          "Minimum Attendance (%)",
+        "minPctHint":      "Students below this threshold are flagged as at-risk.",
+        "dropPct":         "At-Risk Drop Threshold (%)",
+        "dropPctHint":     "Flag students whose attendance drops by this much vs the previous period.",
+        "autoNotify":      "Auto-notify parents",
+        "autoNotifyHint":  "Automatically send WhatsApp notifications when the scan job runs.",
+        "notifyThreshold": "Notify when attendance drops below (%)",
+        "cooldownDays":    "Notification cooldown",
+        "cooldownHint":    "Minimum days between notifications for the same student.",
+        "days":            "days",
+        "lastUpdated":     "Last updated by",
+        "saved":           "Policy saved successfully."
+      }
     }
   },
   "auth": {

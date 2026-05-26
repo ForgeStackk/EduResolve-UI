@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { LanguageToggleComponent } from '../i18n/language-toggle/language-toggle.component';
 import { AuthService } from '../auth/auth.service';
 
@@ -11,10 +12,11 @@ import { AuthService } from '../auth/auth.service';
 })
 export class TopNavComponent {
   private authService = inject(AuthService);
+  private router      = inject(Router);
 
-  schoolName     = computed(() => this.authService.currentUser()?.schoolName ?? '');
+  schoolName      = computed(() => this.authService.currentUser()?.schoolName ?? '');
   isAuthenticated = computed(() => this.authService.isAuthenticated());
 
-  login(): void  { this.authService.login(); }
+  login(): void  { this.router.navigate(['/auth/login']); }
   logout(): void { this.authService.logout(); }
 }

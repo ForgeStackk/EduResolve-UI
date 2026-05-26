@@ -67,6 +67,7 @@ export interface TicketDetail extends TicketSummary {
 }
 
 export interface ClassSummary {
+  id: number;
   classId: string;
   className: string;
   section: string;
@@ -80,6 +81,7 @@ export interface BroadcastSummary {
   classId: string | null;
   targetStudents: boolean;
   targetParents: boolean;
+  targetTeachers: boolean;
   message: string;
   isEmergency: boolean;
   status: string;
@@ -180,6 +182,7 @@ export class AdminApiService {
     classId: string | null;
     targetStudents: boolean;
     targetParents: boolean;
+    targetTeachers: boolean;
     message: string;
     isEmergency: boolean;
     sentByName: string;

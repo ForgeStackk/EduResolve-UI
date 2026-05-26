@@ -10,7 +10,7 @@
       <option value="">{{ 'teacher.classSelect.select' | translate }}</option>
       @for (cls of classes(); track cls.classId) {
         <option [value]="cls.classId">
-          {{ cls.className }}-{{ cls.section }}
+          {{ cls.section ? cls.className + '-' + cls.section : cls.className }}
           @if (cls.isClassTeacher) { {{ 'teacher.classSelect.ct' | translate }} }
         </option>
       }
