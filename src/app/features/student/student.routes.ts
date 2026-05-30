@@ -11,5 +11,17 @@ export const STUDENT_ROUTES: Routes = [
   { path: 'homework/submit',      component: HomeworkSubmitComponent   },
   { path: 'doubts',               component: StudentDoubtsComponent    },
   { path: 'doubts/:threadId',     component: DoubtThreadComponent      },
+  {
+    path: 'notes',
+    loadComponent: () => import('./notes/notes-library/notes-library.component').then(m => m.NotesLibraryComponent)
+  },
+  {
+    path: 'classroom',
+    loadComponent: () => import('./classroom/classroom.component').then(m => m.ClassroomComponent)
+  },
+  {
+    path: 'notes/:noteId',
+    loadComponent: () => import('./notes/note-detail/note-detail.component').then(m => m.NoteDetailComponent)
+  },
   { path: '',                     redirectTo: 'dashboard', pathMatch: 'full' }
 ];

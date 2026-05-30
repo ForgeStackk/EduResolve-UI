@@ -8,6 +8,7 @@ import { LanguageToggleComponent } from '../i18n/language-toggle/language-toggle
 import { AuthService, MOCK_STUDENT_PROFILE } from '../auth/auth.service';
 import { StudentApiService, StudentProfile } from '../api/student-api.service';
 import { InboxWebSocketService } from '../inbox/inbox-websocket.service';
+import { ClassroomWsService } from '../../features/student/classroom/classroom-ws.service';
 
 export type HudRole = 'student' | 'teacher' | 'admin' | 'parent';
 
@@ -33,6 +34,8 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
       { icon: 'home',          labelKey: 'nav.home',     link: '/student/dashboard', exact: true },
       { icon: 'inbox',         labelKey: 'nav.inbox',    link: '/student/inbox' },
       { icon: 'local_library', labelKey: 'nav.subjects', link: '/learn/subjects' },
+      { icon: 'edit_note',     labelKey: 'nav.notes',     link: '/student/notes' },
+      { icon: 'groups',        labelKey: 'nav.classroom', link: '/student/classroom' },
       { icon: 'forum',         labelKey: 'nav.doubts',   link: '/student/doubts' },
       { icon: 'psychology_alt',labelKey: 'nav.ai',       link: '/learn/doubt' }
     ]
@@ -67,6 +70,8 @@ const HUD_ROLE_THEMES: Record<HudRole, HudRoleTheme> = {
 const ROOT_PATHS = new Set([
   '/student/dashboard',
   '/student/inbox',
+  '/student/notes',
+  '/student/classroom',
   '/student/doubts',
   '/learn/subjects',
   '/learn/quiz',
@@ -87,17 +92,19 @@ const ROOT_PATHS = new Set([
   styleUrl: './hud-shell.component.css'
 })
 export class HudShellComponent implements OnInit {
-  private studentApi = inject(StudentApiService);
-  private auth       = inject(AuthService);
-  private location   = inject(Location);
-  private ws         = inject(InboxWebSocketService);
-  protected router   = inject(Router);
+  private studentApi   = inject(StudentApiService);
+  private auth         = inject(AuthService);
+  private location     = inject(Location);
+  private ws           = inject(InboxWebSocketService);
+  private classroomWs  = inject(ClassroomWsService);
+  protected router     = inject(Router);
 
   role       = signal<HudRole>(this.roleFromUrl(this.router.url));
   currentUrl = signal<string>(this.router.url.split('?')[0]);
 
   /** Unread inbox badge — shown on the Inbox nav item. */
-  inboxBadge = computed(() => this.ws.unreadCount());
+  inboxBadge     = computed(() => this.ws.unreadCount());
+  classroomBadge = computed(() => this.classroomWs.unreadCount());
 
   theme = computed(() => HUD_ROLE_THEMES[this.role()]);
 

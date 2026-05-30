@@ -1,0 +1,155 @@
+@if (loading()) {
+  <div class="flex items-center justify-center py-24">
+    <span class="material-symbols-outlined animate-spin text-3xl text-red-500">refresh</span>
+  </div>
+} @else if (note(); as n) {
+  <div class="max-w-3xl mx-auto pb-24">
+
+    <!-- Header bar -->
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div class="flex-1 min-w-0">
+        @if (editing()) {
+          <input type="text" [ngModel]="editTitle()" (ngModelChange)="editTitle.set($event)"
+                 class="w-full text-xl font-bold text-ink-900 border-b-2 border-red-400 focus:outline-none pb-1 bg-transparent">
+        } @else {
+          <h1 class="text-xl font-bold text-ink-900 leading-snug">{{ n.title }}</h1>
+        }
+        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span class="text-xs text-ink-400">{{ formatDate(n.updatedAt) }}</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full border font-semibold"
+                [class]="n.language === 'hi' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'">
+            {{ n.language === 'hi' ? 'हिन्दी' : 'EN' }}
+          </span>
+          @if (n.isEdited) {
+            <span class="text-[10px] text-ink-400 italic">edited</span>
+          }
+        </div>
+        @if (n.tags && n.tags.length > 0) {
+          <div class="flex flex-wrap gap-1 mt-2">
+            @for (tag of n.tags; track tag) {
+              <span class="text-[10px] px-2 py-0.5 bg-surface-2 text-ink-600 rounded-full border border-surface-3">{{ tag }}</span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center gap-1 shrink-0">
+        @if (!editing()) {
+          <button (click)="togglePin()"
+                  class="p-2 rounded-xl hover:bg-amber-50 transition-colors"
+                  [title]="(n.isPinned ? 'notes.unpin' : 'notes.pin') | translate">
+            <span class="material-symbols-outlined text-xl"
+                  [class]="n.isPinned ? 'text-amber-500' : 'text-ink-400'">
+              {{ n.isPinned ? 'keep' : 'push_pin' }}
+            </span>
+          </button>
+          <button (click)="startEdit()"
+                  class="p-2 rounded-xl hover:bg-blue-50 text-ink-400 hover:text-blue-600 transition-colors"
+                  [title]="'notes.edit' | translate">
+            <span class="material-symbols-outlined text-xl">edit</span>
+          </button>
+          <button (click)="openVersions()"
+                  class="p-2 rounded-xl hover:bg-surface-2 text-ink-400 transition-colors"
+                  [title]="'notes.versions' | translate">
+            <span class="material-symbols-outlined text-xl">history</span>
+          </button>
+          <button (click)="deleteNote()"
+                  class="p-2 rounded-xl hover:bg-red-50 text-ink-400 hover:text-red-600 transition-colors"
+                  [title]="'notes.delete' | translate">
+            <span class="material-symbols-outlined text-xl">delete</span>
+          </button>
+        } @else {
+          <button (click)="cancelEdit()"
+                  class="px-3 py-1.5 rounded-full text-sm text-ink-500 hover:bg-surface-2 transition-colors">
+            {{ 'notes.cancel' | translate }}
+          </button>
+          <button (click)="saveEdit()" [disabled]="saving()"
+                  class="px-4 py-1.5 rounded-full text-sm font-semibold bg-red-600 text-white
+                         hover:bg-red-700 disabled:opacity-50 transition-colors">
+            {{ saving() ? '…' : ('notes.save' | translate) }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-surface-3 mb-5">
+      <button (click)="tab.set('content')"
+              class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors"
+              [class]="tab() === 'content' ? 'border-red-600 text-red-600' : 'border-transparent text-ink-500 hover:text-ink-700'">
+        Note
+      </button>
+      <button (click)="openVersions()"
+              class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors"
+              [class]="tab() === 'versions' ? 'border-red-600 text-red-600' : 'border-transparent text-ink-500 hover:text-ink-700'">
+        {{ 'notes.versions' | translate }}
+      </button>
+    </div>
+
+    <!-- Content Tab -->
+    @if (tab() === 'content') {
+      @if (editing()) {
+        <textarea [ngModel]="editContent()" (ngModelChange)="editContent.set($event)"
+                  rows="20"
+                  class="w-full rounded-xl border border-surface-3 px-4 py-3 text-sm font-mono
+                         text-ink-900 resize-none focus:outline-none focus:ring-2 focus:ring-red-300">
+        </textarea>
+      } @else {
+        <article #contentEl
+                 class="prose prose-sm max-w-none text-ink-800 leading-relaxed
+                        [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-ink-900 [&_h1]:mt-6 [&_h1]:mb-3
+                        [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-ink-900 [&_h2]:mt-5 [&_h2]:mb-2
+                        [&_h3]:font-semibold [&_h3]:text-ink-900 [&_h3]:mt-4 [&_h3]:mb-2
+                        [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1
+                        [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1
+                        [&_li]:text-sm [&_p]:text-sm [&_p]:mb-3
+                        [&_strong]:font-bold [&_strong]:text-ink-900
+                        [&_pre]:bg-surface-2 [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:overflow-x-auto
+                        [&_code]:text-xs [&_code:not(pre_code)]:bg-surface-2 [&_code:not(pre_code)]:px-1.5 [&_code:not(pre_code)]:py-0.5 [&_code:not(pre_code)]:rounded
+                        [&_blockquote]:border-l-4 [&_blockquote]:border-red-300 [&_blockquote]:pl-4 [&_blockquote]:text-ink-600 [&_blockquote]:italic"
+                 [innerHTML]="renderedHtml()">
+        </article>
+      }
+
+      <!-- Related Notes -->
+      @if (related().length > 0) {
+        <div class="mt-8">
+          <h3 class="text-sm font-semibold text-ink-600 uppercase tracking-wide mb-3">{{ 'notes.related' | translate }}</h3>
+          <div class="flex flex-wrap gap-2">
+            @for (r of related(); track r.id) {
+              <button (click)="openRelated(r)"
+                      class="px-3 py-2 rounded-xl border border-surface-3 bg-white
+                             text-sm text-ink-700 hover:border-red-300 hover:text-red-700 transition-colors text-left">
+                {{ r.title }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Versions Tab -->
+    @if (tab() === 'versions') {
+      @if (versions().length === 0) {
+        <p class="text-sm text-ink-500 py-8 text-center">{{ 'notes.versions.empty' | translate }}</p>
+      } @else {
+        <div class="flex flex-col gap-3">
+          @for (v of versions(); track v.id) {
+            <div class="bg-white rounded-xl border border-surface-3 p-4 flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-ink-800">Version {{ v.versionNumber }}</p>
+                <p class="text-xs text-ink-400">{{ formatDate(v.editedAt) }}</p>
+              </div>
+              <button (click)="restoreVersion(v)"
+                      class="px-3 py-1.5 rounded-full border border-red-300 text-red-700 text-xs font-semibold
+                             hover:bg-red-50 transition-colors">
+                {{ 'notes.versions.restore' | translate }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+}

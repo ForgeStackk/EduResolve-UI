@@ -1,0 +1,194 @@
+<div class="min-h-screen pb-24">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold text-ink-900">{{ 'notes.title' | translate }}</h1>
+    <button (click)="showGenerate.set(true)"
+            [disabled]="limitReached()"
+            class="flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-sm
+                   bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed
+                   transition-colors shadow-sm">
+      <span class="material-symbols-outlined text-base leading-none">add</span>
+      {{ 'notes.generate' | translate }}
+    </button>
+  </div>
+
+  <!-- Daily usage chip -->
+  @if (stats()) {
+    <div class="mb-3 flex items-center gap-2">
+      <span class="px-3 py-1 rounded-full text-xs font-semibold border"
+            [class]="limitReached()
+              ? 'bg-red-50 text-red-700 border-red-200'
+              : 'bg-surface-2 text-ink-600 border-surface-3'">
+        @if (limitReached()) {
+          {{ 'notes.limitReached' | translate }}
+        } @else {
+          {{ 'notes.dailyUsed' | translate : { used: dailyUsed(), limit: dailyLimit() } }}
+        }
+      </span>
+    </div>
+
+    <!-- Warning banner at ≥75% usage -->
+    @if (showWarning()) {
+      <div class="mb-4 flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
+        <span class="material-symbols-outlined text-amber-600 text-xl shrink-0 mt-0.5">warning</span>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-amber-800">
+            {{ 'notes.warningTitle' | translate }}
+          </p>
+          <p class="text-xs text-amber-700 mt-0.5">
+            {{ 'notes.warningBanner' | translate : { used: dailyUsed(), limit: dailyLimit(), remaining: dailyRemaining() } }}
+          </p>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Tabs -->
+  <div class="flex border-b border-surface-3 mb-4">
+    <button (click)="setTab('library')"
+            class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors"
+            [class]="tab() === 'library' ? 'border-red-600 text-red-600' : 'border-transparent text-ink-500 hover:text-ink-700'">
+      {{ 'notes.tab.library' | translate }}
+    </button>
+    <button (click)="setTab('trash')"
+            class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors"
+            [class]="tab() === 'trash' ? 'border-red-600 text-red-600' : 'border-transparent text-ink-500 hover:text-ink-700'">
+      {{ 'notes.tab.trash' | translate }}
+    </button>
+  </div>
+
+  <!-- Library Tab -->
+  @if (tab() === 'library') {
+    <!-- Search -->
+    <div class="relative mb-4">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-base">search</span>
+      <input type="text"
+             [value]="search()"
+             (input)="onSearch($any($event.target).value)"
+             [placeholder]="'common.search' | translate"
+             class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-surface-3 bg-surface-2
+                    text-sm text-ink-900 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-red-300">
+    </div>
+
+    @if (loading()) {
+      <p class="text-center text-ink-500 py-12">{{ 'notes.loading' | translate }}</p>
+    } @else if (notes().length === 0) {
+      <div class="text-center py-16 text-ink-500">
+        <span class="material-symbols-outlined text-5xl text-ink-300 mb-3 block">edit_note</span>
+        <p class="text-sm">{{ 'notes.empty' | translate }}</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3">
+        @for (note of notes(); track note.id) {
+          <div (click)="openNote(note)"
+               class="bg-white rounded-2xl border border-surface-3 p-4 shadow-sm
+                      hover:border-red-300 hover:shadow-md transition-all cursor-pointer group">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  @if (note.isPinned) {
+                    <span class="material-symbols-outlined text-amber-500 text-sm">push_pin</span>
+                  }
+                  <span class="material-symbols-outlined text-ink-400 text-sm">{{ sourceIcon(note.sourceType) }}</span>
+                  <span class="text-[10px] uppercase tracking-wider text-ink-400 font-semibold">
+                    {{ 'notes.source.' + note.sourceType | translate }}
+                  </span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full border font-semibold"
+                        [class]="note.language === 'hi' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'">
+                    {{ note.language === 'hi' ? 'हिन्दी' : 'EN' }}
+                  </span>
+                </div>
+                <h3 class="font-semibold text-ink-900 truncate mb-1">{{ note.title }}</h3>
+                <p class="text-xs text-ink-500 line-clamp-2">{{ note.contentPreview }}</p>
+                @if (note.tags && note.tags.length > 0) {
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    @for (tag of note.tags.slice(0, 4); track tag) {
+                      <span class="text-[10px] px-2 py-0.5 bg-surface-2 text-ink-600 rounded-full border border-surface-3">
+                        {{ tag }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+              <!-- Actions -->
+              <div class="flex flex-col items-end gap-2 shrink-0">
+                <span class="text-xs text-ink-400">{{ formatDate(note.updatedAt) }}</span>
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button (click)="togglePin(note, $event)"
+                          class="p-1.5 rounded-lg hover:bg-amber-50 text-ink-400 hover:text-amber-600 transition-colors"
+                          [title]="(note.isPinned ? 'notes.unpin' : 'notes.pin') | translate">
+                    <span class="material-symbols-outlined text-base">{{ note.isPinned ? 'keep_off' : 'push_pin' }}</span>
+                  </button>
+                  <button (click)="deleteNote(note, $event)"
+                          class="p-1.5 rounded-lg hover:bg-red-50 text-ink-400 hover:text-red-600 transition-colors"
+                          [title]="'notes.delete' | translate">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="flex justify-center items-center gap-4 mt-6">
+          <button (click)="prevPage()" [disabled]="page() === 0"
+                  class="px-4 py-2 rounded-full border text-sm disabled:opacity-40 hover:bg-surface-2 transition-colors">
+            {{ 'common.previous' | translate }}
+          </button>
+          <span class="text-sm text-ink-500">{{ page() + 1 }} / {{ totalPages() }}</span>
+          <button (click)="nextPage()" [disabled]="page() === totalPages() - 1"
+                  class="px-4 py-2 rounded-full border text-sm disabled:opacity-40 hover:bg-surface-2 transition-colors">
+            {{ 'common.next' | translate }}
+          </button>
+        </div>
+      }
+    }
+  }
+
+  <!-- Trash Tab -->
+  @if (tab() === 'trash') {
+    @if (loading()) {
+      <p class="text-center text-ink-500 py-12">{{ 'notes.loading' | translate }}</p>
+    } @else if (trash().length === 0) {
+      <div class="text-center py-16 text-ink-500">
+        <span class="material-symbols-outlined text-5xl text-ink-300 mb-3 block">delete</span>
+        <p class="text-sm">{{ 'notes.emptyTrash' | translate }}</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3">
+        @for (note of trash(); track note.id) {
+          <div class="bg-white rounded-2xl border border-surface-3 p-4 shadow-sm opacity-75">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-ink-700 truncate mb-1">{{ note.title }}</h3>
+                @if (note.deletedAt) {
+                  <p class="text-xs text-ink-400">
+                    {{ 'notes.trash.deletedOn' | translate : { date: formatDate(note.deletedAt) } }}
+                    · {{ 'notes.trash.daysLeft' | translate : { days: 30 - daysInTrash(note.deletedAt) } }}
+                  </p>
+                }
+              </div>
+              <button (click)="restoreNote(note, $event)"
+                      class="shrink-0 px-3 py-1.5 rounded-full border border-green-300 text-green-700
+                             bg-green-50 text-xs font-semibold hover:bg-green-100 transition-colors">
+                {{ 'notes.restore' | translate }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Generate Note Overlay -->
+@if (showGenerate()) {
+  <app-generate-note
+    (cancel)="showGenerate.set(false)"
+    (done)="onGenerateDone()">
+  </app-generate-note>
+}

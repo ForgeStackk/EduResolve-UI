@@ -113,7 +113,26 @@
           {{ feedback() === 'down' ? ('doubt.feedbackLogged' | translate) : ('doubt.notHelpful' | translate) }}
         </button>
       </div>
+
+      <!-- Save as Note -->
+      <div class="pt-3 border-t border-surface-3">
+        <button type="button" (click)="saveAsNote()"
+                class="hud-btn-ghost w-full justify-center text-sm text-amber-400 border-amber-500/40 hover:border-amber-400 transition-colors">
+          <span class="material-symbols-outlined" style="font-size:16px">edit_note</span>
+          {{ 'doubt.saveAsNote' | translate }}
+        </button>
+      </div>
     </section>
+  }
+
+  <!-- Generate Note overlay -->
+  @if (showSaveNote()) {
+    <app-generate-note
+      [initialPrompt]="saveNotePrompt()"
+      [initialSourceType]="'TOPIC_INPUT'"
+      (cancel)="showSaveNote.set(false)"
+      (done)="showSaveNote.set(false)">
+    </app-generate-note>
   }
 
   <!-- Tips -->

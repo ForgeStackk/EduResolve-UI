@@ -82,6 +82,61 @@
     </div>
 
   <!-- =============================================================
+       NOTES STATS WIDGET
+       ============================================================= -->
+  @if (noteStats(); as ns) {
+    <div class="hud-card flex flex-col gap-3 overflow-hidden">
+      <div class="hud-accent" style="background:#f59e0b"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined fill text-amber-400">edit_note</span>
+          <h3 class="hud-display text-lg text-ink-900">{{ 'dashboard.notesStats.title' | translate }}</h3>
+        </div>
+        <a [routerLink]="['/student/notes']"
+           class="hud-caps text-amber-500/80 hover:text-amber-400 transition-colors"
+           style="text-decoration:none;font-size:10px">{{ 'dashboard.notesStats.viewAll' | translate }}</a>
+      </div>
+
+      <!-- Stat row -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface-2 border border-surface-3">
+          <span class="text-2xl font-bold text-ink-900 tabular-nums">{{ ns.totalNotes }}</span>
+          <span class="text-[10px] text-ink-400 font-semibold uppercase tracking-wide text-center">
+            {{ 'dashboard.notesStats.total' | translate }}
+          </span>
+        </div>
+        <div class="flex flex-col items-center gap-1 p-3 rounded-xl bg-amber-50 border border-amber-200">
+          <span class="text-2xl font-bold text-amber-700 tabular-nums">{{ ns.notesGeneratedToday }}</span>
+          <span class="text-[10px] text-amber-600 font-semibold uppercase tracking-wide text-center">
+            {{ 'dashboard.notesStats.today' | translate }}
+          </span>
+        </div>
+        <div class="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface-2 border border-surface-3">
+          <span class="text-2xl font-bold text-ink-900 tabular-nums">{{ ns.dailyLimitRemaining }}</span>
+          <span class="text-[10px] text-ink-400 font-semibold uppercase tracking-wide text-center">
+            {{ 'dashboard.notesStats.remaining' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Daily progress bar -->
+      <div>
+        <div class="flex justify-between text-[10px] text-ink-400 mb-1">
+          <span>{{ 'dashboard.notesStats.dailyProgress' | translate }}</span>
+          <span class="tabular-nums">{{ ns.notesGeneratedToday }}/{{ ns.notesGeneratedToday + ns.dailyLimitRemaining }}</span>
+        </div>
+        <div class="h-2 rounded-full bg-surface-3 overflow-hidden">
+          <div class="h-full rounded-full transition-all"
+               [style.width.%]="(ns.notesGeneratedToday / (ns.notesGeneratedToday + ns.dailyLimitRemaining)) * 100"
+               [style.background]="ns.dailyLimitRemaining === 0 ? '#dc2626' : ns.notesGeneratedToday >= (ns.notesGeneratedToday + ns.dailyLimitRemaining) * 0.75 ? '#f59e0b' : '#10b981'">
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- =============================================================
        STRATEGIC FOCUS: Subject Chips
        ============================================================= -->
   <section class="space-y-4">

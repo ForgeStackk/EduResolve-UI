@@ -30,6 +30,7 @@
     "angular-oauth2-oidc": "^20.0.2",
     "express": "^5.1.0",
     "marked": "^18.0.4",
+    "mermaid": "^11.4.1",
     "ng2-pdf-viewer": "^10.4.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

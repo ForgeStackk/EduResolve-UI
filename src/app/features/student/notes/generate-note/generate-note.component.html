@@ -1,0 +1,144 @@
+<!-- Full-screen overlay -->
+<div class="fixed inset-0 z-50 flex flex-col bg-white">
+
+  <!-- Top bar -->
+  <div class="flex items-center justify-between px-4 py-4 border-b border-surface-3 shrink-0">
+    <h2 class="font-bold text-lg text-ink-900">{{ 'notes.generate.title' | translate }}</h2>
+    @if (step() !== 'streaming') {
+      <button (click)="cancel.emit()"
+              class="p-2 rounded-full hover:bg-surface-2 text-ink-500 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    }
+  </div>
+
+  <!-- ── Step: source ──────────────────────────────────────────────────── -->
+  @if (step() === 'source') {
+    <div class="flex-1 overflow-y-auto px-4 py-6">
+      <p class="text-sm text-ink-600 mb-5 font-medium">{{ 'notes.generate.chooseSource' | translate }}</p>
+      <div class="grid grid-cols-3 gap-3">
+        @for (st of sourcetypes; track st.key) {
+          <button (click)="selectSource(st.key)"
+                  class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-surface-3
+                         hover:border-red-400 hover:bg-red-50 transition-all group">
+            <span class="material-symbols-outlined text-3xl text-ink-500 group-hover:text-red-600">{{ st.icon }}</span>
+            <span class="text-xs font-semibold text-ink-600 group-hover:text-red-700 text-center leading-tight">
+              {{ st.labelKey | translate }}
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── Step: input ───────────────────────────────────────────────────── -->
+  @if (step() === 'input') {
+    <div class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
+
+      <!-- Language selector -->
+      <div>
+        <label class="block text-xs font-semibold text-ink-600 uppercase tracking-wide mb-2">
+          {{ 'notes.generate.language' | translate }}
+        </label>
+        <div class="flex gap-2">
+          <button (click)="language.set('en')"
+                  class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
+                  [class]="language() === 'en' ? 'border-red-500 bg-red-50 text-red-700' : 'border-surface-3 text-ink-600 hover:border-red-300'">
+            English
+          </button>
+          <button (click)="language.set('hi')"
+                  class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
+                  [class]="language() === 'hi' ? 'border-red-500 bg-red-50 text-red-700' : 'border-surface-3 text-ink-600 hover:border-red-300'">
+            हिन्दी
+          </button>
+        </div>
+      </div>
+
+      <!-- Input based on source type -->
+      @if (sourceType() === 'PDF_UPLOAD') {
+        <div>
+          <label class="block text-xs font-semibold text-ink-600 uppercase tracking-wide mb-2">
+            {{ 'notes.generate.pdfUpload' | translate }}
+          </label>
+          <label class="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed
+                        border-surface-3 hover:border-red-400 cursor-pointer transition-colors bg-surface-2">
+            <span class="material-symbols-outlined text-4xl text-ink-400">upload_file</span>
+            <span class="text-sm text-ink-500">{{ pdfFile()?.name ?? 'Tap to select PDF' }}</span>
+            <input type="file" accept=".pdf" class="hidden" (change)="onPdfSelected($event)">
+          </label>
+          @if (pdfPolling()) {
+            <p class="text-sm text-amber-700 mt-3 flex items-center gap-2">
+              <span class="material-symbols-outlined animate-spin text-base">refresh</span>
+              {{ 'notes.generate.pdfProcessing' | translate }}
+            </p>
+          }
+          @if (pdfStatus()?.status === 'COMPLETED') {
+            <p class="text-sm text-green-700 mt-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">check_circle</span>
+              {{ pdfStatus()!.pageCount }} pages · {{ pdfStatus()!.characterCount }} chars extracted
+            </p>
+          }
+          @if (pdfStatus()?.status === 'FAILED') {
+            <p class="text-sm text-red-700 mt-3">{{ 'notes.generate.pdfFailed' | translate }}</p>
+          }
+        </div>
+      } @else {
+        <div>
+          <label class="block text-xs font-semibold text-ink-600 uppercase tracking-wide mb-2">
+            {{ 'notes.generate.prompt' | translate }}
+          </label>
+          <textarea [ngModel]="prompt()" (ngModelChange)="prompt.set($event)"
+                    [placeholder]="'notes.generate.promptHint' | translate"
+                    rows="5"
+                    class="w-full rounded-xl border border-surface-3 px-4 py-3 text-sm text-ink-900
+                           placeholder-ink-400 resize-none focus:outline-none focus:ring-2 focus:ring-red-300">
+          </textarea>
+        </div>
+      }
+
+      <button (click)="startGeneration()"
+              [disabled]="!canGenerate()"
+              class="w-full py-3.5 rounded-xl font-bold text-sm
+                     bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed
+                     transition-colors shadow-sm mt-auto">
+        {{ 'notes.generate.start' | translate }}
+      </button>
+    </div>
+  }
+
+  <!-- ── Step: streaming ───────────────────────────────────────────────── -->
+  @if (step() === 'streaming') {
+    <div class="flex-1 overflow-y-auto px-4 py-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="material-symbols-outlined animate-pulse text-red-600">auto_awesome</span>
+        <p class="text-sm font-semibold text-ink-700">{{ 'notes.generate.generating' | translate }}</p>
+      </div>
+      <div class="bg-surface-2 rounded-2xl p-4 min-h-[200px] text-sm text-ink-800 leading-relaxed
+                  whitespace-pre-wrap font-mono border border-surface-3">{{ streamContent() }}</div>
+    </div>
+  }
+
+  <!-- ── Step: done ────────────────────────────────────────────────────── -->
+  @if (step() === 'done') {
+    <div class="flex-1 flex flex-col items-center justify-center gap-4 px-4">
+      <span class="material-symbols-outlined text-6xl text-green-500">check_circle</span>
+      <p class="text-lg font-bold text-ink-900">{{ 'notes.generate.done' | translate }}</p>
+      <button (click)="finishAndClose()"
+              class="px-8 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">
+        {{ 'notes.tab.library' | translate }}
+      </button>
+    </div>
+  }
+
+  <!-- ── Step: error ───────────────────────────────────────────────────── -->
+  @if (step() === 'error') {
+    <div class="flex-1 flex flex-col items-center justify-center gap-4 px-4 text-center">
+      <span class="material-symbols-outlined text-5xl text-red-500">error</span>
+      <p class="text-sm text-red-700">{{ errorMsg() || ('notes.generate.error' | translate) }}</p>
+      <button (click)="retryGeneration()"
+              class="px-6 py-2.5 rounded-full border border-red-300 text-red-700 font-semibold hover:bg-red-50 transition-colors">
+        Retry
+      </button>
+    </div>
+  }
+</div>

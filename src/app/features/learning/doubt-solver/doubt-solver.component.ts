@@ -7,11 +7,12 @@ import { LanguageService } from '../../../core/i18n/language.service';
 import { SubjectCatalogService } from '../../../core/subject-catalog.service';
 import { ClassContextService } from '../../../core/class-context.service';
 import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
+import { GenerateNoteComponent } from '../../student/notes/generate-note/generate-note.component';
 
 @Component({
   selector: 'app-doubt-solver',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, MarkdownPipe],
+  imports: [CommonModule, FormsModule, TranslateModule, MarkdownPipe, GenerateNoteComponent],
   templateUrl: './doubt-solver.component.html',
   styleUrl: './doubt-solver.component.css'
 })
@@ -27,6 +28,8 @@ export class DoubtSolverComponent {
   loading         = signal(false);
   answer          = signal<DoubtAnswer | null>(null);
   feedback        = signal<'up' | 'down' | null>(null);
+  showSaveNote    = signal(false);
+  saveNotePrompt  = signal('');
 
   constructor() {
     this.catalog.load();
@@ -57,6 +60,14 @@ export class DoubtSolverComponent {
     if (a) {
       console.info('[doubt-solver] feedback', { answerId: a.id, verdict });
     }
+  }
+
+  saveAsNote(): void {
+    const a = this.answer();
+    if (!a) return;
+    const text = `Q: ${this.query.trim()}\n\nA: ${a.answer}`.slice(0, 2000);
+    this.saveNotePrompt.set(text);
+    this.showSaveNote.set(true);
   }
 
   back(): void {

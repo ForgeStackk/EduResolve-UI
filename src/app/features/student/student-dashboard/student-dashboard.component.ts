@@ -10,6 +10,7 @@ import { StudentApiService, StudentProfile } from '../../../core/api/student-api
 import { LearningApiService, Chapter, NcertBook } from '../../../core/api/learning-api.service';
 import { PerformanceApiService, WeakTopic } from '../../../core/api/performance-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { NotesApiService, NoteStats } from '../../../core/api/notes-api.service';
 import { StreakEngineService } from '../streak-engine.service';
 import { AiDoubtCenterComponent } from '../ai-doubt-center/ai-doubt-center.component';
 import { StudentInboxApiService, StudentInboxItem } from '../../../core/api/student-inbox-api.service';
@@ -76,6 +77,7 @@ export class StudentDashboardComponent implements OnInit {
   private router          = inject(Router);
   private http            = inject(HttpClient);
   private inboxApi        = inject(StudentInboxApiService);
+  private notesApi        = inject(NotesApiService);
   readonly streakEngine   = inject(StreakEngineService);
   readonly subjectCatalog = inject(SubjectCatalogService);
 
@@ -99,6 +101,7 @@ export class StudentDashboardComponent implements OnInit {
   // ---- UI state ----
   private completed     = signal<Record<number, boolean>>({});
   recentMessages        = signal<StudentInboxItem[]>([]);
+  noteStats             = signal<NoteStats | null>(null);
 
   // ---- Computed ----
   firstName = computed(() => this.studentName().split(' ')[0] || '');
@@ -211,6 +214,7 @@ export class StudentDashboardComponent implements OnInit {
       next: msgs => this.recentMessages.set(msgs),
       error: () => {}
     });
+    this.notesApi.stats().subscribe({ next: s => this.noteStats.set(s), error: () => {} });
   }
 
   private loadStudentProfile(studentId: number | undefined): void {
