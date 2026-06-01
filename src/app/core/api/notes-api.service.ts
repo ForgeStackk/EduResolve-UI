@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 export interface NoteListItem {
   id: number;
@@ -81,6 +82,7 @@ export interface PageResult<T> {
 @Injectable({ providedIn: 'root' })
 export class NotesApiService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
   private base = `${environment.apiBaseUrl}/student/notes`;
 
   list(params: {
@@ -173,7 +175,7 @@ export class NotesApiService {
     onDone: () => void;
     onError: (msg: string) => void;
   }): () => void {
-    const token = localStorage.getItem('edu_token') ?? '';
+    const token = this.auth.getToken() ?? '';
     const ctrl = new AbortController();
 
     fetch(`${this.base}/generate`, {
@@ -214,7 +216,7 @@ export class NotesApiService {
     language: string,
     handlers: { onDelta: (t: string) => void; onDone: () => void; onError: (m: string) => void }
   ): () => void {
-    const token = localStorage.getItem('edu_token') ?? '';
+    const token = this.auth.getToken() ?? '';
     const ctrl  = new AbortController();
     const form  = new FormData();
     form.append('image', file);
@@ -267,7 +269,7 @@ export class NotesApiService {
     language: string,
     handlers: { onDelta: (t: string) => void; onDone: () => void; onError: (m: string) => void }
   ): () => void {
-    const token = localStorage.getItem('edu_token') ?? '';
+    const token = this.auth.getToken() ?? '';
     const ctrl  = new AbortController();
     const form  = new FormData();
     form.append('audio', file);

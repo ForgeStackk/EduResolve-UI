@@ -67,8 +67,20 @@ export class GenerateNoteComponent implements OnInit, OnDestroy {
   inputError   = signal<string>('');
   isDragOver   = signal(false);
 
-  // Audio upload
-  audioFile = signal<File | null>(null);
+  // Audio upload / recording
+  audioFile    = signal<File | null>(null);
+  voiceTab     = signal<'record' | 'upload'>('record');
+  isRecording  = signal(false);
+  recordingSec = signal(0);
+
+  private mediaRecorder?: MediaRecorder;
+  private recordingChunks: Blob[] = [];
+  private recordingTimer?: ReturnType<typeof setInterval>;
+
+  readonly recordingTime = computed(() => {
+    const s = this.recordingSec();
+    return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+  });
 
   // ── Computed ─────────────────────────────────────────────────────────────
 
@@ -128,12 +140,17 @@ export class GenerateNoteComponent implements OnInit, OnDestroy {
   selectSource(key: string): void {
     const prev = this.sourceType();
     if (prev !== key) {
-      // Warn if user switches away with data entered
       this.prompt.set('');
       this.pdfFile.set(null); this.pdfStatus.set(null);
       this.photoFile.set(null); this.photoDataUrl.set('');
       this.audioFile.set(null);
       this.inputError.set('');
+    }
+    if (key === 'VOICE') {
+      this.mediaRecorder?.stop();
+      clearInterval(this.recordingTimer);
+      this.isRecording.set(false);
+      this.voiceTab.set('record');
     }
     this.sourceType.set(key);
     this.step.set('input');
@@ -235,6 +252,34 @@ export class GenerateNoteComponent implements OnInit, OnDestroy {
     this.inputError.set('');
   }
 
+  async startRecording(): Promise<void> {
+    this.inputError.set('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.recordingChunks = [];
+      this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      this.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) this.recordingChunks.push(e.data); };
+      this.mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(this.recordingTimer);
+        const blob = new Blob(this.recordingChunks, { type: 'audio/webm' });
+        const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'audio/webm' });
+        this.audioFile.set(file);
+        this.isRecording.set(false);
+      };
+      this.mediaRecorder.start();
+      this.isRecording.set(true);
+      this.recordingSec.set(0);
+      this.recordingTimer = setInterval(() => this.recordingSec.update(s => s + 1), 1000);
+    } catch {
+      this.inputError.set('Microphone access denied. Please allow microphone permission and try again.');
+    }
+  }
+
+  stopRecording(): void {
+    this.mediaRecorder?.stop();
+  }
+
   formatFileSize(bytes: number): string {
     return bytes > 1_048_576
       ? (bytes / 1_048_576).toFixed(1) + ' MB'
@@ -301,5 +346,7 @@ export class GenerateNoteComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.cancelStream?.();
     clearInterval(this.pollTimer);
+    this.mediaRecorder?.stop();
+    clearInterval(this.recordingTimer);
   }
 }

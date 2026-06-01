@@ -1,7 +1,14 @@
-<div class="fixed inset-0 z-50 flex flex-col bg-white">
+<div class="fixed inset-0 z-[100] flex flex-col bg-white">
 
   <!-- ── Top bar ───────────────────────────────────────────────────────────── -->
   <div class="flex items-center gap-2 px-4 py-4 border-b border-surface-3 shrink-0">
+    @if (step() === 'source') {
+      <button (click)="cancel.emit()"
+              aria-label="Back"
+              class="p-2 rounded-full hover:bg-surface-2 text-ink-500 transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-red-300">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+    }
     @if (step() === 'input') {
       <button (click)="goBackToSource()"
               aria-label="Back to source selection"
@@ -96,6 +103,20 @@
               <span class="material-symbols-outlined text-base">check_circle</span>
               {{ pdfStatus()!.pageCount }} pages extracted
             </p>
+            <button (click)="startGeneration()"
+                    [disabled]="isGenerating()"
+                    class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
+                           font-bold text-sm bg-red-600 text-white hover:bg-red-700
+                           transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400
+                           disabled:opacity-40 disabled:cursor-not-allowed">
+              @if (isGenerating()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                Generating…
+              } @else {
+                <span class="material-symbols-outlined text-base">auto_awesome</span>
+                Generate Notes from PDF
+              }
+            </button>
           }
           @if (pdfStatus()?.status === 'FAILED') {
             <p class="text-sm text-red-600">{{ 'notes.generate.pdfFailed' | translate }}</p>
@@ -158,6 +179,22 @@
                 </div>
               </div>
             </div>
+
+            <!-- Generate CTA -->
+            <button (click)="startGeneration()"
+                    [disabled]="isGenerating()"
+                    class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
+                           font-bold text-sm bg-red-600 text-white hover:bg-red-700
+                           transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400
+                           disabled:opacity-40 disabled:cursor-not-allowed">
+              @if (isGenerating()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                Generating…
+              } @else {
+                <span class="material-symbols-outlined text-base">auto_awesome</span>
+                Generate Notes from Image
+              }
+            </button>
           }
 
           <!-- Inline error — never a toast -->
@@ -172,15 +209,68 @@
       <!-- Audio / Voice -->
       } @else if (sourceType() === 'VOICE') {
         <div class="flex flex-col gap-3">
-          <label class="block text-xs font-semibold text-ink-500 uppercase tracking-wide">
-            Upload Audio Recording
-          </label>
 
+          <!-- Record / Upload tabs -->
           @if (!audioFile()) {
+            <div class="flex gap-2">
+              <button (click)="voiceTab.set('record')"
+                      class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all
+                             focus:outline-none focus:ring-2 focus:ring-red-300"
+                      [class]="voiceTab() === 'record'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-surface-3 text-ink-600 hover:border-red-300'">
+                Record Now
+              </button>
+              <button (click)="voiceTab.set('upload')"
+                      class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all
+                             focus:outline-none focus:ring-2 focus:ring-red-300"
+                      [class]="voiceTab() === 'upload'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-surface-3 text-ink-600 hover:border-red-300'">
+                Upload File
+              </button>
+            </div>
+          }
+
+          <!-- Record tab -->
+          @if (!audioFile() && voiceTab() === 'record') {
+            @if (!isRecording()) {
+              <div class="flex flex-col items-center justify-center gap-4 p-10 rounded-2xl
+                          border-2 border-surface-3 bg-surface-2">
+                <button (click)="startRecording()"
+                        class="w-20 h-20 rounded-full bg-red-600 text-white
+                               flex items-center justify-center shadow-lg
+                               hover:bg-red-700 active:scale-95 transition-all
+                               focus:outline-none focus:ring-4 focus:ring-red-300">
+                  <span class="material-symbols-outlined text-4xl">mic</span>
+                </button>
+                <p class="text-sm font-medium text-ink-600">Tap to start recording</p>
+              </div>
+            } @else {
+              <div class="flex flex-col items-center justify-center gap-4 p-10 rounded-2xl
+                          border-2 border-red-200 bg-red-50">
+                <div class="relative w-20 h-20 flex items-center justify-center">
+                  <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-50 animate-ping"></span>
+                  <button (click)="stopRecording()"
+                          class="relative w-20 h-20 rounded-full bg-red-600 text-white
+                                 flex items-center justify-center shadow-lg
+                                 hover:bg-red-700 active:scale-95 transition-all
+                                 focus:outline-none focus:ring-4 focus:ring-red-300">
+                    <span class="material-symbols-outlined text-4xl">stop</span>
+                  </button>
+                </div>
+                <p class="text-2xl font-bold text-red-700 tabular-nums">{{ recordingTime() }}</p>
+                <p class="text-xs text-red-500">Tap to stop recording</p>
+              </div>
+            }
+          }
+
+          <!-- Upload tab -->
+          @if (!audioFile() && voiceTab() === 'upload') {
             <label class="flex flex-col items-center justify-center gap-3 p-10 rounded-2xl
                           border-2 border-dashed border-surface-3 hover:border-red-400
                           cursor-pointer transition-colors bg-surface-2">
-              <span class="material-symbols-outlined text-5xl text-ink-400">mic</span>
+              <span class="material-symbols-outlined text-5xl text-ink-400">upload_file</span>
               <div class="text-center">
                 <p class="text-sm font-medium text-ink-600">Tap to browse audio files</p>
                 <p class="text-xs text-ink-400 mt-1">MP3, WAV, MP4, WebM · max 25 MB</p>
@@ -188,26 +278,37 @@
               <input type="file" accept="audio/mpeg,audio/wav,audio/mp4,audio/webm,audio/ogg"
                      class="hidden" (change)="onAudioSelected($event)">
             </label>
-          } @else {
+          }
+
+          <!-- Audio ready (recorded or uploaded) -->
+          @if (audioFile()) {
             <div class="flex gap-3 p-3 rounded-2xl border border-surface-3 bg-surface-2 items-center">
               <span class="material-symbols-outlined text-3xl text-red-600 shrink-0">audio_file</span>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-ink-800 truncate">{{ audioFile()!.name }}</p>
                 <p class="text-xs text-ink-400 mt-0.5">{{ formatFileSize(audioFile()!.size) }}</p>
               </div>
-              <div class="flex gap-2 shrink-0">
-                <label class="text-xs text-red-700 font-semibold cursor-pointer hover:underline">
-                  Replace
-                  <input type="file" accept="audio/mpeg,audio/wav,audio/mp4,audio/webm,audio/ogg"
-                         class="hidden" (change)="onAudioSelected($event)">
-                </label>
-                <span class="text-ink-300">·</span>
-                <button (click)="removeAudio()"
-                        class="text-xs text-ink-500 hover:text-red-600 transition-colors">
-                  Remove
-                </button>
-              </div>
+              <button (click)="removeAudio()"
+                      class="text-xs text-ink-500 hover:text-red-600 shrink-0 transition-colors">
+                Remove
+              </button>
             </div>
+
+            <!-- Generate CTA -->
+            <button (click)="startGeneration()"
+                    [disabled]="isGenerating()"
+                    class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
+                           font-bold text-sm bg-red-600 text-white hover:bg-red-700
+                           transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400
+                           disabled:opacity-40 disabled:cursor-not-allowed">
+              @if (isGenerating()) {
+                <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+                Generating…
+              } @else {
+                <span class="material-symbols-outlined text-base">auto_awesome</span>
+                Generate Notes from Audio
+              }
+            </button>
           }
 
           @if (inputError()) {
@@ -254,26 +355,31 @@
 
     </div><!-- /scrollable area -->
 
-    <!-- ── Sticky Generate button ──────────────────────────────────────────── -->
-    <div class="shrink-0 px-4 py-4 bg-white border-t border-surface-3">
-      <button (click)="startGeneration()"
-              [disabled]="!inputValid() || isGenerating()"
-              [attr.title]="disabledReason()"
-              [attr.aria-label]="generateAriaLabel()"
-              class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
-                     font-bold text-sm transition-colors shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-              [class]="inputValid() && !isGenerating()
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-surface-2 text-ink-400 cursor-not-allowed'">
-        @if (isGenerating()) {
-          <span class="material-symbols-outlined text-base animate-spin">refresh</span>
-          Generating…
-        } @else {
-          {{ 'notes.generate.start' | translate }}
+    <!-- ── Sticky Generate button — text sources only ───────────────────────── -->
+    @if (sourceType() !== 'VOICE' && sourceType() !== 'PHOTO_OCR' && sourceType() !== 'PDF_UPLOAD') {
+      <div class="shrink-0 px-4 py-4 bg-white border-t border-surface-3">
+        <button (click)="startGeneration()"
+                [disabled]="!inputValid() || isGenerating()"
+                [attr.title]="disabledReason()"
+                [attr.aria-label]="generateAriaLabel()"
+                class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
+                       font-bold text-sm transition-colors shadow-sm
+                       focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                [class]="inputValid() && !isGenerating()
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-surface-2 text-ink-400 cursor-not-allowed'">
+          @if (isGenerating()) {
+            <span class="material-symbols-outlined text-base animate-spin">refresh</span>
+            Generating…
+          } @else {
+            {{ 'notes.generate.start' | translate }}
+          }
+        </button>
+        @if (!inputValid() && !isGenerating()) {
+          <p class="text-center text-xs text-ink-400 mt-2">{{ disabledReason() }}</p>
         }
-      </button>
-    </div>
+      </div>
+    }
   }
 
   <!-- ── Step: streaming ───────────────────────────────────────────────────── -->
