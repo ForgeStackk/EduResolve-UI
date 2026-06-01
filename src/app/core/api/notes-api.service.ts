@@ -167,7 +167,7 @@ export class NotesApiService {
   /** Returns an AbortController cancel fn. Calls onDelta for each token, onDone(noteId) when complete. */
   generateStream(req: {
     sourceType: string; language: string; prompt?: string;
-    subjectId?: number; pdfJobId?: number; noteLength?: string;
+    subjectId?: number; pdfJobId?: number; noteLength?: string; photoUrl?: string;
   }, handlers: {
     onDelta: (token: string) => void;
     onDone: () => void;
@@ -206,5 +206,132 @@ export class NotesApiService {
     });
 
     return () => ctrl.abort();
+  }
+
+  /** POST /from-image — multipart image → OCR → SSE stream (same shape as generateStream). */
+  generateFromImage(
+    file: File,
+    language: string,
+    handlers: { onDelta: (t: string) => void; onDone: () => void; onError: (m: string) => void }
+  ): () => void {
+    const token = localStorage.getItem('edu_token') ?? '';
+    const ctrl  = new AbortController();
+    const form  = new FormData();
+    form.append('image', file);
+    form.append('language', language);
+
+    fetch(`${this.base}/from-image`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }, // no Content-Type — browser sets boundary for multipart
+      body: form,
+      signal: ctrl.signal
+    }).then(async res => {
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        const errorCode = this.parseFileErrorCode(text, res.status, 'image');
+        handlers.onError(errorCode);
+        return;
+      }
+      const reader  = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim();
+            if (!data) continue;
+            if (data.startsWith('ERROR:')) {
+              handlers.onError(this.parseFileErrorCode(data.slice(6), 0, 'image'));
+              return;
+            }
+            handlers.onDelta(data);
+          }
+        }
+      }
+      handlers.onDone();
+    }).catch(err => {
+      if (err.name !== 'AbortError') handlers.onError('Connection lost');
+    });
+
+    return () => ctrl.abort();
+  }
+
+  /** POST /from-audio — multipart audio → Whisper transcription → SSE stream. */
+  generateFromAudio(
+    file: File,
+    language: string,
+    handlers: { onDelta: (t: string) => void; onDone: () => void; onError: (m: string) => void }
+  ): () => void {
+    const token = localStorage.getItem('edu_token') ?? '';
+    const ctrl  = new AbortController();
+    const form  = new FormData();
+    form.append('audio', file);
+    form.append('language', language);
+
+    fetch(`${this.base}/from-audio`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: form,
+      signal: ctrl.signal
+    }).then(async res => {
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        handlers.onError(this.parseFileErrorCode(text, res.status, 'audio'));
+        return;
+      }
+      const reader  = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim();
+            if (!data) continue;
+            if (data.startsWith('ERROR:')) {
+              handlers.onError(this.parseFileErrorCode(data.slice(6), 0, 'audio'));
+              return;
+            }
+            handlers.onDelta(data);
+          }
+        }
+      }
+      handlers.onDone();
+    }).catch(err => {
+      if (err.name !== 'AbortError') handlers.onError('Connection lost');
+    });
+
+    return () => ctrl.abort();
+  }
+
+  private parseFileErrorCode(body: string, status: number, kind: 'image' | 'audio'): string {
+    const map: Record<string, string> = {
+      OCR_EMPTY:           "We couldn't read any text from this image. Try a clearer photo.",
+      OCR_LOW_CONFIDENCE:  "The image was unclear. Try a higher-quality photo.",
+      TRANSCRIPTION_FAILED:"We couldn't transcribe this audio. Try a clearer recording or different format.",
+      UNSUPPORTED_FORMAT:  kind === 'audio'
+                             ? 'Unsupported format. Use MP3, WAV, MP4, or WebM audio.'
+                             : 'Unsupported format. Use JPG, PNG, or WEBP.',
+      FILE_TOO_LARGE:      kind === 'audio' ? 'Audio must be under 25 MB.' : 'Image must be under 10 MB.',
+      GENERATION_FAILED:   'Generation failed. Please try again.',
+    };
+    try {
+      const parsed = JSON.parse(body);
+      const code = parsed.errorCode ?? parsed.error ?? '';
+      return map[code] ?? `Error ${status}: ${code || 'Generation failed'}`;
+    } catch {
+      return status === 413 ? map['FILE_TOO_LARGE']
+           : status === 415 ? map['UNSUPPORTED_FORMAT']
+           : `Error ${status}`;
+    }
   }
 }

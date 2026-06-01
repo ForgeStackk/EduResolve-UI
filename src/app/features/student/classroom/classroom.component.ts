@@ -10,12 +10,12 @@ import { Router } from '@angular/router';
 
 import {
   ClassroomApiService,
-  ClassroomInfo, SubjectRoom, ClassroomMessage, ClassroomMember
+  ClassroomInfo, SubjectRoom, ClassroomMessage, ClassroomMember, StudyGroup, GroupMember
 } from '../../../core/api/classroom-api.service';
 import { ClassroomWsService, ClassroomEvent } from './classroom-ws.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
-type Panel = 'chat' | 'members' | 'pinned';
+type Panel = 'chat' | 'members' | 'pinned' | 'groups';
 
 @Component({
   selector: 'app-classroom',
@@ -51,6 +51,32 @@ export class ClassroomComponent implements OnInit, OnDestroy, AfterViewChecked {
   error               = signal('');
 
   replyTo = signal<ClassroomMessage | null>(null);
+
+  // ── Study groups state ────────────────────────────────────────────────────
+  groups           = signal<StudyGroup[]>([]);
+  groupsLoading    = signal(false);
+  activeGroup      = signal<StudyGroup | null>(null);
+
+  // Create/edit modal
+  showGroupModal   = signal(false);
+  groupModalMode   = signal<'create' | 'manage'>('create');
+  groupName        = signal('');
+  groupDescription = signal('');
+  groupError       = signal('');
+  groupSaving      = signal(false);
+  memberSearch     = signal('');
+  selectedIds      = signal<Set<number>>(new Set());
+  showDeleteConfirm = signal(false);
+
+  readonly filteredMembers = computed(() => {
+    const q = this.memberSearch().toLowerCase();
+    const myId = this.currentUserId();
+    return this.members().filter(m =>
+      m.userId !== myId && m.name.toLowerCase().includes(q)
+    );
+  });
+
+  readonly selectedCount = computed(() => this.selectedIds().size);
 
   readonly QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🙏', '🔥'];
 
@@ -242,6 +268,142 @@ export class ClassroomComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   openNoteDetail(noteId: number): void {
     this.router.navigate(['/student/notes', noteId]);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/student/dashboard']);
+  }
+
+  // ── Groups panel ──────────────────────────────────────────────────────────
+
+  showGroups(): void {
+    this.panel.set('groups');
+    const cr = this.classroom();
+    if (cr && this.groups().length === 0) this.loadGroups(cr.id);
+    // Ensure member list is loaded for the create-group modal member picker
+    if (this.members().length === 0 && cr) {
+      this.api.getMembers(cr.id).subscribe({ next: m => this.members.set(m), error: () => {} });
+    }
+  }
+
+  private loadGroups(classroomId: number): void {
+    this.groupsLoading.set(true);
+    this.api.listGroups(classroomId).subscribe({
+      next: g => { this.groups.set(g); this.groupsLoading.set(false); },
+      error: () => this.groupsLoading.set(false)
+    });
+  }
+
+  openCreateGroup(): void {
+    this.groupModalMode.set('create');
+    this.groupName.set('');
+    this.groupDescription.set('');
+    this.selectedIds.set(new Set());
+    this.memberSearch.set('');
+    this.groupError.set('');
+    this.activeGroup.set(null);
+    this.showGroupModal.set(true);
+  }
+
+  openManageGroup(g: StudyGroup): void {
+    this.activeGroup.set(g);
+    this.groupModalMode.set('manage');
+    this.groupName.set(g.name);
+    this.groupDescription.set(g.description ?? '');
+    this.groupError.set('');
+    this.showDeleteConfirm.set(false);
+    this.showGroupModal.set(true);
+  }
+
+  closeGroupModal(): void {
+    this.showGroupModal.set(false);
+    this.showDeleteConfirm.set(false);
+    this.groupError.set('');
+  }
+
+  toggleMember(userId: number): void {
+    this.selectedIds.update(s => {
+      const next = new Set(s);
+      next.has(userId) ? next.delete(userId) : next.add(userId);
+      return next;
+    });
+  }
+
+  submitCreateGroup(): void {
+    const cr = this.classroom();
+    if (!cr) return;
+    const name = this.groupName().trim();
+    if (!name) { this.groupError.set('Group name is required.'); return; }
+    if (this.selectedIds().size === 0) { this.groupError.set('Select at least one classmate.'); return; }
+
+    this.groupSaving.set(true);
+    this.groupError.set('');
+    this.api.createGroup(cr.id, {
+      name,
+      description: this.groupDescription().trim() || undefined,
+      memberUserIds: [...this.selectedIds()]
+    }).subscribe({
+      next: g => {
+        this.groups.update(gs => [g, ...gs]);
+        this.groupSaving.set(false);
+        this.closeGroupModal();
+      },
+      error: (e) => {
+        this.groupError.set(e?.error?.message ?? 'Failed to create group. Try again.');
+        this.groupSaving.set(false);
+      }
+    });
+  }
+
+  submitUpdateGroup(): void {
+    const cr = this.classroom();
+    const g  = this.activeGroup();
+    if (!cr || !g) return;
+    const name = this.groupName().trim();
+    if (!name) { this.groupError.set('Group name is required.'); return; }
+
+    this.groupSaving.set(true);
+    this.api.updateGroup(cr.id, g.id, {
+      name,
+      description: this.groupDescription().trim() || undefined
+    }).subscribe({
+      next: updated => {
+        this.groups.update(gs => gs.map(x => x.id === updated.id ? updated : x));
+        this.groupSaving.set(false);
+        this.closeGroupModal();
+      },
+      error: () => { this.groupError.set('Failed to update. Try again.'); this.groupSaving.set(false); }
+    });
+  }
+
+  confirmDeleteGroup(): void { this.showDeleteConfirm.set(true); }
+
+  executeDeleteGroup(): void {
+    const cr = this.classroom();
+    const g  = this.activeGroup();
+    if (!cr || !g) return;
+    this.groupSaving.set(true);
+    this.api.deleteGroup(cr.id, g.id).subscribe({
+      next: () => {
+        this.groups.update(gs => gs.filter(x => x.id !== g.id));
+        this.groupSaving.set(false);
+        this.closeGroupModal();
+      },
+      error: () => { this.groupError.set('Failed to delete. Try again.'); this.groupSaving.set(false); }
+    });
+  }
+
+  removeMemberFromGroup(g: StudyGroup, userId: number): void {
+    const cr = this.classroom();
+    if (!cr) return;
+    this.api.removeGroupMember(cr.id, g.id, userId).subscribe({
+      next: () => {
+        const updated: StudyGroup = { ...g, members: g.members.filter(m => m.userId !== userId) };
+        this.groups.update(gs => gs.map(x => x.id === g.id ? updated : x));
+        if (this.activeGroup()?.id === g.id) this.activeGroup.set(updated);
+      },
+      error: () => {}
+    });
   }
 
   // ── WebSocket ─────────────────────────────────────────────────────────────

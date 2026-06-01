@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
@@ -13,8 +13,11 @@ import { GenerateNoteComponent } from '../generate-note/generate-note.component'
   templateUrl: './notes-library.component.html'
 })
 export class NotesLibraryComponent implements OnInit {
-  private api    = inject(NotesApiService);
-  private router = inject(Router);
+  private api      = inject(NotesApiService);
+  private router   = inject(Router);
+  private location = inject(Location);
+
+  goBack(): void { this.location.back(); }
 
   tab        = signal<'library' | 'trash'>('library');
   notes      = signal<NoteListItem[]>([]);

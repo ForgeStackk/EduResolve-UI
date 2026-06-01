@@ -21,7 +21,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     'Pragma': 'no-cache',
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  const authReq = req.clone({ setHeaders: headers });
+
+  // Bust browser HTTP cache for GET requests — Fetch API ignores Cache-Control
+  // request headers on its own cache layer, so a unique URL param is required.
+  const bust = req.method === 'GET'
+    ? req.clone({ setHeaders: headers, params: req.params.set('_t', Date.now().toString()) })
+    : req.clone({ setHeaders: headers });
+  const authReq = bust;
 
   return next(authReq).pipe(
     catchError(err => {

@@ -59,6 +59,24 @@ export interface ClassroomMember {
   joinedAt: string;
 }
 
+export interface GroupMember {
+  userId: number;
+  name: string;
+  isOwner: boolean;
+}
+
+export interface StudyGroup {
+  id: number;
+  classroomId: number;
+  name: string;
+  description: string | null;
+  ownerUserId: number;
+  ownerName: string;
+  isOwner: boolean;
+  members: GroupMember[];
+  createdAt: string;
+}
+
 export interface PageResult<T> {
   content: T[];
   totalElements: number;
@@ -147,5 +165,31 @@ export class ClassroomApiService {
 
   reportMessage(classroomId: number, messageId: number, reason: string): Observable<void> {
     return this.http.post<void>(`${this.base}/${classroomId}/messages/${messageId}/report`, { reason });
+  }
+
+  // ── Study groups ──────────────────────────────────────────────────────────
+
+  createGroup(classroomId: number, body: { name: string; description?: string; memberUserIds: number[] }): Observable<StudyGroup> {
+    return this.http.post<StudyGroup>(`${this.base}/${classroomId}/groups`, body);
+  }
+
+  listGroups(classroomId: number): Observable<StudyGroup[]> {
+    return this.http.get<StudyGroup[]>(`${this.base}/${classroomId}/groups`);
+  }
+
+  updateGroup(classroomId: number, groupId: number, body: { name?: string; description?: string }): Observable<StudyGroup> {
+    return this.http.put<StudyGroup>(`${this.base}/${classroomId}/groups/${groupId}`, body);
+  }
+
+  addGroupMembers(classroomId: number, groupId: number, memberUserIds: number[]): Observable<void> {
+    return this.http.post<void>(`${this.base}/${classroomId}/groups/${groupId}/members`, memberUserIds);
+  }
+
+  removeGroupMember(classroomId: number, groupId: number, userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${classroomId}/groups/${groupId}/members/${userId}`);
+  }
+
+  deleteGroup(classroomId: number, groupId: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${classroomId}/groups/${groupId}`);
   }
 }

@@ -175,12 +175,23 @@
   <div class="menu-overlay" *ngIf="showShareMenu || showMoreMenu" (click)="closeMenus()"></div>
 
   <!-- Floating Action Button (when toolbar hidden) -->
-  <button 
-    *ngIf="!showToolbar" 
+  <button
+    *ngIf="!showToolbar"
     (click)="toggleToolbar()"
     class="fab-button"
     title="Show Controls">
     <span class="material-symbols-outlined">menu</span>
+  </button>
+
+  <!-- Generate Notes FAB -->
+  <button
+    *ngIf="isLoaded && !showGenerateNotes"
+    (click)="showGenerateNotes = true; $event.stopPropagation()"
+    class="fixed bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full
+           bg-red-600 text-white font-semibold text-sm shadow-lg hover:bg-red-700 transition-colors"
+    title="Generate Notes">
+    <span class="material-symbols-outlined text-base leading-none">auto_awesome</span>
+    Generate Notes
   </button>
 
   <!-- Progress Bar -->
@@ -202,3 +213,12 @@
     </div>
   </div>
 </div>
+
+<!-- Generate Notes overlay (outside the pdf-viewer-container so it sits on top) -->
+<app-generate-note
+  *ngIf="showGenerateNotes"
+  [initialSourceType]="'CHAPTER'"
+  [initialPrompt]="title()"
+  (cancel)="showGenerateNotes = false"
+  (done)="showGenerateNotes = false">
+</app-generate-note>

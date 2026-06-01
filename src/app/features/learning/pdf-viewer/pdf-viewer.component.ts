@@ -7,11 +7,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { GenerateNoteComponent } from '../../student/notes/generate-note/generate-note.component';
 
 @Component({
   selector: 'app-pdf-viewer',
   standalone: true,
-  imports: [CommonModule, FormsModule, PdfViewerModule, TranslateModule, NgIf],
+  imports: [CommonModule, FormsModule, PdfViewerModule, TranslateModule, NgIf, GenerateNoteComponent],
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.css']
 })
@@ -65,6 +66,8 @@ export class PdfViewerComponent implements OnInit {
   // Reading progress
   readingProgress: number = 0;
   
+  showGenerateNotes = false;
+
   // Text selection mode
   textSelectionMode: boolean = false;
   

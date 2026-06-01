@@ -2,7 +2,13 @@
 
   <!-- Header -->
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold text-ink-900">{{ 'notes.title' | translate }}</h1>
+    <div class="flex items-center gap-2">
+      <button (click)="goBack()"
+              class="p-2 rounded-full hover:bg-surface-2 text-ink-500 transition-colors -ml-2">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="text-2xl font-bold text-ink-900">{{ 'notes.title' | translate }}</h1>
+    </div>
     <button (click)="showGenerate.set(true)"
             [disabled]="limitReached()"
             class="flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-sm
