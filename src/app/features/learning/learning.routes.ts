@@ -34,6 +34,10 @@ export const LEARNING_ROUTES: Routes = [
     loadComponent: () => import('./quiz-runner/quiz-runner.component').then(m => m.QuizRunnerComponent)
   },
   {
+    path: 'notes',
+    loadComponent: () => import('./notes-coming-soon/notes-coming-soon.component').then(m => m.NotesComingSoonComponent)
+  },
+  {
     path: 'pyqs',
     loadComponent: () => import('./pyq-list/pyq-list.component').then(m => m.PyqListComponent)
   },
