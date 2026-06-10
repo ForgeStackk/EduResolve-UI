@@ -3,7 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
-import { firstValueFrom, Observable, tap, map } from 'rxjs';
+import { firstValueFrom, Observable, tap, map, catchError, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'edu_token';
@@ -41,10 +42,15 @@ export const MOCK_STUDENT_PROFILE = {
   topPercentage: 3
 } as const;
 
+const _origin = typeof window !== 'undefined' ? window.location.origin : '';
+const _issuer = environment.keycloakIssuer.startsWith('/')
+  ? _origin + environment.keycloakIssuer
+  : environment.keycloakIssuer;
+
 const oidcConfig: AuthConfig = {
-  issuer: environment.keycloakIssuer,
+  issuer: _issuer,
   clientId: environment.keycloakClientId,
-  redirectUri: typeof window !== 'undefined' ? window.location.origin : '',
+  redirectUri: _origin,
   responseType: 'code',
   scope: 'openid profile email',
   showDebugInformation: !environment.production,
@@ -96,7 +102,6 @@ export class AuthService {
       password,
     }).pipe(
       tap(res => {
-        if (!res.success) throw new Error(res.message ?? 'Login failed');
         localStorage.setItem(TOKEN_KEY, res.token);
         const user: User = {
           id:          String(res.id),
@@ -115,7 +120,11 @@ export class AuthService {
         this.currentUser.set(user);
         localStorage.setItem('user', JSON.stringify(user));
       }),
-      map(() => void 0)
+      map(() => void 0),
+      catchError((err: HttpErrorResponse) => {
+        const message = err.error?.message ?? err.error?.error ?? 'Invalid credentials.';
+        return throwError(() => ({ error: { message } }));
+      })
     );
   }
 

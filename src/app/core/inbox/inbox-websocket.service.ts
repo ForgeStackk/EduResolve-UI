@@ -28,7 +28,7 @@ export class InboxWebSocketService implements OnDestroy {
    * Call once after login. Connects to the STOMP endpoint and subscribes to
    * /topic/inbox/{recipientId}  (recipientId = student or parent portal UUID).
    */
-  connect(recipientId: string): void {
+  connect(recipientId: string, jwtToken?: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.disconnect();
 
@@ -36,8 +36,12 @@ export class InboxWebSocketService implements OnDestroy {
       .replace('/api', '/ws/websocket')
       .replace(/^http/, 'ws');
 
+    const connectHeaders: Record<string, string> = {};
+    if (jwtToken) connectHeaders['Authorization'] = `Bearer ${jwtToken}`;
+
     this.client = new Client({
       brokerURL: wsUrl,
+      connectHeaders,
       reconnectDelay: 5000,
       onConnect: () => {
         this.client!.subscribe(`/topic/inbox/${recipientId}`, (frame: IMessage) => {

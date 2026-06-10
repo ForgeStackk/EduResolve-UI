@@ -178,7 +178,7 @@ export class AdminApiService {
   }
 
   createBroadcast(data: {
-    channels: string;
+    channels: string | string[];
     classId: string | null;
     targetStudents: boolean;
     targetParents: boolean;
@@ -187,7 +187,12 @@ export class AdminApiService {
     isEmergency: boolean;
     sentByName: string;
   }): Observable<{ id: number; recipientCount: number }> {
-    return this.http.post<{ id: number; recipientCount: number }>(`${this.base}/broadcasts`, data);
+    // Backend now expects channels as a List<String> — always send as array
+    const payload = {
+      ...data,
+      channels: Array.isArray(data.channels) ? data.channels : data.channels.split(',').map(c => c.trim()),
+    };
+    return this.http.post<{ id: number; recipientCount: number }>(`${this.base}/broadcasts`, payload);
   }
 
   // ── Audit Logs ────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   apiBaseUrl: '/api',
-  keycloakIssuer: '/realms/eduresolve',
+  keycloakIssuer: '/auth/realms/eduresolve',
   keycloakClientId: 'eduresolve-frontend',
   features: {
     homeworkSubmission: true,
